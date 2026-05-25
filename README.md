@@ -162,3 +162,8 @@ Licensed under the Apache License, Version 2.0. See [LICENSE](./LICENSE) and [NO
 - Modifications for library use: chisakiShinichirouToshiyuki
 
 freee, freee会計, and related marks are trademarks of freee K.K. Use of those marks in this README is for descriptive purposes only and does not imply endorsement.
+
+
+## 開発 (Ecosystem)
+
+本 repo は MCP ecosystem (free-mcp-core / remote-logic-solver-mcp / logic-solver-mcp) の 1 つ。 3 repo の issue / PR は [Project #22 "logic-solver-mcp ecosystem"](https://github.com/users/chisakiShinichirouToshiyuki/projects/22) で横断管理。 ecosystem 共通の開発標準は [remote-logic-solver-mcp/.github/CONTRIBUTING.md](https://github.com/chisakiShinichirouToshiyuki/remote-logic-solver-mcp/blob/develop/.github/CONTRIBUTING.md) に集約 (AI 用軽量抜粋: [CLAUDE.md](CLAUDE.md))。
