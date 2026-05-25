@@ -145,3 +145,17 @@ Common issues:
 ## Writing Style
 
 - Do not use markdown bold syntax (`**`)  in any files
+
+
+## Ecosystem 横断管理
+
+本 repo は MCP ecosystem (`free-mcp-core` / `remote-logic-solver-mcp` / `logic-solver-mcp`) の 1 つ。 3 repo の issue / PR は [Project #22 "logic-solver-mcp ecosystem"](https://github.com/users/chisakiShinichirouToshiyuki/projects/22) で横断管理。
+
+- 本 repo の issue / PR には `board/{feature,dx,incident,infra}` label を付与 (= L1)
+- ecosystem 共通の開発標準 (= 5W1H 書き分け / 仕様 = test case / TDD / 再発防止階段 / branch・merge / Secret 取扱い) は **remote-logic-solver-mcp に集約**:
+  - [.github/CONTRIBUTING.md](https://github.com/chisakiShinichirouToshiyuki/remote-logic-solver-mcp/blob/develop/.github/CONTRIBUTING.md)
+  - AI 軽量抜粋: [CLAUDE.md](https://github.com/chisakiShinichirouToshiyuki/remote-logic-solver-mcp/blob/develop/CLAUDE.md) / [AGENTS.md](https://github.com/chisakiShinichirouToshiyuki/remote-logic-solver-mcp/blob/develop/AGENTS.md)
+- 看板の Status 6 列 / View filter 等は上記 CONTRIBUTING.md §10
+- 新規 session の最短経路 (= issue → PR → merge): CONTRIBUTING.md §12
+
+> 本 repo 固有の Contribution Policy (= 外部 PR 受け付けない / freee-mcp 文化) は [CONTRIBUTING.md](CONTRIBUTING.md) を維持。 ecosystem pointer は上記 link で参照。
