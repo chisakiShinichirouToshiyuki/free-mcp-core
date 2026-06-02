@@ -1,5 +1,19 @@
 # freee-mcp
 
+## 0.28.0
+
+### Minor Changes
+
+- [`a79b638`](https://github.com/freee/freee-mcp/commit/a79b6387f4fa76b680e37a91c4995b48f3ba7fd5): `/health` エンドポイント (transitional alias) を削除し、liveness は `/livez`、readiness は `/readyz` のみで提供。 ([#162](https://github.com/freee/freee-mcp/pull/162))
+
+  - BREAKING (operator-facing): アップグレード前に liveness / readiness probe を `/livez` / `/readyz` へ移行してください。`/health` への probe は 404 を返します。
+
+### Patch Changes
+
+- [`1361282`](https://github.com/freee/freee-mcp/commit/1361282528995ae4a9d95c9111c8442c45301e65): readiness probe で Redis 疎通確認に用いるタイムアウトが確実にクリーンアップされるように修正した。 ([#163](https://github.com/freee/freee-mcp/pull/163))
+- [`dea5e2c`](https://github.com/freee/freee-mcp/commit/dea5e2c32405b520c2a1e06d52a628976d795c18): serve モードの HTTP server タイムアウトを明示設定。long-lived な MCP Streamable-HTTP / SSE 接続に合わせて Node.js の `requestTimeout` / `headersTimeout` / `keepAliveTimeout` をデフォルト 10m / 65s / 60s に固定し、それぞれ `HTTP_REQUEST_TIMEOUT_MS` / `HTTP_HEADERS_TIMEOUT_MS` / `HTTP_KEEP_ALIVE_TIMEOUT_MS` 環境変数で上書き可能にした。Node デフォルト (5m / 60s / 5s) では中間プロキシのストリームアイドルタイムアウトと衝突して MCP セッション中の長時間接続が切れるケースがあったため。 ([#134](https://github.com/freee/freee-mcp/pull/134))
+- [`7881ebd`](https://github.com/freee/freee-mcp/commit/7881ebdbdc3acae36ded50b9643567a4bb4a9961): freee public API リクエストに `x-freee-company-id` ヘッダーを付与。WAF の ApiCompositeRateLimit が (IP + company_id) の composite key でレートリミットできるようになり、共有 IP 経由で複数事業所が利用する際の誤 BLOCK を防ぐ。companyId 未設定時は従来どおりヘッダーを付与しない。 ([#139](https://github.com/freee/freee-mcp/pull/139))
+
 ## 0.27.1
 
 ### Patch Changes
