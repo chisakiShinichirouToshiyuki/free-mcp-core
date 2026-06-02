@@ -15,9 +15,7 @@ const CLIENT_TTL_SECONDS = 365 * 24 * 60 * 60; // 1 year
 // clients (e.g. claude.ai) repeat the same metadata for every user, so a
 // content fingerprint lets us reuse a single registration instead of
 // minting a new client_id per request and exhausting the /register limit.
-export function computeClientFingerprint(
-  metadata: Partial<OAuthClientInformationFull>,
-): string {
+export function computeClientFingerprint(metadata: Partial<OAuthClientInformationFull>): string {
   const normalized = {
     software_id: metadata.software_id ?? '',
     redirect_uris: [...(metadata.redirect_uris ?? [])].sort(),
@@ -82,12 +80,7 @@ export class RedisClientStore implements OAuthRegisteredClientsStore {
       ),
     );
     await withRedis('registerClient:fp-write', () =>
-      this.redis.set(
-        `${this.prefix}:client-fp:${fp}`,
-        client.client_id,
-        'EX',
-        CLIENT_TTL_SECONDS,
-      ),
+      this.redis.set(`${this.prefix}:client-fp:${fp}`, client.client_id, 'EX', CLIENT_TTL_SECONDS),
     );
     return client;
   }
@@ -99,9 +92,7 @@ export class RedisClientStore implements OAuthRegisteredClientsStore {
     fingerprint: string,
   ): Promise<OAuthClientInformationFull | undefined> {
     const fpKey = `${this.prefix}:client-fp:${fingerprint}`;
-    const clientId = await withRedis('findClientByFingerprint:lookup', () =>
-      this.redis.get(fpKey),
-    );
+    const clientId = await withRedis('findClientByFingerprint:lookup', () => this.redis.get(fpKey));
     if (!clientId) return undefined;
     return this.getDcrClient(clientId);
   }

@@ -7,7 +7,7 @@ import { serializeErrorChain } from '../server/error-serializer.js';
 import type { ApiCallErrorType } from '../server/request-context.js';
 import { getCurrentRecorder } from '../server/request-context.js';
 import { getUserAgent } from '../server/user-agent.js';
-import { type TokenContext, resolveCompanyId } from '../storage/context.js';
+import { resolveCompanyId, type TokenContext } from '../storage/context.js';
 import { formatApiErrorMessage, formatResponseErrorInfo } from '../utils/error.js';
 
 const MAX_FILE_SIZE_BYTES = 64 * 1024 * 1024; // 64MB

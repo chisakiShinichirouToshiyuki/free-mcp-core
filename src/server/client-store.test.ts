@@ -4,7 +4,7 @@ import type {
 } from '@modelcontextprotocol/sdk/shared/auth.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CIMDFetcher } from './cimd-fetcher.js';
-import { RedisClientStore, computeClientFingerprint } from './client-store.js';
+import { computeClientFingerprint, RedisClientStore } from './client-store.js';
 import { RedisUnavailableError } from './errors.js';
 
 function createMockRedis() {
@@ -136,7 +136,9 @@ describe('RedisClientStore', () => {
           allowInsecureLocalhost: true,
         });
 
-        const result = await store.getClient('http://localhost:3000/.well-known/oauth-client-metadata');
+        const result = await store.getClient(
+          'http://localhost:3000/.well-known/oauth-client-metadata',
+        );
         expect(fetcher.fetch).toHaveBeenCalledWith(
           'http://localhost:3000/.well-known/oauth-client-metadata',
         );

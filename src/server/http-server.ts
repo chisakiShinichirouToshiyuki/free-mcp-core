@@ -13,7 +13,7 @@ import type { Redis } from '../storage/redis-client.js';
 import { closeRedisClient, getRedisClient } from '../storage/redis-client.js';
 import { RedisTokenStore } from '../storage/redis-token-store.js';
 import { createTracingMiddleware } from '../telemetry/middleware.js';
-import { RedisClientStore, computeClientFingerprint } from './client-store.js';
+import { computeClientFingerprint, RedisClientStore } from './client-store.js';
 import { makeErrorChain, serializeErrorChain } from './error-serializer.js';
 import { RedisUnavailableError } from './errors.js';
 import { createFreeeCallbackHandler } from './freee-callback.js';
@@ -482,11 +482,7 @@ async function setupRateLimiting(
   app.use('/token', createLimiter(TOKEN_RATE_LIMIT_WINDOW_MS, TOKEN_RATE_LIMIT_MAX, 'token'));
   app.use(
     FREEE_CALLBACK_PATH,
-    createLimiter(
-      FREEE_CALLBACK_RATE_LIMIT_WINDOW_MS,
-      FREEE_CALLBACK_RATE_LIMIT_MAX,
-      'freee-cb',
-    ),
+    createLimiter(FREEE_CALLBACK_RATE_LIMIT_WINDOW_MS, FREEE_CALLBACK_RATE_LIMIT_MAX, 'freee-cb'),
   );
 
   // /mcp pre-auth: keep a coarse IP guard before bearer auth. Per-user limits

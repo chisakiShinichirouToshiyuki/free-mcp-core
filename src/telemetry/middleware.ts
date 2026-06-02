@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import {
-  SpanKind,
-  SpanStatusCode,
   context,
   propagation,
-  trace,
   type Span,
+  SpanKind,
+  SpanStatusCode,
+  trace,
 } from '@opentelemetry/api';
 import type { NextFunction, Request, Response } from 'express';
 import { scrubErrorMessage } from '../server/error-serializer.js';

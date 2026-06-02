@@ -33,7 +33,11 @@ vi.mock('../telemetry/tool-tracer.js', () => ({
 }));
 
 vi.mock('./schema-loader.js', () => ({
-  validatePathForService: vi.fn(() => ({ isValid: true, actualPath: undefined, baseUrl: undefined })),
+  validatePathForService: vi.fn(() => ({
+    isValid: true,
+    actualPath: undefined,
+    baseUrl: undefined,
+  })),
   listAllAvailablePaths: vi.fn(() => ''),
 }));
 
@@ -320,7 +324,10 @@ describe('coercibleRecord', () => {
     const tool = tools.tools.find((t) => t.name === 'with_body');
     if (!tool) throw new Error('tool not registered');
 
-    type ToolInputSchema = { properties: { body: { anyOf?: Array<{ type?: string }> } }; required?: string[] };
+    type ToolInputSchema = {
+      properties: { body: { anyOf?: Array<{ type?: string }> } };
+      required?: string[];
+    };
     const inputSchema = tool.inputSchema as ToolInputSchema;
     expect(inputSchema.properties.body.anyOf).toEqual(
       expect.arrayContaining([
