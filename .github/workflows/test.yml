@@ -23,8 +23,8 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run type check
         run: bun run typecheck
-      - name: Run linter
-        run: bun run lint
+      - name: Run Biome check (lint, format, import organization)
+        run: bun run check
 
   unit-test:
     runs-on: ubuntu-latest
