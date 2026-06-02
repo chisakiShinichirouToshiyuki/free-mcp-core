@@ -14,10 +14,6 @@ function buildApp(redis: RedisLike, pingTimeoutMs?: number): Express {
     '/readyz',
     createReadinessHandler(redis, pingTimeoutMs !== undefined ? { pingTimeoutMs } : undefined),
   );
-  app.get(
-    '/health',
-    createReadinessHandler(redis, pingTimeoutMs !== undefined ? { pingTimeoutMs } : undefined),
-  );
   return app;
 }
 
@@ -137,32 +133,6 @@ describe('createReadinessHandler', () => {
     const app = buildApp(redis, 0);
 
     const res = await request(app).get('/readyz');
-
-    expect(res.status).toBe(503);
-    expect(res.body).toEqual({ status: 'degraded', redis: 'disconnected' });
-  });
-});
-
-describe('/health backward compatibility', () => {
-  it('mirrors /readyz on success', async () => {
-    const redis: RedisLike = {
-      ping: vi.fn().mockResolvedValue('PONG'),
-    };
-    const app = buildApp(redis);
-
-    const res = await request(app).get('/health');
-
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: 'ok', redis: 'connected' });
-  });
-
-  it('mirrors /readyz on failure (returns 503 when Redis is unreachable)', async () => {
-    const redis: RedisLike = {
-      ping: vi.fn().mockRejectedValue(new Error('connection refused')),
-    };
-    const app = buildApp(redis);
-
-    const res = await request(app).get('/health');
 
     expect(res.status).toBe(503);
     expect(res.body).toEqual({ status: 'degraded', redis: 'disconnected' });
