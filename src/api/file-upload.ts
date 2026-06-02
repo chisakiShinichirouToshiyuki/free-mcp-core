@@ -146,14 +146,19 @@ export async function uploadReceipt(
     throw err;
   };
 
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    'User-Agent': getUserAgent(),
+  };
+  if (companyId) {
+    headers['x-freee-company-id'] = String(companyId);
+  }
+
   let response: Response;
   try {
     response = await fetch(url, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'User-Agent': getUserAgent(),
-      },
+      headers,
       body: formData,
     });
   } catch (fetchError) {

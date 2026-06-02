@@ -143,16 +143,21 @@ export async function makeApiRequest(
     }
   }
 
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+    'User-Agent': getUserAgent(),
+    'freee-using-beta': 'true',
+  };
+  if (companyId) {
+    headers['x-freee-company-id'] = String(companyId);
+  }
+
   let response: Response;
   try {
     response = await fetch(url.toString(), {
       method,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'User-Agent': getUserAgent(),
-        'freee-using-beta': 'true',
-      },
+      headers,
       body: body ? JSON.stringify(typeof body === 'string' ? JSON.parse(body) : body) : undefined,
       signal: AbortSignal.timeout(FETCH_TIMEOUT_API_MS),
     });
