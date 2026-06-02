@@ -260,11 +260,7 @@ const VALID_LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 's
 /** Optional env var that, when set, must coerce to a positive integer. */
 function positiveIntEnv(name: string) {
   const message = `${name} must be a positive integer.`;
-  return z.coerce
-    .number({ invalid_type_error: message })
-    .int(message)
-    .positive(message)
-    .optional();
+  return z.coerce.number({ invalid_type_error: message }).int(message).positive(message).optional();
 }
 
 /**
