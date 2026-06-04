@@ -13,11 +13,11 @@ import { type ApiType, listAllAvailablePaths, validatePathForService } from './s
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
-const SERVICE_HINT = 'service: accounting/hr/invoice/pm/sm';
+const SERVICE_HINT = 'service: accounting/hr/invoice/pm/sm/it_management';
 const SKILL_HINT = '詳細ガイドはfreee-api-skill skillを参照';
 
 const serviceSchema = z
-  .enum(['accounting', 'hr', 'invoice', 'pm', 'sm'])
+  .enum(['accounting', 'hr', 'invoice', 'pm', 'sm', 'it_management'])
   .describe('対象のfreeeサービス');
 
 const UTF8_BOM = String.fromCharCode(0xfeff);
