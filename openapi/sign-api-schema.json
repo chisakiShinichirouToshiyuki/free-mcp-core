@@ -1357,6 +1357,90 @@
         }
       }
     },
+    "/v1/documents/{document_id}/comments": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": "document_id",
+          "in": "path",
+          "required": true,
+          "description": "文書のID"
+        }
+      ],
+      "post": {
+        "summary": "文書コメントの投稿",
+        "operationId": "post-v1-documents-document_id-comments",
+        "description": "指定した文書にコメントを投稿する。\n投稿者はアクセストークンの保有者（OAuth 連携の認可ユーザー）に固定される。\nコメント機能を含むプランの契約が必要。",
+        "tags": [
+          "文書"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "description": "コメント本文",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "投稿成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerDocumentComment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "リクエストになんらかの問題がある場合\n- body が空文字、または必須項目が欠落",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "対象リソースが存在しない\n- 指定された document_id が current_team の文書に存在しない、または削除済み",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "その他のエラー（認証エラー・プラン制限など）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/documents/{document_id}/conclusion": {
       "parameters": [
         {
@@ -2138,6 +2222,100 @@
             }
           }
         }
+      }
+    },
+    "/v1/documents/{document_id}/face_to_face_extension": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": "document_id",
+          "in": "path",
+          "required": true,
+          "description": "有効期限を延長する対面契約文書のID"
+        }
+      ],
+      "post": {
+        "summary": "対面契約文書の有効期限延長",
+        "operationId": "post-v1-documents-document_id-face-to-face-extension",
+        "responses": {
+          "200": {
+            "description": "延長成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "リクエスト不正（sender_id不備・文書不一致など）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "プランまたは権限により実行不可",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "機能無効または対面契約文書ではない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "なんらかのエラーが発生した場合",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "description": "対面契約 (notification_type=face_to_face) の文書の有効期限を延長する。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sender_id": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Sender-id"
+                      }
+                    ],
+                    "description": "実行ユーザーのID (APIクライアントを利用する場合は必須)"
+                  }
+                }
+              }
+            }
+          },
+          "description": "対面契約文書 有効期限延長パラメーター"
+        },
+        "tags": [
+          "文書"
+        ]
       }
     },
     "/v1/documents/{document_id}/meta": {
@@ -5335,6 +5513,61 @@
           }
         },
         "nullable": true
+      },
+      "OwnerDocumentComment": {
+        "type": "object",
+        "description": "文書コメント",
+        "required": [
+          "id",
+          "body",
+          "user",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "コメントID"
+          },
+          "body": {
+            "type": "string",
+            "description": "コメント本文"
+          },
+          "user": {
+            "type": "object",
+            "description": "投稿者",
+            "required": [
+              "id",
+              "full_name",
+              "email"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ユーザーID"
+              },
+              "full_name": {
+                "type": "string",
+                "description": "ユーザーのフルネーム"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "メールアドレス"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     },
     "securitySchemes": {
