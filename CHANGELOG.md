@@ -1,5 +1,18 @@
 # freee-mcp
 
+## 0.29.0
+
+### Minor Changes
+
+- [`2a9a82c`](https://github.com/freee/freee-mcp/commit/2a9a82c620485b70cb87f8e27d263f8d1d5a730f): freeeIT 管理 API（メンバー・SaaS アカウント・備品）をサポート対象に追加。`service: it_management` で `freee_api_*` ツールから呼び出せるようになり、freee-api-skill にもエンドポイントリファレンスと操作レシピを同梱。 ([#135](https://github.com/freee/freee-mcp/pull/135))
+
+  - `company_id` は必須（GET / DELETE はクエリ、POST はボディ。PATCH は不要）
+  - IT 管理 API はオープンベータのため、必須ヘッダ `freee-using-beta: true` をサーバーが自動付与
+
+### Patch Changes
+
+- [`582cbf0`](https://github.com/freee/freee-mcp/commit/582cbf0d6f0a719fff2dc44e984aeeabe20c6fc7): sign API リファレンスを最新スキーマに更新（対面契約・文書コメント・パスワード機能の追加） ([#168](https://github.com/freee/freee-mcp/pull/168))
+
 ## 0.28.0
 
 ### Minor Changes
