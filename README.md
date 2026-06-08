@@ -151,6 +151,20 @@ Claude Code のプロンプト内からも実行できます:
 /plugin install freee-mcp@freee-mcp-marketplace
 ```
 
+## Codex Plugin として使う
+
+OpenAI Codex のプラグインマーケットプレース（[公式ドキュメント](https://developers.openai.com/codex/plugins)）にも対応しており、MCP サーバーと Agent Skills（API リファレンス・操作レシピ）をまとめて利用できます。
+
+Codex CLI からマーケットプレースを追加します:
+
+```bash
+codex plugin marketplace add freee/freee-mcp
+```
+
+その後 Codex を起動し、`/plugins` スラッシュコマンドでプラグイン一覧を開き、`freee-mcp` を選択して `Install plugin` を実行してください。
+
+プラグイン定義は `.codex-plugin/plugin.json`、マーケットプレースカタログは `.agents/plugins/marketplace.json` にあります。
+
 ## Agent Skills の内容
 
 | API      | 内容                                             | ファイル数 |
