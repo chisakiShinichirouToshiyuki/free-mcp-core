@@ -1,5 +1,38 @@
 # freee-mcp
 
+## 0.30.0
+
+### Minor Changes
+
+- [`fb2d04c`](https://github.com/freee/freee-mcp/commit/fb2d04c8c23655502aa23d7076e75291ccbdbd37): Codex プラグイン定義を追加 ([#176](https://github.com/freee/freee-mcp/pull/176))
+
+  - `.codex-plugin/plugin.json` を追加し、OpenAI Codex のプラグインとして MCP サーバーと Agent Skills をまとめて利用可能に
+  - `.agents/plugins/marketplace.json`（Codex マーケットプレースカタログ）を追加
+  - README に Codex でのインストール手順を追記
+
+- [`54031da`](https://github.com/freee/freee-mcp/commit/54031da6ad8849542e8f51e836354ddcbccdec7d): 請求書 API（freee 請求書）の発注書(purchase_order)操作に対応 ([#181](https://github.com/freee/freee-mcp/pull/181))
+
+  - `skills/freee-api-skill/recipes/invoice-operations.md` に発注書のパス・作成例・Web 確認 URL・リファレンス参照を追記
+  - `skills/freee-api-skill/references/invoice-purchase-orders.md` を公開スキーマから生成して追加
+  - あわせて領収書(receipts)のレシピ記載漏れを補完
+  - `fetch:schemas` / `generate:references` の再実行で生じた他 API（会計・IT 管理・サイン）の公開スキーマ最新化差分を反映
+
+### Patch Changes
+
+- [`48e9800`](https://github.com/freee/freee-mcp/commit/48e9800cf42b3b29dfad806d082a3380d89da40b): npm パッケージを最新版に更新 ([#175](https://github.com/freee/freee-mcp/pull/175))
+- [`83bf657`](https://github.com/freee/freee-mcp/commit/83bf6575758ac1c4d93352e73eee9e4399fcb5df): IT 管理 API スキーマを更新し、一覧取得の検索パラメーターを追加 ([#182](https://github.com/freee/freee-mcp/pull/182))
+
+  - メンバー一覧: 雇用形態 ID・入社日/退職日の範囲での絞り込みに対応
+  - アカウント一覧: アカウントホルダーのメンバー ID での絞り込みに対応
+  - 備品一覧: 利用者のメンバー ID での絞り込みに対応
+
+- [`df31caf`](https://github.com/freee/freee-mcp/commit/df31caffe75e9af40bccce640e7c942965445060): knip 設定を整理し、未使用のコードと依存を削除 ([#177](https://github.com/freee/freee-mcp/pull/177))
+
+  - `knip.json` を最小構成に整理（sign エントリを追加、stale な ignore を削除）
+  - 未使用の `@opentelemetry/semantic-conventions` 依存を削除
+  - 未使用ファイル `src/storage/index.ts` を削除
+  - 内部参照のみの export を非公開化して公開 API 表面を縮小
+
 ## 0.29.0
 
 ### Minor Changes
