@@ -2,13 +2,13 @@
 
 ## 概要
 
-it_management_membersの操作
+members
 
 ## エンドポイント一覧
 
 ### GET /hub/it_management/members
 
-操作: メンバー一覧取得
+操作: メンバー一覧取得（β版）
 
 説明: メンバーの一覧をカーソルページネーションで取得します。
 
@@ -53,7 +53,7 @@ it_management_membersの操作
 
 ### POST /hub/it_management/members
 
-操作: メンバー作成
+操作: メンバー作成（β版）
 
 説明: メンバーを作成します。
 
@@ -115,7 +115,7 @@ it_management_membersの操作
 
 ### GET /hub/it_management/members/{id}
 
-操作: メンバー詳細取得
+操作: メンバー詳細取得（β版）
 
 説明: メンバーの詳細を取得します。
 
@@ -160,7 +160,7 @@ it_management_membersの操作
 
 ### PATCH /hub/it_management/members/{id}
 
-操作: メンバー部分更新
+操作: メンバー部分更新（β版）
 
 説明: メンバーを部分的に更新します。 ##
 
@@ -226,7 +226,7 @@ it_management_membersの操作
 
 ### DELETE /hub/it_management/members/{id}
 
-操作: メンバー削除
+操作: メンバー削除（β版）
 
 説明: メンバーを削除します（ソフトデリート）。
 
