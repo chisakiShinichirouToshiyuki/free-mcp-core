@@ -23,6 +23,11 @@ members
 | keyword | query | いいえ | string | キーワード検索（name, email, code に部分一致） |
 | status | query | いいえ | object | 在籍ステータス |
 | department_id | query | いいえ | string(uuid) | 部署IDでフィルタ |
+| employment_type_id | query | いいえ | string(uuid) | 雇用形態IDでフィルタ |
+| entered_since | query | いいえ | string(date) | 入社日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降) |
+| entered_until | query | いいえ | string(date) | 入社日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前) |
+| resigned_since | query | いいえ | string(date) | 退職日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降) |
+| resigned_until | query | いいえ | string(date) | 退職日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前) |
 
 ### レスポンス (200)
 

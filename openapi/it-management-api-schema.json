@@ -53,6 +53,9 @@
           },
           {
             "$ref": "#/components/parameters/ItManagement.ApplicationAccounts.ListRequest.status_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.ApplicationAccounts.ListRequest.member_id"
           }
         ],
         "responses": {
@@ -353,6 +356,9 @@
           },
           {
             "$ref": "#/components/parameters/ItManagement.Assets.ListRequest.asset_category_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Assets.ListRequest.member_id"
           }
         ],
         "responses": {
@@ -652,6 +658,21 @@
           },
           {
             "$ref": "#/components/parameters/ItManagement.Members.ListRequest.department_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Members.ListRequest.employment_type_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Members.ListRequest.entered_since"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Members.ListRequest.entered_until"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Members.ListRequest.resigned_since"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Members.ListRequest.resigned_until"
           }
         ],
         "responses": {
@@ -1111,6 +1132,17 @@
         },
         "explode": false
       },
+      "ItManagement.ApplicationAccounts.ListRequest.member_id": {
+        "name": "member_id",
+        "in": "query",
+        "required": false,
+        "description": "アカウントホルダーのメンバーIDでフィルタ",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "explode": false
+      },
       "ItManagement.ApplicationAccounts.GetRequest.company_id": {
         "name": "company_id",
         "in": "query",
@@ -1223,6 +1255,17 @@
         "in": "query",
         "required": false,
         "description": "種別IDでフィルタ",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "explode": false
+      },
+      "ItManagement.Assets.ListRequest.member_id": {
+        "name": "member_id",
+        "in": "query",
+        "required": false,
+        "description": "利用者のメンバーIDでフィルタ",
         "schema": {
           "type": "string",
           "format": "uuid"
@@ -1343,6 +1386,61 @@
         "schema": {
           "type": "string",
           "format": "uuid"
+        },
+        "explode": false
+      },
+      "ItManagement.Members.ListRequest.employment_type_id": {
+        "name": "employment_type_id",
+        "in": "query",
+        "required": false,
+        "description": "雇用形態IDでフィルタ",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "explode": false
+      },
+      "ItManagement.Members.ListRequest.entered_since": {
+        "name": "entered_since",
+        "in": "query",
+        "required": false,
+        "description": "入社日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降)",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "ItManagement.Members.ListRequest.entered_until": {
+        "name": "entered_until",
+        "in": "query",
+        "required": false,
+        "description": "入社日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前)",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "ItManagement.Members.ListRequest.resigned_since": {
+        "name": "resigned_since",
+        "in": "query",
+        "required": false,
+        "description": "退職日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降)",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "ItManagement.Members.ListRequest.resigned_until": {
+        "name": "resigned_until",
+        "in": "query",
+        "required": false,
+        "description": "退職日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前)",
+        "schema": {
+          "type": "string",
+          "format": "date"
         },
         "explode": false
       },

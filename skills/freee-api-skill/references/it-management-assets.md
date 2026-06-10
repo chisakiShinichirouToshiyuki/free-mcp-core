@@ -23,6 +23,7 @@ assets
 | keyword | query | いいえ | string | キーワード検索（name, asset_number, serial_number に部分一致） |
 | asset_status_id | query | いいえ | string(uuid) | ステータスIDでフィルタ |
 | asset_category_id | query | いいえ | string(uuid) | 種別IDでフィルタ |
+| member_id | query | いいえ | string(uuid) | 利用者のメンバーIDでフィルタ |
 
 ### レスポンス (200)
 
