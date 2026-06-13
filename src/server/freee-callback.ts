@@ -14,7 +14,7 @@ import { getLogger } from './logger.js';
 import type { OAuthStateStore } from './oauth-store.js';
 import { getUserAgent } from './user-agent.js';
 
-export interface FreeeCallbackDeps {
+interface FreeeCallbackDeps {
   oauthStore: OAuthStateStore;
   tokenStore: TokenStore;
   clientStore?: OAuthRegisteredClientsStore;
@@ -93,7 +93,7 @@ async function fetchFreeeUserId(accessToken: string, apiUrl: string): Promise<st
 async function fetchFirstCompany(
   accessToken: string,
   apiUrl: string,
-): Promise<{ id: number; name?: string | null } | null> {
+): Promise<{ id: number; name?: string | null; display_name?: string | null } | null> {
   // Try accounting API first
   try {
     const response = await fetch(`${apiUrl}/api/1/companies`, {
@@ -106,7 +106,7 @@ async function fetchFirstCompany(
 
     if (response.ok) {
       const data = (await response.json()) as {
-        companies?: Array<{ id: number; name?: string | null }>;
+        companies?: Array<{ id: number; name?: string | null; display_name?: string | null }>;
       };
       const first = data.companies?.[0];
       if (first) {
@@ -129,7 +129,7 @@ async function fetchFirstCompany(
 
     if (response.ok) {
       const data = (await response.json()) as {
-        companies?: Array<{ id: number; name?: string | null }>;
+        companies?: Array<{ id: number; name?: string | null; display_name?: string | null }>;
       };
       const first = data.companies?.[0];
       if (first) {
@@ -164,6 +164,8 @@ async function setDefaultCompanyIfNeeded(
       userId,
       String(firstCompany.id),
       firstCompany.name ?? undefined,
+      undefined,
+      firstCompany.display_name ?? undefined,
     );
     getLogger().info(
       { userId, companyId: firstCompany.id, companyName: firstCompany.name },
@@ -242,8 +244,9 @@ async function handleCallback(
   }
 
   // Validate redirect_uri against registered client (defense-in-depth).
-  // Wrapped in try-catch: session is already consumed above, so a Redis failure here
-  // must not abort the flow — the user cannot retry without restarting OAuth.
+  // Fail-closed: any exception during lookup (e.g. Redis failure) returns 400 so
+  // an unverifiable redirect_uri cannot bypass the check. The session is already
+  // consumed above, so the user must restart the OAuth flow on failure.
   if (deps.clientStore) {
     try {
       const client = await deps.clientStore.getClient(session.clientId);
@@ -254,7 +257,8 @@ async function handleCallback(
       }
     } catch (err) {
       getLogger().error({ clientId: session.clientId, err }, 'Failed to validate redirect_uri');
-      // Continue — redirect_uri validation is defense-in-depth, not critical path
+      res.status(400).send('redirect_uri validation failed');
+      return;
     }
   }
 

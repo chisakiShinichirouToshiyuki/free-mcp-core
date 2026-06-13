@@ -2,13 +2,13 @@ import fs from 'node:fs/promises';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setupTestTempDir } from '../test-utils/temp-dir.js';
 import {
-  type TokenData,
   clearSignTokens,
   getValidSignAccessToken,
   isSignTokenValid,
   loadSignTokens,
   refreshSignAccessToken,
   saveSignTokens,
+  type TokenData,
 } from './tokens.js';
 
 const { setup: setupTempDir, cleanup: cleanupTempDir } = setupTestTempDir('sign-tokens-test-');

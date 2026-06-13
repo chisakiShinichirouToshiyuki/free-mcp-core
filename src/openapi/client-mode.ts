@@ -8,61 +8,58 @@ import type { AuthExtra } from '../storage/context.js';
 import { extractTokenContext } from '../storage/context.js';
 import { registerTracedTool, setToolAttributes } from '../telemetry/tool-tracer.js';
 import { createTextResponse, formatErrorMessage } from '../utils/error.js';
+import { getHttpMethodToolAnnotations } from '../utils/http-method-annotations.js';
 import { type ApiType, listAllAvailablePaths, validatePathForService } from './schema-loader.js';
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
-const SERVICE_HINT = 'service: accounting/hr/invoice/pm/sm';
+const SERVICE_HINT = 'service: accounting/hr/invoice/pm/sm/it_management';
 const SKILL_HINT = '詳細ガイドはfreee-api-skill skillを参照';
 
 const serviceSchema = z
-  .enum(['accounting', 'hr', 'invoice', 'pm', 'sm'])
+  .enum(['accounting', 'hr', 'invoice', 'pm', 'sm', 'it_management'])
   .describe('対象のfreeeサービス');
 
 const UTF8_BOM = String.fromCharCode(0xfeff);
 
-/**
- * Some MCP clients send object parameters as JSON strings. This wrapper
- * accepts both a plain object and a JSON string, coercing the latter.
- *
- * A leading UTF-8 BOM (U+FEFF) is rejected with a dedicated error rather than
- * silently stripped: silent normalization would make the same payload behave
- * differently across operating systems and hide upstream encoding bugs. The
- * generic parse-failure message intentionally carries only the string length —
- * never any portion of the raw string — so customer payload data cannot leak
- * into error responses or downstream logs.
- */
+// Top-level union (record | string-decoding-to-record) rather than
+// `z.preprocess(..., z.record(...))` so the JSON Schema published via
+// tools/list becomes `anyOf: [{type: "object"}, {type: "string"}]`. Some MCP
+// clients validate arguments against the published JSON Schema before
+// forwarding the call, and `{type: "object"}` alone causes them to reject
+// string-shaped bodies before the server-side coercion can run (issue #410).
+const recordSchema = z.record(z.string(), z.unknown());
+const jsonStringToRecord = z
+  .string()
+  .transform((val, ctx) => {
+    if (val.startsWith(UTF8_BOM)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          `string starts with a UTF-8 BOM (U+FEFF), which is not valid JSON. ` +
+          `The MCP client likely transcoded the payload through a transport ` +
+          `that prepended a BOM (commonly seen on Windows). ` +
+          `Send the JSON without a BOM.`,
+      });
+      return z.NEVER;
+    }
+    try {
+      return JSON.parse(val);
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          `expected object or JSON-encoded object string; received string ` +
+          `of length ${val.length} that could not be parsed as JSON`,
+      });
+      return z.NEVER;
+    }
+  })
+  .pipe(recordSchema);
+const coercibleRecordSchema = z.union([recordSchema, jsonStringToRecord]);
+
 export function coercibleRecord(description: string) {
-  return z
-    .preprocess(
-      (val, ctx) => {
-        if (typeof val !== 'string') return val;
-        if (val.startsWith(UTF8_BOM)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              `string starts with a UTF-8 BOM (U+FEFF), which is not valid JSON. ` +
-              `The MCP client likely transcoded the payload through a transport ` +
-              `that prepended a BOM (commonly seen on Windows). ` +
-              `Send the JSON without a BOM.`,
-          });
-          return z.NEVER;
-        }
-        try {
-          return JSON.parse(val);
-        } catch {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              `expected object or JSON-encoded object string; received string ` +
-              `of length ${val.length} that could not be parsed as JSON`,
-          });
-          return z.NEVER;
-        }
-      },
-      z.record(z.string(), z.unknown()),
-    )
-    .describe(description);
+  return coercibleRecordSchema.describe(description);
 }
 
 /**
@@ -183,7 +180,12 @@ function createMethodTool(method: string) {
         duration_ms: Date.now() - startTime,
       });
       recorder?.recordError({ source: 'tool_handler', chain: serializeErrorChain(error) });
-      return createTextResponse(`APIリクエストエラー: ${formatErrorMessage(error)}`);
+      // MCP 仕様 (Tools - Error Handling): 上流 API への呼び出しが 2xx 以外で返ってきた
+      // ケース（4xx/5xx/network/timeout 等）はツール実行失敗として `isError: true` で
+      // 返し、LLM/クライアントに成功と区別させる。
+      return createTextResponse(`APIリクエストエラー: ${formatErrorMessage(error)}`, {
+        isError: true,
+      });
     }
   };
 }
@@ -204,7 +206,7 @@ export function generateClientModeTool(server: McpServer): void {
         path: z.string().describe('APIパス (例: /api/1/deals)'),
         query: coercibleRecord('クエリパラメータ (オプション)').optional(),
       },
-      annotations: { readOnlyHint: true },
+      annotations: getHttpMethodToolAnnotations('GET'),
     },
     createMethodTool('GET'),
   );
@@ -222,7 +224,7 @@ export function generateClientModeTool(server: McpServer): void {
         body: coercibleRecord('リクエストボディ'),
         query: coercibleRecord('クエリパラメータ (オプション)').optional(),
       },
-      annotations: { destructiveHint: false },
+      annotations: getHttpMethodToolAnnotations('POST'),
     },
     createMethodTool('POST'),
   );
@@ -240,7 +242,7 @@ export function generateClientModeTool(server: McpServer): void {
         body: coercibleRecord('リクエストボディ'),
         query: coercibleRecord('クエリパラメータ (オプション)').optional(),
       },
-      annotations: { destructiveHint: false, idempotentHint: true },
+      annotations: getHttpMethodToolAnnotations('PUT'),
     },
     createMethodTool('PUT'),
   );
@@ -257,7 +259,7 @@ export function generateClientModeTool(server: McpServer): void {
         path: z.string().describe('APIパス (例: /api/1/deals/123)'),
         query: coercibleRecord('クエリパラメータ (オプション)').optional(),
       },
-      annotations: { idempotentHint: true },
+      annotations: getHttpMethodToolAnnotations('DELETE'),
     },
     createMethodTool('DELETE'),
   );
@@ -275,7 +277,7 @@ export function generateClientModeTool(server: McpServer): void {
         body: coercibleRecord('リクエストボディ'),
         query: coercibleRecord('クエリパラメータ (オプション)').optional(),
       },
-      annotations: { destructiveHint: false },
+      annotations: getHttpMethodToolAnnotations('PATCH'),
     },
     createMethodTool('PATCH'),
   );

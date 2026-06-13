@@ -19,19 +19,19 @@ start_registered_date : 登録日(絞り込み開始) end_registered_date : 登�
 
 | 名前 | 位置 | 必須 | 型 | 説明 |
 |------|------|------|-----|------|
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
-|  |  | いいえ |  |  |
+| company_id | query | はい | integer(int64) | 事業所ID |
+| start_registered_date | query | いいえ | string(date) | 登録日で絞込：開始日(yyyy-mm-dd) |
+| end_registered_date | query | いいえ | string(date) | 登録日で絞込：終了日(yyyy-mm-dd) |
+| start_delivery_date | query | いいえ | string(date) | 納品日で絞込：開始日(yyyy-mm-dd) |
+| end_delivery_date | query | いいえ | string(date) | 納品日で絞込：終了日(yyyy-mm-dd) |
+| start_acceptance_date | query | いいえ | string(date) | 検収日で絞込：開始日(yyyy-mm-dd) |
+| end_acceptance_date | query | いいえ | string(date) | 検収日で絞込：終了日(yyyy-mm-dd) |
+| charge_employee_ids[] | query | いいえ | array[integer] | 社内担当者の従業員ID |
+| customer_ids[] | query | いいえ | array[integer] | 顧客の取引先ID |
+| delivery_status | query | いいえ | string | 納品ステータス (未納品: not_delivered, 納品済: delivered) (選択肢: not_delivered, delivered) |
+| canceled | query | いいえ | boolean | 取消状態 |
+| limit | query | いいえ | integer(int32) | 取得レコードの件数（デフォルト：20, 最小：1, 最大：100） |
+| offset | query | いいえ | integer(int32) | 取得レコードのオフセット（デフォルト：0） |
 
 ### レスポンス (200)
 
@@ -56,7 +56,7 @@ start_registered_date : 登録日(絞り込み開始) end_registered_date : 登�
 
 | 名前 | 位置 | 必須 | 型 | 説明 |
 |------|------|------|-----|------|
-|  |  | いいえ |  |  |
+| company_id | query | はい | integer(int64) | 事業所ID |
 | id | path | はい | string | 納品ID |
 
 ### レスポンス (200)
@@ -78,6 +78,64 @@ start_registered_date : 登録日(絞り込み開始) end_registered_date : 登�
 | 名前 | 位置 | 必須 | 型 | 説明 |
 |------|------|------|-----|------|
 | id | path | はい | string | 納品ID |
+
+### レスポンス (200)
+
+### POST /deliveries/{id}/cancellation
+
+操作: 納品取消
+
+説明: 概要 指定されたIDの納品を取消します。
+
+### パラメータ
+
+| 名前 | 位置 | 必須 | 型 | 説明 |
+|------|------|------|-----|------|
+| id | path | はい | string | 納品ID |
+
+### レスポンス (200)
+
+### PUT /deliveries/{id}/delivery_status
+
+操作: 納品ステータス変更
+
+説明: 概要 指定されたIDの納品の納品ステータスを変更します。
+
+定義
+status : 納品ステータス (未納品: not_delivered, 納品済: delivered)
+
+### パラメータ
+
+| 名前 | 位置 | 必須 | 型 | 説明 |
+|------|------|------|-----|------|
+| id | path | はい | string | 納品ID |
+
+### リクエストボディ
+
+(必須)
+
+
+### レスポンス (200)
+
+### PUT /deliveries/{id}/acceptance_status
+
+操作: 検収ステータス変更
+
+説明: 概要 指定されたIDの納品の検収ステータスを変更します。
+
+定義
+status : 検収ステータス (未検収: not_accepted, 検収済: accepted)
+
+### パラメータ
+
+| 名前 | 位置 | 必須 | 型 | 説明 |
+|------|------|------|-----|------|
+| id | path | はい | string | 納品ID |
+
+### リクエストボディ
+
+(必須)
+
 
 ### レスポンス (200)
 

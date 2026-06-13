@@ -6,7 +6,7 @@ import { serializeErrorChain } from '../server/error-serializer.js';
 import { sanitizePath } from '../server/logger.js';
 import { deriveQueryKeys, getCurrentRecorder } from '../server/request-context.js';
 import { getUserAgent } from '../server/user-agent.js';
-import { type TokenContext, resolveCompanyId } from '../storage/context.js';
+import { resolveCompanyId, type TokenContext } from '../storage/context.js';
 import { formatApiErrorMessage, formatResponseErrorInfo } from '../utils/error.js';
 
 /**
@@ -39,6 +39,28 @@ function isBinaryContentType(contentType: string): boolean {
   return binaryTypes.some((type) => contentType.includes(type));
 }
 
+/**
+ * Build a Japanese retry guidance message from a Retry-After header value.
+ * RFC 7231 §7.1.3 allows delta-seconds (integer) or HTTP-date forms; both are
+ * normalized to a "N秒後に再試行してください。" message. Falls back to a
+ * generic "wait a few minutes" message when the header is absent or
+ * unparseable, so a malformed value never bleeds into the user-facing string.
+ */
+export function formatRetryAfterMessage(retryAfter: string | null): string {
+  const fallback = '数分待ってから再試行してください。';
+  if (!retryAfter) return fallback;
+  const trimmed = retryAfter.trim();
+  if (/^\d+$/.test(trimmed)) {
+    return `${trimmed}秒後に再試行してください。`;
+  }
+  const parsed = Date.parse(trimmed);
+  if (Number.isFinite(parsed)) {
+    const seconds = Math.max(0, Math.ceil((parsed - Date.now()) / 1000));
+    return `${seconds}秒後に再試行してください。`;
+  }
+  return fallback;
+}
+
 export async function makeApiRequest(
   method: string,
   apiPath: string,
@@ -67,17 +89,18 @@ export async function makeApiRequest(
     );
   }
 
+  // path に ? / # を許すと tenant smuggling (?company_id=B 埋め込みで consistency check と
+  // OpenAPI route validator の両方をすり抜ける) の経路になるため、ここで弾く。
+  if (apiPath.includes('?') || apiPath.includes('#')) {
+    throw new Error(
+      'API path に "?" または "#" を含めることはできません。クエリパラメータは params 引数で指定してください。',
+    );
+  }
+
   // Properly join baseUrl and path, preserving baseUrl's path component
   const normalizedBase = apiUrl.endsWith('/') ? apiUrl : `${apiUrl}/`;
   const normalizedPath = apiPath.startsWith('/') ? apiPath.slice(1) : apiPath;
   const url = new URL(normalizedPath, normalizedBase);
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        url.searchParams.append(key, String(value));
-      }
-    });
-  }
 
   // Validate company_id consistency if present in params
   const paramsCompanyId = params?.company_id;
@@ -97,15 +120,44 @@ export async function makeApiRequest(
     );
   }
 
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined) continue;
+      // company_id は重複クエリ ("last value wins" で別テナントへ流れる経路) を避けるため set
+      if (key === 'company_id') {
+        url.searchParams.set(key, String(value));
+      } else {
+        url.searchParams.append(key, String(value));
+      }
+    }
+  }
+
+  // Defense-in-depth: baseUrl 側等に紛れ込んだ company_id を最終 URL ベースで再検査する
+  const allCompanyIds = url.searchParams.getAll('company_id');
+  for (const value of allCompanyIds) {
+    if (value !== String(companyId)) {
+      throw new Error(
+        `company_id の不整合: リクエスト URL に現在の事業所 (${companyId}) と異なる company_id (${value}) が含まれています。\n` +
+          `freee_set_current_company で事業所を切り替えるか、リクエストを修正してください。`,
+      );
+    }
+  }
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+    'User-Agent': getUserAgent(),
+    'freee-using-beta': 'true',
+  };
+  if (companyId) {
+    headers['x-freee-company-id'] = String(companyId);
+  }
+
   let response: Response;
   try {
     response = await fetch(url.toString(), {
       method,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'User-Agent': getUserAgent(),
-      },
+      headers,
       body: body ? JSON.stringify(typeof body === 'string' ? JSON.parse(body) : body) : undefined,
       signal: AbortSignal.timeout(FETCH_TIMEOUT_API_MS),
     });
@@ -188,6 +240,32 @@ export async function makeApiRequest(
       chain: serializeErrorChain(forbiddenError),
     });
     throw forbiddenError;
+  }
+
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After');
+    const errorInfo = await formatResponseErrorInfo(response);
+    const retryMsg = formatRetryAfterMessage(retryAfter);
+    const rateLimitError = new Error(
+      `レートリミットに達しました (429): ${errorInfo}\n` + `事業所ID: ${companyId}\n` + retryMsg,
+    );
+    recorder?.recordApiCall({
+      method,
+      path_pattern: safePath,
+      status_code: 429,
+      duration_ms: Date.now() - startTime,
+      company_id: String(companyId ?? ''),
+      user_id: userId,
+      error_type: 'rate_limit',
+      query_keys: queryKeys,
+    });
+    recorder?.recordError({
+      source: 'api_client',
+      status_code: 429,
+      error_type: 'rate_limit',
+      chain: serializeErrorChain(rateLimitError),
+    });
+    throw rateLimitError;
   }
 
   if (!response.ok) {

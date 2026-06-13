@@ -1,5 +1,14 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ZodIssue } from 'zod';
+
+function collectIssueMessages(issues: ZodIssue[]): string[] {
+  return issues.flatMap((issue) =>
+    issue.code === 'invalid_union'
+      ? issue.unionErrors.flatMap((err) => collectIssueMessages(err.issues))
+      : [issue.message],
+  );
+}
 
 // Privacy regression tests: query values and request bodies must never appear
 // in the canonical log payload emitted by RequestRecorder.
@@ -138,6 +147,71 @@ describe('generateClientModeTool - privacy', () => {
   // `path_pattern` now lives on `ApiCallInfo` (which is recorded inside
   // `makeApiRequest`), and that path is mocked in this test file.
 
+  it('returns isError: true when upstream API responds with 4xx', async () => {
+    // MCP spec (Tools - Error Handling) recommends signalling tool execution
+    // errors via `CallToolResult.isError: true` so LLMs and clients can
+    // distinguish them from successful responses without parsing the body.
+    const clientModule = await import('../api/client.js');
+    vi.mocked(clientModule.makeApiRequest).mockRejectedValueOnce(
+      new Error('API request failed: 400\n\nエラー詳細:\nissue_date は必須です'),
+    );
+
+    const { generateClientModeTool } = await import('./client-mode.js');
+
+    generateClientModeTool(stubServer);
+    const postHandler = capturedHandlers.get('freee_api_post');
+    expect(postHandler).toBeDefined();
+
+    const result = (await postHandler?.(
+      { service: 'accounting', path: '/api/1/deals', body: { foo: 'bar' } },
+      undefined,
+    )) as { isError?: boolean; content: Array<{ type: string; text: string }> };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/APIリクエストエラー/);
+    expect(result.content[0].text).toMatch(/issue_date は必須です/);
+  });
+
+  it('returns isError: true when upstream API responds with 5xx', async () => {
+    const clientModule = await import('../api/client.js');
+    vi.mocked(clientModule.makeApiRequest).mockRejectedValueOnce(
+      new Error('API request failed: 500'),
+    );
+
+    const { generateClientModeTool } = await import('./client-mode.js');
+
+    generateClientModeTool(stubServer);
+    const getHandler = capturedHandlers.get('freee_api_get');
+
+    const result = (await getHandler?.(
+      { service: 'accounting', path: '/api/1/users/me' },
+      undefined,
+    )) as { isError?: boolean; content: Array<{ type: string; text: string }> };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/APIリクエストエラー/);
+  });
+
+  it('returns isError: true for auth/network/etc. errors thrown from makeApiRequest', async () => {
+    // 401/403/429 と network/timeout エラーも catch ブロックに入るので同様に isError 扱い
+    const clientModule = await import('../api/client.js');
+    vi.mocked(clientModule.makeApiRequest).mockRejectedValueOnce(
+      new Error('認証エラーが発生しました。'),
+    );
+
+    const { generateClientModeTool } = await import('./client-mode.js');
+
+    generateClientModeTool(stubServer);
+    const getHandler = capturedHandlers.get('freee_api_get');
+
+    const result = (await getHandler?.(
+      { service: 'accounting', path: '/api/1/users/me' },
+      undefined,
+    )) as { isError?: boolean; content: Array<{ type: string; text: string }> };
+
+    expect(result.isError).toBe(true);
+  });
+
   it('records tool_call with error status when validation fails', async () => {
     const schemaLoader = await import('./schema-loader.js');
     vi.mocked(schemaLoader.validatePathForService).mockReturnValueOnce({
@@ -199,7 +273,8 @@ describe('coercibleRecord', () => {
     const result = schema.safeParse(`${bom}{"a":1}`);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toMatch(/UTF-8 BOM/);
+      const messages = collectIssueMessages(result.error.issues);
+      expect(messages.some((m) => m.includes('UTF-8 BOM'))).toBe(true);
     }
   });
 
@@ -218,11 +293,50 @@ describe('coercibleRecord', () => {
     const result = schema.safeParse(SECRET);
     expect(result.success).toBe(false);
     if (!result.success) {
-      const message = result.error.issues[0].message;
-      expect(message).toMatch(/length \d+/);
-      expect(message).not.toContain('Acme');
-      expect(message).not.toContain('SECRET');
-      expect(message).not.toContain('partner_name');
+      const messages = collectIssueMessages(result.error.issues);
+      expect(messages.some((m) => /length \d+/.test(m))).toBe(true);
+      for (const message of messages) {
+        expect(message).not.toContain('Acme');
+        expect(message).not.toContain('SECRET');
+        expect(message).not.toContain('partner_name');
+      }
     }
+  });
+
+  it('publishes anyOf JSON Schema so MCP clients accept both object and string bodies', async () => {
+    const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
+    const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
+    const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.js');
+    const { coercibleRecord } = await import('./client-mode.js');
+
+    const server = new McpServer({ name: 'test', version: '1.0.0' });
+    server.registerTool(
+      'with_body',
+      { inputSchema: { body: coercibleRecord('body') } },
+      async () => ({ content: [{ type: 'text' as const, text: 'ok' }] }),
+    );
+
+    const [serverT, clientT] = InMemoryTransport.createLinkedPair();
+    const client = new Client({ name: 'tester', version: '1.0.0' });
+    await Promise.all([server.connect(serverT), client.connect(clientT)]);
+
+    const tools = await client.listTools();
+    const tool = tools.tools.find((t) => t.name === 'with_body');
+    if (!tool) throw new Error('tool not registered');
+
+    type ToolInputSchema = {
+      properties: { body: { anyOf?: Array<{ type?: string }> } };
+      required?: string[];
+    };
+    const inputSchema = tool.inputSchema as ToolInputSchema;
+    expect(inputSchema.properties.body.anyOf).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'object' }),
+        expect.objectContaining({ type: 'string' }),
+      ]),
+    );
+    expect(inputSchema.required).toContain('body');
+
+    await client.close();
   });
 });

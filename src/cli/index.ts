@@ -14,7 +14,7 @@ import {
   selectCompany,
 } from './prompts.js';
 
-export interface ConfigureOptions {
+interface ConfigureOptions {
   force?: boolean;
 }
 

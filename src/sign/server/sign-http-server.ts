@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { RedisClientStore } from '../../server/client-store.js';
 import { makeErrorChain, serializeErrorChain } from '../../server/error-serializer.js';
 import { RedisUnavailableError } from '../../server/errors.js';
+import { createLivenessHandler, createReadinessHandler } from '../../server/health-endpoints.js';
 import { initLogger } from '../../server/logger.js';
 import { OAuthStateStore } from '../../server/oauth-store.js';
 import { getCurrentRecorder } from '../../server/request-context.js';
@@ -10,7 +11,12 @@ import { initUserAgentTransportMode } from '../../server/user-agent.js';
 import type { Redis } from '../../storage/redis-client.js';
 import { closeRedisClient, getRedisClient } from '../../storage/redis-client.js';
 import { createTracingMiddleware } from '../../telemetry/middleware.js';
-import { loadSignRemoteServerConfig, SIGN_API_URL, SIGN_CALLBACK_PATH } from '../config.js';
+import {
+  loadSignRemoteServerConfig,
+  SIGN_API_URL,
+  SIGN_CALLBACK_PATH,
+  summarizeSignRemoteServerConfig,
+} from '../config.js';
 import { createSignMcpServer } from '../handlers.js';
 import { createSignCallbackHandler } from './sign-callback.js';
 import { SignOAuthProvider } from './sign-oauth-provider.js';
@@ -37,6 +43,13 @@ export async function startSignHttpServer(options?: {
     serviceName: 'freee-sign-mcp',
   });
   initUserAgentTransportMode('remote');
+
+  // Log the resolved configuration with secrets masked, so operators can verify
+  // what was loaded at startup without exposing credentials.
+  logger.info(
+    { config: summarizeSignRemoteServerConfig(signRemoteConfig) },
+    'Loaded sign remote server config',
+  );
 
   const redis = getRedisClient(signRemoteConfig.redisUrl);
 
@@ -146,21 +159,14 @@ export async function startSignHttpServer(options?: {
     await setupRateLimiting(app, redis, logger);
   }
 
-  // Health check endpoint (no auth required)
-  app.get('/health', async (_req: Request, res: Response) => {
-    try {
-      await redis.ping();
-      res.json({
-        status: 'ok',
-        redis: 'connected',
-      });
-    } catch {
-      res.status(503).json({
-        status: 'degraded',
-        redis: 'disconnected',
-      });
-    }
-  });
+  // Liveness probe (no auth required, no external dependencies).
+  app.get('/livez', createLivenessHandler());
+
+  // Readiness probe (no auth required).
+  // Returns 503 when Redis is unreachable so the orchestrator stops sending
+  // traffic to this instance.
+  const readinessHandler = createReadinessHandler(redis);
+  app.get('/readyz', readinessHandler);
 
   // Sign OAuth callback (browser redirect, no MCP auth required)
   app.get(SIGN_CALLBACK_PATH, signCallbackHandler);
@@ -169,6 +175,24 @@ export async function startSignHttpServer(options?: {
   const { mcpAuthRouter } = await import('@modelcontextprotocol/sdk/server/auth/router.js');
   const issuerUrl = new URL(signRemoteConfig.issuerUrl);
   const mcpResourceUrl = new URL('/mcp', issuerUrl);
+  // Override the SDK's authorization-server metadata to advertise
+  // client_secret_basic (RFC 6749 §2.3.1). Mounted before mcpAuthRouter so
+  // Express first-match-wins routes /.well-known here instead of into the SDK.
+  const { createOverrideMetadataHandler } = await import('../../server/oauth-metadata-override.js');
+  app.get(
+    '/.well-known/oauth-authorization-server',
+    createOverrideMetadataHandler({
+      provider,
+      issuerUrl,
+      scopesSupported: ['mcp:read', 'mcp:write'],
+    }),
+  );
+  // Adapter middleware that extends the SDK's body-only client auth to also
+  // accept Authorization: Basic. RFC 6749 §2.3.1 requires Basic to be
+  // supported when client passwords are issued.
+  const { decodeBasicAuth } = await import('../../server/client-auth-basic.js');
+  app.use('/token', decodeBasicAuth({ clientStore, realm: 'freee Sign MCP' }));
+  app.use('/revoke', decodeBasicAuth({ clientStore, realm: 'freee Sign MCP' }));
   app.use(
     mcpAuthRouter({
       provider,

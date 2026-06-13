@@ -908,7 +908,7 @@
                         "properties": {
                           "sending_method": {
                             "type": "string",
-                            "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)\nただし、pdf_delivery および pdf_delivery_and_posting は2026年5月末頃に利用可能となる予定です。",
+                            "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)",
                             "example": "posting",
                             "enum": [
                               "email",
@@ -17830,7 +17830,7 @@
           "Fixed assets"
         ],
         "summary": "固定資産一覧の取得",
-        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所の固定資産一覧を取得する</p>\n\n<h2 id=\"\">定義</h2>\n<ul>\n  <li>このAPIは法人エンタープライズに加入している事業所のみが利用できます。</li>\n  <li><p>target_date : 表示したい会計期間の開始年月日。開始年月日以外を指定した場合は、その日付が含まれる会計期間が対象となります。</p></li>\n  <li><p>depreciation_amount : 本年分の償却費合計</p></li>\n  <li><p>depreciation_method : 償却方法</p></li>\n  <li><p>depreciation_account_item_id : 減価償却に使う勘定科目</p></li>\n  <li><p>acquisition_cost : 取得価額</p></li>\n  <li><p>opening_balance : 期首残高</p></li>\n  <li><p>undepreciated_balance : 未償却残高。土地などの償却しない固定資産はnullが返ります。</p></li>\n  <li><p>opening_accumulated_depreciation : 期首減価償却累計額</p></li>\n  <li><p>closing_accumulated_depreciation : 期末減価償却累計額</p></li>\n</ul>\n<h2 id=\"\">注意点</h2>\n<ul>\n  <li><p>up_to_dateがfalseの場合、残高の集計が完了していません。最新の集計結果を確認したい場合は、時間を空けて再度取得する必要があります。</p></li>\n</ul>",
+        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所の固定資産一覧を取得する</p>\n\n<h2 id=\"\">定義</h2>\n<ul>\n  <li>このAPIは法人エンタープライズに加入している事業所のみが利用できます。</li>\n  <li><p>target_date : 表示したい会計期間の開始年月日。開始年月日以外を指定した場合は、その日付が含まれる会計期間が対象となります。</p></li>\n  <li><p>depreciation_amount : 本年分の償却費合計</p></li>\n  <li><p>depreciation_method : 償却方法</p></li>\n  <li><p>depreciation_account_item_id : 減価償却に使う勘定科目</p></li>\n  <li><p>acquisition_cost : 取得価額</p></li>\n  <li><p>opening_balance : 期首残高</p></li>\n  <li><p>undepreciated_balance : 未償却残高。土地などの償却しない固定資産はnullが返ります。</p></li>\n  <li><p>opening_accumulated_depreciation : 期首減価償却累計額</p></li>\n  <li><p>closing_accumulated_depreciation : 期末減価償却累計額</p></li>\n</ul>\n<h2 id=\"\">注意点</h2>\n<ul>\n  <li><p>up_to_dateがfalseの場合、残高の集計が完了していません。最新の集計結果を確認したい場合は、時間を空けて再度取得する必要があります。</p></li>\n  <li><p>このAPIはfreee会計の固定資産台帳を取得します。freee固定資産で登録した固定資産は取得できませんのでご注意ください。<a href=\"https://docs.google.com/presentation/d/1LDrOH1d8FJeCA_qTJuIXwcou1kh00dCLR_X8nacPb98/edit?usp=sharing\">freee固定資産の詳細はこちらをご覧ください。</a></p></li>\n</ul>",
         "operationId": "get_fixed_assets",
         "parameters": [
           {
@@ -19996,6 +19996,20 @@
                   "description": "部門コード",
                   "example": "code001"
                 },
+                "partner_id": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "nullable": true,
+                  "description": "取引先ID",
+                  "example": 1
+                },
+                "partner_code": {
+                  "type": "string",
+                  "description": "取引先コード",
+                  "nullable": true,
+                  "example": "code001"
+                },
                 "tag_ids": {
                   "type": "array",
                   "description": "メモタグID",
@@ -20220,6 +20234,14 @@
                   "description": "部門ID",
                   "example": 1
                 },
+                "partner_id": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "nullable": true,
+                  "description": "取引先ID",
+                  "example": 1
+                },
                 "tag_ids": {
                   "type": "array",
                   "description": "メモタグID",
@@ -20307,7 +20329,6 @@
             "type": "array",
             "items": {
               "required": [
-                "account_item_id",
                 "amount",
                 "entry_side",
                 "tax_code"
@@ -20337,6 +20358,11 @@
                   "minimum": 1,
                   "description": "勘定科目ID",
                   "example": 1
+                },
+                "account_item_code": {
+                  "type": "string",
+                  "description": "勘定科目コード",
+                  "example": "code001"
                 },
                 "amount": {
                   "type": "integer",
@@ -20371,12 +20397,22 @@
                   "description": "品目ID",
                   "example": 1
                 },
+                "item_code": {
+                  "type": "string",
+                  "description": "品目コード",
+                  "example": "code001"
+                },
                 "section_id": {
                   "type": "integer",
                   "format": "int64",
                   "minimum": 1,
                   "description": "部門ID",
                   "example": 1
+                },
+                "section_code": {
+                  "type": "string",
+                  "description": "部門コード",
+                  "example": "code001"
                 },
                 "tag_ids": {
                   "type": "array",
@@ -20408,6 +20444,21 @@
                   "minimum": 1,
                   "description": "セグメント３タグID",
                   "example": 1
+                },
+                "segment_1_tag_code": {
+                  "type": "string",
+                  "description": "セグメント１タグコード",
+                  "example": "code001"
+                },
+                "segment_2_tag_code": {
+                  "type": "string",
+                  "description": "セグメント２タグコード",
+                  "example": "code001"
+                },
+                "segment_3_tag_code": {
+                  "type": "string",
+                  "description": "セグメント３タグコード",
+                  "example": "code001"
                 },
                 "description": {
                   "type": "string",
@@ -20459,7 +20510,6 @@
             "type": "array",
             "items": {
               "required": [
-                "account_item_id",
                 "amount",
                 "entry_side",
                 "tax_code"
@@ -20497,6 +20547,11 @@
                   "description": "勘定科目ID",
                   "example": 1
                 },
+                "account_item_code": {
+                  "type": "string",
+                  "description": "勘定科目コード",
+                  "example": "code001"
+                },
                 "amount": {
                   "type": "integer",
                   "format": "int64",
@@ -20530,12 +20585,22 @@
                   "description": "品目ID",
                   "example": 1
                 },
+                "item_code": {
+                  "type": "string",
+                  "description": "品目コード",
+                  "example": "code001"
+                },
                 "section_id": {
                   "type": "integer",
                   "format": "int64",
                   "minimum": 1,
                   "description": "部門ID",
                   "example": 1
+                },
+                "section_code": {
+                  "type": "string",
+                  "description": "部門コード",
+                  "example": "code001"
                 },
                 "tag_ids": {
                   "type": "array",
@@ -20567,6 +20632,21 @@
                   "minimum": 1,
                   "description": "セグメント３タグID",
                   "example": 1
+                },
+                "segment_1_tag_code": {
+                  "type": "string",
+                  "description": "セグメント１タグコード",
+                  "example": "code001"
+                },
+                "segment_2_tag_code": {
+                  "type": "string",
+                  "description": "セグメント２タグコード",
+                  "example": "code001"
+                },
+                "segment_3_tag_code": {
+                  "type": "string",
+                  "description": "セグメント３タグコード",
+                  "example": "code001"
                 },
                 "description": {
                   "type": "string",
@@ -22039,7 +22119,7 @@
             "properties": {
               "sending_method": {
                 "type": "string",
-                "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)\nただし、pdf_delivery および pdf_delivery_and_posting は2026年5月末頃に利用可能となる予定です。",
+                "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)",
                 "example": "posting",
                 "enum": [
                   "email",
@@ -22324,7 +22404,7 @@
             "properties": {
               "sending_method": {
                 "type": "string",
-                "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)\nただし、pdf_delivery および pdf_delivery_and_posting は2026年5月末頃に利用可能となる予定です。",
+                "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)",
                 "example": "posting",
                 "enum": [
                   "email",
@@ -31308,6 +31388,19 @@
                       "description": "税区分コード",
                       "example": 2
                     },
+                    "partner_id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "取引先ID",
+                      "example": 201,
+                      "nullable": true
+                    },
+                    "partner_code": {
+                      "type": "string",
+                      "description": "取引先コード",
+                      "example": "code001",
+                      "nullable": true
+                    },
                     "item_id": {
                       "type": "integer",
                       "format": "int64",
@@ -31728,6 +31821,19 @@
                   "description": "税区分コード",
                   "example": 2
                 },
+                "partner_id": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "取引先ID",
+                  "example": 201,
+                  "nullable": true
+                },
+                "partner_code": {
+                  "type": "string",
+                  "description": "取引先コード",
+                  "example": "code001",
+                  "nullable": true
+                },
                 "item_id": {
                   "type": "integer",
                   "format": "int64",
@@ -31890,6 +31996,19 @@
                         "maximum": 2147483647,
                         "description": "税区分コード",
                         "example": 1
+                      },
+                      "partner_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "取引先ID",
+                        "example": 201,
+                        "nullable": true
+                      },
+                      "partner_code": {
+                        "type": "string",
+                        "description": "取引先コード",
+                        "example": "code001",
+                        "nullable": true
                       },
                       "item_id": {
                         "type": "integer",
@@ -32611,8 +32730,7 @@
           "company_id",
           "details",
           "id",
-          "issue_date",
-          "txn_number"
+          "issue_date"
         ],
         "properties": {
           "id": {
@@ -32814,6 +32932,36 @@
                   "description": "セグメント３タグ名",
                   "example": "セグメント３",
                   "nullable": true
+                },
+                "account_item_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "勘定科目コード"
+                },
+                "item_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "品目コード"
+                },
+                "section_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "部門コード"
+                },
+                "segment_1_tag_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "セグメント１タグコード"
+                },
+                "segment_2_tag_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "セグメント２タグコード"
+                },
+                "segment_3_tag_code": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "セグメント３タグコード"
                 },
                 "amount": {
                   "type": "integer",
@@ -34146,12 +34294,14 @@
                   "properties": {
                     "sending_method": {
                       "type": "string",
-                      "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、null:設定しない)",
+                      "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)",
                       "example": "posting",
                       "enum": [
                         "email",
                         "posting",
-                        "email_and_posting"
+                        "email_and_posting",
+                        "pdf_delivery",
+                        "pdf_delivery_and_posting"
                       ],
                       "nullable": true
                     }
@@ -34416,7 +34566,7 @@
                 "properties": {
                   "sending_method": {
                     "type": "string",
-                    "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)\nただし、pdf_delivery および pdf_delivery_and_posting は2026年5月末頃に利用可能となる予定です。",
+                    "description": "請求書送付方法(email:メール、posting:郵送、email_and_posting:メールと郵送、pdf_delivery:メール（PDFファイル添付）、pdf_delivery_and_posting:メール（PDFファイル添付）と郵送、null:設定しない)",
                     "example": "posting",
                     "enum": [
                       "email",
@@ -37499,6 +37649,14 @@
                   "description": "部門ID",
                   "example": 1
                 },
+                "partner_id": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "nullable": true,
+                  "description": "取引先ID",
+                  "example": 1
+                },
                 "tag_ids": {
                   "type": "array",
                   "description": "メモタグID",
@@ -37618,6 +37776,14 @@
                   "format": "int64",
                   "minimum": 1,
                   "description": "部門ID",
+                  "example": 1
+                },
+                "partner_id": {
+                  "type": "integer",
+                  "format": "int64",
+                  "minimum": 0,
+                  "nullable": true,
+                  "description": "取引先ID",
                   "example": 1
                 },
                 "tag_ids": {
@@ -38587,6 +38753,49 @@
                 "example": 1
               }
             }
+          }
+        }
+      },
+      "purchaseRequestActionCreateParams": {
+        "type": "object",
+        "required": [
+          "company_id",
+          "do_action"
+        ],
+        "properties": {
+          "company_id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "description": "事業所ID",
+            "example": 1
+          },
+          "do_action": {
+            "type": "string",
+            "description": "操作(apply: 申請する、approve: 承認する、reject: 却下する、feedback: 申請者へ差し戻す)",
+            "example": "approve",
+            "enum": [
+              "apply",
+              "approve",
+              "reject",
+              "feedback"
+            ]
+          },
+          "next_approver_id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "description": "次の承認ステップの承認者のユーザーID",
+            "example": 1,
+            "nullable": true
+          },
+          "next_group_id": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "description": "次の承認ステップの承認グループID",
+            "example": 1,
+            "nullable": true
           }
         }
       },
