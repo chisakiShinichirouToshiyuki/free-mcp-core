@@ -10,11 +10,12 @@ import { getToolErrorCount, getToolInvocationDuration } from './metrics.js';
  * When OTel is not initialized, the no-op tracer passes through transparently
  * (same pattern as withRedis in server/errors.ts).
  */
-// biome-ignore lint/suspicious/noExplicitAny: registerTool has complex generic overloads that cannot be cleanly wrapped
 export function registerTracedTool(
   server: McpServer,
   name: string,
+  // biome-ignore lint/suspicious/noExplicitAny: registerTool has complex generic overloads that cannot be cleanly wrapped
   config: any,
+  // biome-ignore lint/suspicious/noExplicitAny: registerTool has complex generic overloads that cannot be cleanly wrapped
   handler: (...args: any[]) => any,
 ): void {
   // biome-ignore lint/suspicious/noExplicitAny: wrapping preserves original handler's arg types

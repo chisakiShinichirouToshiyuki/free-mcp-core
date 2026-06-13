@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import {
-  SpanKind,
-  SpanStatusCode,
   context,
   propagation,
-  trace,
   type Span,
+  SpanKind,
+  SpanStatusCode,
+  trace,
 } from '@opentelemetry/api';
 import type { NextFunction, Request, Response } from 'express';
 import { scrubErrorMessage } from '../server/error-serializer.js';
@@ -34,7 +34,7 @@ import {
  */
 const MAX_USER_AGENT_LENGTH = 256;
 
-export type CanonicalLogLevel = 'info' | 'warn' | 'error';
+type CanonicalLogLevel = 'info' | 'warn' | 'error';
 
 /**
  * 4xx (incl. 401/403/404/422) → `warn`, 5xx → `error`. Per ECS/Datadog
@@ -113,8 +113,10 @@ export function createTracingMiddleware(): (
   next: NextFunction,
 ) => void {
   return (req: Request, res: Response, next: NextFunction): void => {
-    // Skip health checks entirely — no recorder, no span, no canonical log.
-    if (req.path === '/health') {
+    // Skip liveness/readiness probes entirely — no recorder, no span,
+    // no canonical log. These are polled at high frequency by orchestrators
+    // and would otherwise drown out useful telemetry.
+    if (req.path === '/livez' || req.path === '/readyz') {
       next();
       return;
     }

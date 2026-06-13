@@ -16,12 +16,21 @@ describe('scrubErrorMessage', () => {
     expect(scrubErrorMessage('User user@example.com failed')).toBe('User [REDACTED_EMAIL] failed');
   });
 
+  it('preserves punctuation around masked email addresses', () => {
+    expect(scrubErrorMessage('(user@example.com), owner')).toBe('([REDACTED_EMAIL]), owner');
+  });
+
   it('masks both emails and numeric IDs in one pass', () => {
     expect(scrubErrorMessage('user@x.io id=99999999')).toBe('[REDACTED_EMAIL] id=[REDACTED_ID]');
   });
 
   it('returns empty string unchanged', () => {
     expect(scrubErrorMessage('')).toBe('');
+  });
+
+  it('stringifies non-string inputs before scrubbing', () => {
+    expect(scrubErrorMessage(12345678)).toBe('[REDACTED_ID]');
+    expect(scrubErrorMessage(null)).toBe('');
   });
 
   it('returns plain messages unchanged', () => {

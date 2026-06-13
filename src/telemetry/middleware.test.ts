@@ -124,7 +124,10 @@ describe('createTracingMiddleware', () => {
     });
   });
 
-  it('skips /health endpoint', async () => {
+  it.each([
+    ['/livez'],
+    ['/readyz'],
+  ])('skips %s endpoint (no OTel span emitted)', async (probePath) => {
     process.env.OTEL_ENABLED = 'true';
     const { exporter, provider } = setupInMemoryOtel();
 
@@ -132,7 +135,7 @@ describe('createTracingMiddleware', () => {
     const { createTracingMiddleware } = await import('./middleware.js');
     const app = express();
     app.use(createTracingMiddleware());
-    app.get('/health', (_req, res) => {
+    app.get(probePath, (_req, res) => {
       res.json({ status: 'ok' });
     });
 
@@ -140,7 +143,7 @@ describe('createTracingMiddleware', () => {
     const addr = server.address();
     port = typeof addr === 'object' && addr ? addr.port : 0;
 
-    const result = await makeRequest(port, '/health');
+    const result = await makeRequest(port, probePath);
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body)).toEqual({ status: 'ok' });
 
@@ -633,13 +636,16 @@ describe('createTracingMiddleware - canonical log line', () => {
     expect(logInfo).toHaveBeenCalledTimes(1);
   });
 
-  it('skips /health entirely — no canonical log emitted', async () => {
+  it.each([
+    ['/livez'],
+    ['/readyz'],
+  ])('skips %s entirely — no canonical log emitted', async (probePath) => {
     const { logInfo, app } = await setupAppWithLoggerSpy((_req, res) => {
       res.status(200).json({ status: 'ok' });
-    }, '/health');
+    }, probePath);
     ({ srv: server, port } = await listen(app));
 
-    await makeRequest(port, '/health');
+    await makeRequest(port, probePath);
     await new Promise((r) => setTimeout(r, 10));
 
     expect(logInfo).not.toHaveBeenCalled();

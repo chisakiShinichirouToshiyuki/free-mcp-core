@@ -12,10 +12,53 @@ import { getConfig } from '../config.js';
 import { AUTH_TIMEOUT_MS, PACKAGE_VERSION } from '../constants.js';
 import { makeErrorChain, serializeErrorChain } from '../server/error-serializer.js';
 import { getCurrentRecorder } from '../server/request-context.js';
-import type { AuthExtra } from '../storage/context.js';
-import { registerTracedTool } from '../telemetry/tool-tracer.js';
+import type { AuthExtra, TokenContext } from '../storage/context.js';
 import { extractTokenContext, resolveCompanyId } from '../storage/context.js';
+import { registerTracedTool } from '../telemetry/tool-tracer.js';
 import { createTextResponse, formatErrorMessage } from '../utils/error.js';
+import { formatCompanyName } from '../utils/format-company.js';
+
+const CompaniesLookupSchema = z.object({
+  companies: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string().nullable().optional(),
+        display_name: z.string().nullable().optional(),
+      }),
+    )
+    .optional(),
+});
+
+/**
+ * Looks up name/display_name for the given company id from /api/1/companies.
+ * Returns null when the API call fails or the id is not in the response.
+ * Errors are swallowed because this is a best-effort cache fill.
+ */
+async function resolveCompanyNamesFromApi(
+  companyId: string,
+  tokenContext: TokenContext,
+): Promise<{ name?: string | null; display_name?: string | null } | null> {
+  try {
+    const raw = await makeApiRequest(
+      'GET',
+      '/api/1/companies',
+      undefined,
+      undefined,
+      undefined,
+      tokenContext,
+    );
+    const parsed = CompaniesLookupSchema.safeParse(raw);
+    if (!parsed.success) {
+      return null;
+    }
+    const numericId = Number.parseInt(companyId, 10);
+    const match = parsed.data.companies?.find((c) => c.id === numericId);
+    return match ? { name: match.name, display_name: match.display_name } : null;
+  } catch {
+    return null;
+  }
+}
 
 export function addAuthenticationTools(server: McpServer, options?: { remote?: boolean }): void {
   registerTracedTool(
@@ -57,7 +100,8 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
         return createTextResponse(
           `現在のユーザー情報:\n` +
             `会社ID: ${companyId}\n` +
-            `会社名: ${companyInfo?.name || 'Unknown'}\n` +
+            `会社名: ${formatCompanyName(companyInfo?.name)}\n` +
+            `事業所表示名: ${formatCompanyName(companyInfo?.display_name)}\n` +
             `ユーザー詳細:\n${JSON.stringify(userInfo, null, 2)}`,
         );
       } catch (error) {
@@ -231,7 +275,10 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
       title: '事業所設定',
       description: '事業所を設定・切り替え (詳細ガイドはfreee-api-skill skillを参照)',
       inputSchema: {
-        company_id: z.string().describe('事業所ID'),
+        company_id: z
+          .string()
+          .regex(/^[0-9]+$/, '事業所IDは数字のみ指定してください')
+          .describe('事業所ID'),
         name: z.string().optional().describe('事業所名'),
         description: z.string().optional().describe('説明'),
       },
@@ -254,17 +301,38 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
           description,
         );
 
-        const companyInfo = await tokenContext.tokenStore.getCompanyInfo(
+        let companyInfo = await tokenContext.tokenStore.getCompanyInfo(
           tokenContext.userId,
           company_id,
         );
+
+        if (!companyInfo?.name && !companyInfo?.display_name) {
+          const resolved = await resolveCompanyNamesFromApi(company_id, tokenContext);
+          if (resolved) {
+            await tokenContext.tokenStore.setCurrentCompany(
+              tokenContext.userId,
+              company_id,
+              resolved.name ?? undefined,
+              undefined,
+              resolved.display_name ?? undefined,
+            );
+            companyInfo = {
+              ...(companyInfo ?? { id: company_id, addedAt: Date.now() }),
+              name: resolved.name ?? undefined,
+              display_name: resolved.display_name ?? undefined,
+            };
+          }
+        }
 
         recorder?.recordToolCall({
           tool: 'freee_set_current_company',
           status: 'success',
           duration_ms: Date.now() - toolStart,
         });
-        return createTextResponse(`事業所を設定: ${companyInfo?.name || company_id}`);
+        return createTextResponse(
+          `事業所を設定: ${formatCompanyName(companyInfo?.name)} (ID: ${company_id})` +
+            ` [display_name: ${formatCompanyName(companyInfo?.display_name)}]`,
+        );
       } catch (error) {
         recorder?.recordToolCall({
           tool: 'freee_set_current_company',
@@ -305,7 +373,10 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
           return createTextResponse(`事業所ID: ${companyId} (詳細情報なし)`);
         }
 
-        return createTextResponse(`事業所: ${companyInfo.name} (ID: ${companyInfo.id})`);
+        return createTextResponse(
+          `事業所: ${formatCompanyName(companyInfo.name)} (ID: ${companyInfo.id})` +
+            ` [display_name: ${formatCompanyName(companyInfo.display_name)}]`,
+        );
       } catch (error) {
         recorder?.recordToolCall({
           tool: 'freee_get_current_company',
@@ -331,16 +402,6 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
       const toolStart = Date.now();
       try {
         const tokenContext = extractTokenContext(extra);
-        const CompanyResponseSchema = z.object({
-          companies: z
-            .array(
-              z.object({
-                id: z.number(),
-                name: z.string().nullable(),
-              }),
-            )
-            .optional(),
-        });
         const rawResponse = await makeApiRequest(
           'GET',
           '/api/1/companies',
@@ -349,7 +410,7 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
           undefined,
           tokenContext,
         );
-        const parseResult = CompanyResponseSchema.safeParse(rawResponse);
+        const parseResult = CompaniesLookupSchema.safeParse(rawResponse);
         if (!parseResult.success) {
           recorder?.recordToolCall({
             tool: 'freee_list_companies',
@@ -384,8 +445,11 @@ export function addAuthenticationTools(server: McpServer, options?: { remote?: b
 
         const companyList = apiCompanies.companies
           .map((company) => {
-            const current = company.id === parseInt(currentCompanyId, 10) ? ' *' : '';
-            return `${company.name ?? '(名称未設定)'} (${company.id})${current}`;
+            const current = company.id === Number.parseInt(currentCompanyId, 10) ? ' *' : '';
+            return (
+              `${formatCompanyName(company.name)} (${company.id})${current}` +
+              ` [display_name: ${formatCompanyName(company.display_name)}]`
+            );
           })
           .join('\n');
 

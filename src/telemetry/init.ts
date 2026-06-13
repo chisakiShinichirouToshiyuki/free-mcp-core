@@ -1,4 +1,4 @@
-import { SpanKind, SpanStatusCode, context, metrics, propagation, trace } from '@opentelemetry/api';
+import { context, metrics, propagation, SpanKind, SpanStatusCode, trace } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {
   CompositePropagator,
@@ -64,7 +64,7 @@ export function redactUrl(url: string): string {
 /**
  * Wrap a fetch call with an HTTP client span and W3C traceparent propagation.
  */
-export function instrumentedFetch(
+function instrumentedFetch(
   originalFetch: typeof fetch,
   input: RequestInfo | URL,
   init?: RequestInit,

@@ -1,4 +1,4 @@
-# 請求書・見積書・納品書の操作
+# 請求書・見積書・納品書・領収書・発注書の操作
 
 freee請求書APIを使った帳票操作のガイド。
 
@@ -10,14 +10,18 @@ freee請求書APIを使った帳票操作のガイド。
 
 ## 利用可能なパス
 
-| パス                   | 説明       |
-| ---------------------- | ---------- |
-| `/invoices`            | 請求書一覧 |
-| `/invoices/{id}`       | 請求書詳細 |
-| `/quotations`          | 見積書一覧 |
-| `/quotations/{id}`     | 見積書詳細 |
-| `/delivery_slips`      | 納品書一覧 |
-| `/delivery_slips/{id}` | 納品書詳細 |
+| パス                    | 説明       |
+| ----------------------- | ---------- |
+| `/invoices`             | 請求書一覧 |
+| `/invoices/{id}`        | 請求書詳細 |
+| `/quotations`           | 見積書一覧 |
+| `/quotations/{id}`      | 見積書詳細 |
+| `/delivery_slips`       | 納品書一覧 |
+| `/delivery_slips/{id}`  | 納品書詳細 |
+| `/receipts`             | 領収書一覧 |
+| `/receipts/{id}`        | 領収書詳細 |
+| `/purchase_orders`      | 発注書一覧 |
+| `/purchase_orders/{id}` | 発注書詳細 |
 
 ## 注意: company_id は必須
 
@@ -63,21 +67,83 @@ freee_api_post {
 }
 ```
 
+領収書を作成:
+
+```
+freee_api_post {
+  "service": "invoice",
+  "path": "/receipts",
+  "body": {
+    "company_id": 123456,
+    "receipt_date": "2025-01-15",
+    "partner_id": 789,
+    "partner_title": "御中",
+    "tax_entry_method": "out",
+    "tax_fraction": "omit",
+    "withholding_tax_entry_method": "out",
+    "lines": [
+      {
+        "description": "商品代金",
+        "quantity": 1,
+        "unit_price": "100000",
+        "tax_rate": 10,
+        "tag_ids": [TAG_ID]
+      }
+    ]
+  }
+}
+```
+
+領収書では `receipt_date`（領収日）が必須です。`receipt_number`（領収書番号）は採番設定が[自動採番する]以外の場合に必須です。
+
+発注書を作成:
+
+```
+freee_api_post {
+  "service": "invoice",
+  "path": "/purchase_orders",
+  "body": {
+    "company_id": 123456,
+    "purchase_order_date": "2025-01-15",
+    "partner_id": 789,
+    "partner_title": "御中",
+    "tax_entry_method": "out",
+    "tax_fraction": "omit",
+    "withholding_tax_entry_method": "out",
+    "lines": [
+      {
+        "description": "外注費",
+        "quantity": 1,
+        "unit_price": "100000",
+        "tax_rate": 10,
+        "tag_ids": [TAG_ID]
+      }
+    ]
+  }
+}
+```
+
+発注書では `purchase_order_date`（発注日）が必須です。`purchase_order_number`（発注書番号）は採番設定が[自動採番する]以外の場合に必須、`collects_on`（支払予定日）等の発注書固有項目も指定できます。
+
 ## Tips
 
 ### メモタグ「freee-mcp」の付与
 
-請求書・見積書・納品書を作成する際は、freee-mcp 経由で作成したデータであることを識別できるよう、メモタグ「freee-mcp」を必ず付与すること。手順は `recipes/freee-mcp-tag.md` を参照。`lines[].tag_ids` にタグIDを指定する。
+請求書・見積書・納品書・領収書・発注書を作成する際は、freee-mcp 経由で作成したデータであることを識別できるよう、メモタグ「freee-mcp」を必ず付与すること。手順は `recipes/freee-mcp-tag.md` を参照。`lines[].tag_ids` にタグIDを指定する。
 
 ### 作成後のWeb確認URL
 
-請求書・見積書・納品書を作成・更新した後、以下のURLでWeb画面から確認できます:
+請求書・見積書・納品書・領収書・発注書を作成・更新した後、以下のURLでWeb画面から確認できます:
 
-| 種類   | URL形式                                                          |
-| ------ | ---------------------------------------------------------------- |
-| 請求書 | `https://invoice.secure.freee.co.jp/reports/invoices/{id}`       |
-| 見積書 | `https://invoice.secure.freee.co.jp/reports/quotations/{id}`     |
-| 納品書 | `https://invoice.secure.freee.co.jp/reports/delivery_slips/{id}` |
+| 種類   | URL形式                                                           |
+| ------ | ----------------------------------------------------------------- |
+| 請求書 | `https://invoice.secure.freee.co.jp/reports/invoices/{id}`        |
+| 見積書 | `https://invoice.secure.freee.co.jp/reports/quotations/{id}`      |
+| 納品書 | `https://invoice.secure.freee.co.jp/reports/delivery_slips/{id}`  |
+| 領収書 | `https://invoice.secure.freee.co.jp/reports/receipts/{id}`        |
+| 発注書 | `https://invoice.secure.freee.co.jp/reports/purchase_orders/{id}` |
+
+レスポンスの `report_url` フィールドにも帳票詳細ページのURLが含まれます。
 
 `{id}` は API レスポンスで返されるID（`invoice.id`など）を使用します。
 
@@ -96,3 +162,5 @@ https://invoice.secure.freee.co.jp/reports/invoices/49034614
 - `references/invoice-invoices.md` - 請求書API
 - `references/invoice-quotations.md` - 見積書API
 - `references/invoice-delivery-slips.md` - 納品書API
+- `references/invoice-receipts.md` - 領収書API
+- `references/invoice-purchase-orders.md` - 発注書API
