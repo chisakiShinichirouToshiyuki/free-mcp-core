@@ -1,10 +1,10 @@
-import { configure } from './cli.js';
 import {
   installSkills,
   parseSkillCommandArgs,
   uninstallSkills,
   updateSkills,
 } from './cli/skills.js';
+import { configure } from './cli.js';
 import { createAndStartServer } from './mcp/handlers.js';
 import { getLogger, initLogger } from './server/logger.js';
 import { initUserAgentTransportMode } from './server/user-agent.js';
