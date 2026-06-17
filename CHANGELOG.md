@@ -1,5 +1,23 @@
 # freee-mcp
 
+## 0.30.1
+
+### Patch Changes
+
+- [`bb1d6c2`](https://github.com/freee/freee-mcp/commit/bb1d6c21cd7e8c1ead74dd761ecb3d4ff0841bd6): 販売(sm)管理レシピを最新化 ([#186](https://github.com/freee/freee-mcp/pull/186))
+
+  - GET を含む全リクエストで company_id が必須であることと、指定場所（GET=query / POST・PATCH=body）を明記
+  - 見積・納品・売上・原価予算・その他原価などのパスと、ドメイン用語（案件=businesses 等）の対応を追記
+  - 受注作成サンプルを実際に通る形へ修正し、明細(lines)や請求作成方法・入金方法の enum 値を記載
+  - 取消/ロック/復元の違い、ULID 形式の ID、ページネーションの Tips を追加
+
+- [`d8f0a06`](https://github.com/freee/freee-mcp/commit/d8f0a0683ddedb744e041d5a88968df4bdc2c5ba): OpenAPI スキーマを最新版に同期 ( 2 files changed, 7 insertions(+), 6 deletions(-)) ([#187](https://github.com/freee/freee-mcp/pull/187))
+- [`9d9ca5b`](https://github.com/freee/freee-mcp/commit/9d9ca5ba3a04cf4b7c388369dd8522c0c9a63917): 工数管理スキルのレシピとワークフローガイドを改善 ([#185](https://github.com/freee/freee-mcp/pull/185))
+
+  - pm-operations: `/projects/{id}` を GET のみに修正（PUT/DELETE/PATCH は非対応）、`/workloads/{id}` に PATCH/DELETE を追加
+  - pm-operations: 使用例セクションにリファレンス確認を促す注意書きを追加
+  - pm-workload-registration: `payroll_employee_id`・`employee_id` がともに null の場合（HR 未利用ユーザー）のスキップ手順を追記
+
 ## 0.30.0
 
 ### Minor Changes
