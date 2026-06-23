@@ -1,5 +1,20 @@
 # freee-mcp
 
+## 0.30.2
+
+### Patch Changes
+
+- [`fa60c7c`](https://github.com/freee/freee-mcp/commit/fa60c7cafe01ccec0044597aa851e4c04f2dc638): `freee_file_upload` の fetch に AbortSignal タイムアウト（120 秒）を設定し、上流 API が応答しないケースで abort されるように修正 ([#198](https://github.com/freee/freee-mcp/pull/198))
+- [`da2d7f8`](https://github.com/freee/freee-mcp/commit/da2d7f8502223c9e4ec4a76151752fae59ec9a46): MCP server instructions の対応 API 列挙から漏れていた IT 管理 API を追加 ([#196](https://github.com/freee/freee-mcp/pull/196))
+- [`ddcf382`](https://github.com/freee/freee-mcp/commit/ddcf38241a5e3b5792d5bfc213cecfe6a0d8db40): 請求書 API（freee 請求書）の帳票（請求書・見積書・納品書・領収書・発注書）の取消・復元エンドポイントに対応 ([#192](https://github.com/freee/freee-mcp/pull/192))
+
+  - `skills/freee-api-skill/recipes/invoice-operations.md` に取消(cancel)・復元(uncancel)のパスと使用例を追記
+  - 公開スキーマ最新化に伴い各帳票のリファレンスを再生成
+  - README の請求書の対応帳票に領収書・発注書が反映されていなかったため修正
+
+- [`6366230`](https://github.com/freee/freee-mcp/commit/6366230435342b72d08b14921d83316b717d5456): OAuth callback サーバーのログから `code` / `state` / `code_verifier` を redact。callback リクエストの URL や parsed URL、登録時の state/code_verifier prefix、unknown state 時の state 値などを presence のみのログに置き換え、OAuth artifact が stderr / MCP client log に残らないようにした。 ([#197](https://github.com/freee/freee-mcp/pull/197))
+- [`80d3e70`](https://github.com/freee/freee-mcp/commit/80d3e70e33ed93d3152dbae9ffe5d81f05a28749): OpenAPI スキーマを最新版に同期 ( 3 files changed, 1518 insertions(+), 80 deletions(-)) ([#193](https://github.com/freee/freee-mcp/pull/193))
+
 ## 0.30.1
 
 ### Patch Changes
