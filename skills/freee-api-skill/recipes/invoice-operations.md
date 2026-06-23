@@ -10,18 +10,28 @@ freee請求書APIを使った帳票操作のガイド。
 
 ## 利用可能なパス
 
-| パス                    | 説明       |
-| ----------------------- | ---------- |
-| `/invoices`             | 請求書一覧 |
-| `/invoices/{id}`        | 請求書詳細 |
-| `/quotations`           | 見積書一覧 |
-| `/quotations/{id}`      | 見積書詳細 |
-| `/delivery_slips`       | 納品書一覧 |
-| `/delivery_slips/{id}`  | 納品書詳細 |
-| `/receipts`             | 領収書一覧 |
-| `/receipts/{id}`        | 領収書詳細 |
-| `/purchase_orders`      | 発注書一覧 |
-| `/purchase_orders/{id}` | 発注書詳細 |
+| パス                             | 説明           |
+| -------------------------------- | -------------- |
+| `/invoices`                      | 請求書一覧     |
+| `/invoices/{id}`                 | 請求書詳細     |
+| `/invoices/{id}/cancel`          | 請求書の取消   |
+| `/invoices/{id}/uncancel`        | 請求書の復元   |
+| `/quotations`                    | 見積書一覧     |
+| `/quotations/{id}`               | 見積書詳細     |
+| `/quotations/{id}/cancel`        | 見積書の取消   |
+| `/quotations/{id}/uncancel`      | 見積書の復元   |
+| `/delivery_slips`                | 納品書一覧     |
+| `/delivery_slips/{id}`           | 納品書詳細     |
+| `/delivery_slips/{id}/cancel`    | 納品書の取消   |
+| `/delivery_slips/{id}/uncancel`  | 納品書の復元   |
+| `/receipts`                      | 領収書一覧     |
+| `/receipts/{id}`                 | 領収書詳細     |
+| `/receipts/{id}/cancel`          | 領収書の取消   |
+| `/receipts/{id}/uncancel`        | 領収書の復元   |
+| `/purchase_orders`               | 発注書一覧     |
+| `/purchase_orders/{id}`          | 発注書詳細     |
+| `/purchase_orders/{id}/cancel`   | 発注書の取消   |
+| `/purchase_orders/{id}/uncancel` | 発注書の復元   |
 
 ## 注意: company_id は必須
 
@@ -124,6 +134,36 @@ freee_api_post {
 ```
 
 発注書では `purchase_order_date`（発注日）が必須です。`purchase_order_number`（発注書番号）は採番設定が[自動採番する]以外の場合に必須、`collects_on`（支払予定日）等の発注書固有項目も指定できます。
+
+## 帳票の取消・復元
+
+請求書・見積書・納品書・領収書・発注書は、削除ではなく取消（cancel）/復元（uncancel）が可能です。いずれも `PUT` メソッドで、リクエストボディに `company_id` が必須です。
+
+請求書を取消:
+
+```
+freee_api_put {
+  "service": "invoice",
+  "path": "/invoices/49034614/cancel",
+  "body": { "company_id": 123456 }
+}
+```
+
+取消した請求書を復元:
+
+```
+freee_api_put {
+  "service": "invoice",
+  "path": "/invoices/49034614/uncancel",
+  "body": { "company_id": 123456 }
+}
+```
+
+取消・復元の結果はレスポンスの `cancel_status`（`canceled`: 取消済み、`uncanceled`: 取消されていない）で確認できます。
+
+注意: 取消すると、取引が紐づいている帳票（請求書・納品書・領収書・発注書）では取引も削除されます。見積書は取引が紐づかないため取引削除はありません。
+
+見積書・納品書・領収書・発注書も同様に `/{帳票パス}/{id}/cancel` および `/{帳票パス}/{id}/uncancel` で取消・復元できます。
 
 ## Tips
 
