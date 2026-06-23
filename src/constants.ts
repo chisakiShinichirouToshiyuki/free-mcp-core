@@ -74,6 +74,7 @@ export const OAUTH_KEY_PREFIX = 'freee-mcp:oauth';
 export const FETCH_TIMEOUT_TOKEN_MS = 10_000; // Token exchange / refresh
 export const FETCH_TIMEOUT_USERINFO_MS = 10_000; // User info fetch
 export const FETCH_TIMEOUT_API_MS = 30_000; // freee API calls (MCP tools)
+export const FETCH_TIMEOUT_FILE_UPLOAD_MS = 120_000; // freee file upload (64MB max, accommodates slow connections)
 
 // HTTP server timeouts for serve mode (Streamable-HTTP / SSE long-lived connections).
 // Defaults; per-environment override via HTTP_REQUEST_TIMEOUT_MS / HTTP_HEADERS_TIMEOUT_MS / HTTP_KEEP_ALIVE_TIMEOUT_MS.
