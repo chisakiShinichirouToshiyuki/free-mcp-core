@@ -1,0 +1,24 @@
+# CodeQL config — maximum-strictness profile, blocking on every PR.
+# Mirrors the sibling repos (free-actions-core / remote-free-actions):
+# suites are unioned HERE (a workflow-level `queries:` input without a
+# "+" prefix silently overrides this section).
+#
+# False-positive policy (SECURITY.md): alerts are never dismissed as FP — the
+# flagged pattern is forbidden by coding standard and rewritten. Rule-level
+# exclusions are allowed only for structural incompatibilities, documented
+# inline here.
+name: max strictness profile
+
+queries:
+  - uses: security-extended
+  - uses: security-and-quality
+  - uses: security-experimental
+
+packs:
+  - githubsecuritylab/codeql-javascript-queries
+
+paths:
+  - src
+paths-ignore:
+  - '**/node_modules'
+  - '**/dist'
