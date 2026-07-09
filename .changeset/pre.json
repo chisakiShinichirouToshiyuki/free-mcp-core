@@ -11,6 +11,7 @@
     "rename-to-free-mcp-core",
     "restrict-claude-workflows",
     "sync-upstream-v030",
+    "sync-upstream-v0303",
     "test-auto-publish"
   ]
 }
