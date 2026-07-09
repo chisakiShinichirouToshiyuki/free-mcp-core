@@ -96,7 +96,7 @@ The request has succeeded.
 - purchase_order_note (任意): string - 発注書備考
 - collects_on (任意): string(date) - 支払予定日
 - 発注日（purchase_order_date）以降の日付を指定してください。 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
-- delivery_deadline (任意): string(date) - 納品期限 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
+- delivery_deadline (任意): string - 納品期限
 - delivery_location (任意): string - 納品場所
 - payment_condition (任意): string - 支払条件
 - memo (任意): string - 社内メモ
@@ -282,7 +282,7 @@ The request has succeeded.
   - issue_date (任意): string(date) - 発生日 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
   - purchase_order_note (必須): string - 発注書備考
   - order_date (任意): string(date) - 発注日 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
-  - delivery_deadline (任意): string(date) - 納品期限 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
+  - delivery_deadline (任意): string - 納品期限
   - delivery_location (任意): string - 納品場所
   - payment_condition (任意): string - 支払条件
   - memo (必須): string - 社内メモ
@@ -368,7 +368,7 @@ The request has succeeded.
 - purchase_order_note (任意): string - 発注書備考
 - collects_on (任意): string(date) - 支払予定日
 - 発注日（purchase_order_date）以降の日付を指定してください。 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
-- delivery_deadline (任意): string(date) - 納品期限 (パターン: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$)
+- delivery_deadline (任意): string - 納品期限
 - delivery_location (任意): string - 納品場所
 - payment_condition (任意): string - 支払条件
 - memo (任意): string - 社内メモ
@@ -501,6 +501,60 @@ The request has succeeded.
   - template (任意): object - 帳票テンプレート情報（帳票テンプレート作成の際に設定できる項目です。）
   - lines (必須): array[object] - 発注書の明細行
   - report_url (必須): string(uri) - 帳票詳細ページのURL
+
+### PUT /purchase_orders/{id}/cancel
+
+操作: 発注書の取消
+
+
+説明: 指定された発注書を取消状態にします。 取引が紐づいている場合は取引も削除されます。
+
+### パラメータ
+
+| 名前 | 位置 | 必須 | 型 | 説明 |
+|------|------|------|-----|------|
+| id | path | はい | integer | 発注書ID |
+
+### リクエストボディ
+
+(必須)
+
+- company_id (必須): integer(int64) - 事業所ID (最小: 1, 最大: 9223372036854775000)
+
+### レスポンス (200)
+
+The request has succeeded.
+
+- purchase_order (必須): object
+  - id (必須): integer(int64) - 発注書ID (最小: 1, 最大: 9223372036854775000)
+  - cancel_status (必須): string - 取消状態（canceled: 取消済み、uncanceled: 取消されていない） (選択肢: canceled, uncanceled)
+
+### PUT /purchase_orders/{id}/uncancel
+
+操作: 取消された発注書の復元
+
+
+説明: 指定された取消済み発注書を復元します。
+
+### パラメータ
+
+| 名前 | 位置 | 必須 | 型 | 説明 |
+|------|------|------|-----|------|
+| id | path | はい | integer | 発注書ID |
+
+### リクエストボディ
+
+(必須)
+
+- company_id (必須): integer(int64) - 事業所ID (最小: 1, 最大: 9223372036854775000)
+
+### レスポンス (200)
+
+The request has succeeded.
+
+- purchase_order (必須): object
+  - id (必須): integer(int64) - 発注書ID (最小: 1, 最大: 9223372036854775000)
+  - cancel_status (必須): string - 取消状態（canceled: 取消済み、uncanceled: 取消されていない） (選択肢: canceled, uncanceled)
 
 
 
