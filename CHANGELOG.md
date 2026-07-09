@@ -1,5 +1,18 @@
 # freee-mcp
 
+## 0.1.0-rc.8
+
+### Minor Changes
+
+- [`a951ebe`](https://github.com/freee/freee-mcp/commit/a951ebeacac674de890660389003dcb01e9935e5): upstream freee/freee-mcp v0.30.3 を取り込み ([#26](https://github.com/freee/freee-mcp/pull/26))
+
+  - IT 管理 API のスキーマ・リファレンス追加
+  - 請求書・販売 API のスキーマ更新（発注書の取消・復元など）
+  - OAuth コールバックのログから code / state / verifier を除去（機密の秘匿）
+  - freee_file_upload に AbortSignal タイムアウトを設定
+  - SERVER_INSTRUCTIONS の対応 API 列挙に IT 管理 を追加
+    </content>
+
 ## 0.1.0-rc.7
 
 ### Minor Changes
