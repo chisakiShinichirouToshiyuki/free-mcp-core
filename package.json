@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "free-mcp-core",
-  "version": "0.1.0-rc.8",
+  "version": "0.1.0",
   "main": "./dist/lib.js",
   "types": "./dist/lib.d.ts",
   "exports": {

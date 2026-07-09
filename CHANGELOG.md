@@ -1,5 +1,38 @@
 # freee-mcp
 
+## 0.1.0
+
+### Minor Changes
+
+- [`f650aa9`](https://github.com/freee/freee-mcp/commit/f650aa9cc1a02d5993aabf472f0fade65cd3fd28): `freee-mcp configure` が freee-mcp-core を npm 依存としてラップしている親パッケージを自動検出し、Claude Code / Claude Desktop の MCP 登録を `freee-mcp` ではなく親パッケージ (例: `logic-solver-mcp`) として書き込むようにした。トップレベルで `npx freee-mcp configure` を実行する従来の挙動は変更なし。 ([#5](https://github.com/freee/freee-mcp/pull/5))
+
+  - 検出ロジック: `<host>/node_modules/freee-mcp-core` (scoped install 含む) を走査し、host の package.json が freee-mcp-core を依存として宣言し bin を持つ場合に host の bin 名で `npx <host-bin>` エントリを登録
+  - 親が検出された場合は Skill インストール手引きを host 側ドキュメントに委ねる
+  - `mcp-config.ts` は任意のサーバー名で status check / remove ができるよう汎用化 (`removeMcpServerConfig`, 引数付き `checkMcpConfigStatus`)
+
+- [`17f2268`](https://github.com/freee/freee-mcp/commit/17f2268954050895b94c9c70adedc4119dbb0f19): chore: rename package and repository from `freee-mcp-core` to `free-mcp-core` to avoid using the freee K.K. product name in distribution metadata. Functionality is unchanged. Old `freee-mcp-core` versions remain on npm but are no longer maintained. ([#12](https://github.com/freee/freee-mcp/pull/12))
+- [`2af5719`](https://github.com/freee/freee-mcp/commit/2af57198fd4baa90030590003fa3058592f2bd28): chore: sync with upstream `freee/freee-mcp` v0.30.0 (75 commits). Absorbs upstream bug fixes and features: OpenAPI body coercion publishes `anyOf:[object,string]` so MCP clients don't pre-reject string bodies (#410), company-name resolution fallback via the API, email-scrubbing capture-group fix in the error serializer, and health-probe rename `/health` → `/livez`+`/readyz`. Library exports (`createTextResponse`, `formatErrorMessage`) are unchanged and backward-compatible (`createTextResponse` gains an optional `options` arg). Fork identity (package name `free-mcp-core`, library entrypoint, changesets release) preserved. ([#22](https://github.com/freee/freee-mcp/pull/22))
+- [`a951ebe`](https://github.com/freee/freee-mcp/commit/a951ebeacac674de890660389003dcb01e9935e5): upstream freee/freee-mcp v0.30.3 を取り込み ([#26](https://github.com/freee/freee-mcp/pull/26))
+
+  - IT 管理 API のスキーマ・リファレンス追加
+  - 請求書・販売 API のスキーマ更新（発注書の取消・復元など）
+  - OAuth コールバックのログから code / state / verifier を除去（機密の秘匿）
+  - freee_file_upload に AbortSignal タイムアウトを設定
+  - SERVER_INSTRUCTIONS の対応 API 列挙に IT 管理 を追加
+    </content>
+
+### Patch Changes
+
+- [`3194933`](https://github.com/freee/freee-mcp/commit/319493302f72b26e250552aa82a06ac4ffd112f7): `freee-mcp configure` の host 検出時に登録する MCP エントリを `npx <hostBin>` から `node <絶対パス>` に変更。npm 未公開の host (例: 開発中の logic-solver-mcp) でも `npx` がレジストリ解決失敗を起こさず確実に起動できる。bin 名と上流 npm パッケージ名が同名の場合に意図しない別パッケージを引いてしまう事故も防ぐ。 ([#7](https://github.com/freee/freee-mcp/pull/7))
+- [`7e1d7a4`](https://github.com/freee/freee-mcp/commit/7e1d7a49d5a32e4ca9a745f953d4d72e06e5f557): ci: use a Personal Access Token (`RELEASE_PAT`) for `changesets/action` so commits/pushes it makes are attributed to a real user rather than `github-actions[bot]`. Bot-attributed pushes don't trigger downstream workflows, which previously left the `publish` step stranded after every Release PR merge. With the PAT, merging the Release PR re-fires `release.yml` and runs the publish step automatically. ([#9](https://github.com/freee/freee-mcp/pull/9))
+- [`7b70e92`](https://github.com/freee/freee-mcp/commit/7b70e92aed79d83b7998c74f6ccb432668b9e98d): ci: restrict Claude Code workflows to OWNER / COLLABORATOR / MEMBER actors so drive-by mentions or PRs from random forkers cannot consume the repo's CLAUDE_CODE_OAUTH_TOKEN. Auto code review is additionally limited to PRs whose head branch lives in this repository (no fork PRs). ([#10](https://github.com/freee/freee-mcp/pull/10))
+- [`2f92c6e`](https://github.com/freee/freee-mcp/commit/2f92c6ed17393577c8180c22a2ea59451bd1a543): chore: smoke-test the auto-publish workflow ([#2](https://github.com/freee/freee-mcp/pull/2))
+
+  End-to-end exercise of the new release pipeline (push-to-main trigger +
+  Trusted Publishing). Bumps to 0.1.0-rc.2 to verify the Release PR is
+  auto-created and that the subsequent publish step authenticates via
+  GitHub OIDC without needing NPM_TOKEN.
+
 ## 0.1.0-rc.8
 
 ### Minor Changes
