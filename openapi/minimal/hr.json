@@ -1240,8 +1240,8 @@
     },
     "/api/v1/allowances": {
       "get": {
-        "summary": "手当一覧の取得",
-        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所の手当情報をリストで返します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
+        "summary": "その他手当一覧の取得",
+        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所のその他手当情報をリストで返します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
         "parameters": [
           {
             "name": "company_id",
@@ -1281,8 +1281,8 @@
         ]
       },
       "post": {
-        "summary": "手当の作成",
-        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所の手当を新規作成します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
+        "summary": "その他手当の作成",
+        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所のその他手当を新規作成します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
         "parameters": [
           {
             "name": "company_id",
@@ -1297,15 +1297,15 @@
     },
     "/api/v1/allowances/{id}": {
       "get": {
-        "summary": "手当の取得",
-        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所の手当情報を返します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
+        "summary": "その他手当の取得",
+        "description": "<h2 id=\"\">概要</h2>\n<p>指定した事業所のその他手当情報を返します。</p>\n\n<h2 id=\"_1\">注意点</h2>\n<ul>\n  <li>管理者権限を持ったユーザーのみ実行可能です。</li>\n</ul>",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "type": "integer",
             "required": true,
-            "description": "手当ID"
+            "description": "その他手当ID"
           },
           {
             "name": "company_id",

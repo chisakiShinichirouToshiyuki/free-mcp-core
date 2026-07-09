@@ -87,7 +87,9 @@
     "sales": "sales",
     "cost_budgets": "cost-budgets",
     "other_costs": "other-costs",
-    "quotations": "quotations"
+    "quotations": "quotations",
+    "procurements": "procurements",
+    "purchase_orders": "purchase-orders"
   },
   "it-management-api": {
     "it_management_application_accounts": "application-account",

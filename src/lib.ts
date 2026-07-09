@@ -29,22 +29,17 @@ export { addAuthenticationTools } from './mcp/tools.js';
 export { generateClientModeTool } from './openapi/client-mode.js';
 export {
   API_CONFIGS,
-  type ApiConfig,
   type ApiType,
   listAllAvailablePaths,
-  type PathValidationResult,
   validatePathForService,
 } from './openapi/schema-loader.js';
 export {
   getLogger,
   initLogger,
-  type Logger,
-  type LoggerOptions,
 } from './server/logger.js';
 export {
   getUserAgent,
   initUserAgentTransportMode,
-  type TransportMode,
 } from './server/user-agent.js';
 // Skill bundle directory resolution helper for consumers that want to install
 // or expose the bundled skills/ from this package.
@@ -59,6 +54,5 @@ export { initTelemetry } from './telemetry/init.js';
 export {
   createTextResponse,
   formatErrorMessage,
-  type JsonParseResult,
   parseJsonResponse,
 } from './utils/error.js';
