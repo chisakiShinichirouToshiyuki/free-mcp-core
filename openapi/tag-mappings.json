@@ -31,7 +31,8 @@
     "Fixed assets": "fixed-assets",
     "General ledgers": "general-ledgers",
     "Account groups": "account-groups",
-    "User matchers": "user-matchers"
+    "User matchers": "user-matchers",
+    "Purchase requests": "purchase-requests"
   },
   "hr-api": {
     "ログインユーザー": "login-user",
@@ -79,7 +80,8 @@
     "Teams": "teams",
     "UnitCosts": "unit-costs",
     "Workloads": "workloads",
-    "LaborBudgets": "labor-budgets"
+    "LaborBudgets": "labor-budgets",
+    "WorkloadTagGroups": "workload-tag-groups"
   },
   "sm-api": {
     "businesses": "businesses",
