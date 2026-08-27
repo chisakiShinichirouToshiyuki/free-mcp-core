@@ -53,8 +53,10 @@ export type ApiType =
   | 'pm'
   | 'sm'
   | 'it_management'
+  | 'fixed_asset_management'
   | 'partner_management'
-  | 'survey';
+  | 'survey'
+  | 'tax_return';
 
 interface ApiConfig {
   schema: MinimalSchema;
@@ -108,6 +110,12 @@ const API_METADATA: Record<ApiType, ApiMetadata> = {
     prefix: 'it-management',
     name: 'freeeIT管理 API',
   },
+  fixed_asset_management: {
+    schemaFile: 'fixed-asset-management.json',
+    baseUrl: 'https://api.freee.co.jp',
+    prefix: 'fixed-asset-management',
+    name: 'freee固定資産 API',
+  },
   partner_management: {
     schemaFile: 'partner-management.json',
     baseUrl: 'https://api.freee.co.jp',
@@ -122,6 +130,12 @@ const API_METADATA: Record<ApiType, ApiMetadata> = {
     baseUrl: 'https://api.freee.co.jp',
     prefix: 'survey',
     name: 'freee-survey API',
+  },
+  tax_return: {
+    schemaFile: 'tax-return.json',
+    baseUrl: 'https://api.freee.co.jp',
+    prefix: 'tax-return',
+    name: 'freee申告 API',
   },
 };
 

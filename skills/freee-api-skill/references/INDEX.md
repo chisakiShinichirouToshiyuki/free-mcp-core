@@ -117,8 +117,22 @@
 - it-management-assets.md — assets
 - it-management-members.md — members
 
+## fixed_asset_management - freee固定資産
+
+- fixed-asset-management-fixed-assets.md — fixed_assets
+
+## partner_management - freee業務委託管理
+
+- partner-management-orderer-company-users.md — partner_management_orderer_company_users
+- partner-management-orderer-sections.md — partner_management_orderer_sections
+- partner-management-partner-management-orderer-partners.md — partner_management_orderer_partners
+
 ## survey - freeeサーベイ
 
 - survey-employee-evaluation-evaluation-results.md — ⚠ freee-mcp（リモート版） 限定 / evaluation_results
 - survey-launch-kaigyo-application.md — ⚠ freee-mcp（リモート版） 限定 / launch_kaigyo_application
 - survey-surveys.md — ⚠ freee-mcp（リモート版） 限定 / survey
+
+## tax_return - freee申告
+
+- tax-return-corporate.md — tax_return_corporate
