@@ -2,113 +2,115 @@
 
 ⚠ freee-mcp（リモート版） 限定: このAPIは 「freee-mcp（リモート版）」でのみ利用できます。freee_server_info の transport が stdio の場合は呼び出せません。その際はユーザーに freee-mcp（リモート版）の設定（https://support.freee.co.jp/hc/ja/articles/56390747520537）を案内してください。
 
-## 概要
-
 survey
 
-## エンドポイント一覧
+## GET /hub/survey/base_surveys — サーベイ企画一覧取得（リモート版freee-mcp限定）
 
-### GET /hub/survey/base_surveys
-
-操作: サーベイ企画一覧取得（リモート版freee-mcp限定）
-
-説明: サーベイ企画の一覧を取得します。
+サーベイ企画の一覧を取得します。
 
 ### パラメータ
 
-| 名前 | 位置 | 必須 | 型 | 説明 |
-|------|------|------|-----|------|
-| company_id | query | はい | integer(int64) | 事業所ID |
+- company_id*: integer(int64) - 事業所ID
 
-### レスポンス (200)
+### レスポンス
 
 サーベイ企画一覧取得レスポンス
+- data*: array[object] - サーベイ企画のリスト
 
-- base_surveys (必須): array[object] - サーベイ企画のリスト
-  配列の要素:
-    - id (必須): integer(int64) - サーベイ企画ID 例: `1`
-    - title (必須): string - タイトル 例: `入社1ヶ月アンケート`
-    - description (必須): string - 説明 例: `入社1ヶ月の従業員向けアンケートです`
-    - template_id (必須): integer(int64) - テンプレートID 例: `1`
-    - is_auto_add (必須): boolean - 対象者を自動追加するか 例: `true`
-    - next_start_date (必須): string(date-time) - 次回開始日(ISO8601) 例: `2026-08-01T00:00:00Z`
-    - is_pause (必須): boolean - 一時停止中か 例: `false`
-    - survey_type (必須): string - サーベイ種別 (選択肢: retention)
-    - answer_period (必須): integer(int32) - 回答期間 例: `7`
-    - answer_period_unit (必須): string - 回答期間の単位 (選択肢: days, weeks)
-    - reminder_setting (必須): object - リマインド設定
-    - repeat_frequency_setting (必須): object - 繰り返し設定
-    - questions_summary (必須): object - 質問数のサマリ
-    - viewer_scope (必須): string - 閲覧範囲 例: `all`
+## GET /hub/survey/base_surveys/{base_survey_id}/surveys — 実施回一覧取得（リモート版freee-mcp限定）
 
-### GET /hub/survey/base_surveys/{base_survey_id}/surveys
-
-操作: 実施回一覧取得（リモート版freee-mcp限定）
-
-説明: 指定したサーベイ企画に紐づく実施回の一覧を取得します。
+指定したサーベイ企画に紐づく実施回の一覧を取得します。
 
 ### パラメータ
 
-| 名前 | 位置 | 必須 | 型 | 説明 |
-|------|------|------|-----|------|
-| company_id | query | はい | integer(int64) | 事業所ID |
-| base_survey_id | path | はい | integer(int64) | サーベイ企画ID |
-| include_hidden | query | いいえ | boolean | 非表示の実施回も含めるか |
-| year | query | いいえ | integer(int32) | 対象年でのフィルタ |
+- company_id*: integer(int64) - 事業所ID
+- base_survey_id* (path): integer(int64) - サーベイ企画ID
+- include_hidden: boolean - 非表示の実施回も含めるか
+- year: integer(int32) - 対象年でのフィルタ
 
-### レスポンス (200)
+### レスポンス
 
 実施回一覧取得レスポンス
+- data*: array[object] - 実施回のリスト
 
-- surveys (必須): array[object] - 実施回のリスト
-  配列の要素:
-    - id (必須): integer(int64) - 実施回ID 例: `1`
-    - title (必須): string - タイトル 例: `2026年8月度`
-    - start_date (必須): string(date-time) - 開始日(ISO8601) 例: `2026-08-01T00:00:00Z`
-    - status (必須): string - 実施回のステータス (選択肢: in_progress, completed)
-    - answered_ratio (必須): number(float) - 回答率 例: `0.5`
-    - target_count (必須): integer(int32) - 対象者数 例: `20`
-    - unanswered_count (必須): integer(int32) - 未回答者数 例: `10`
-    - is_hidden (必須): boolean - 非表示か 例: `false`
+## GET /hub/survey/surveys/{id} — 実施回詳細取得（リモート版freee-mcp限定）
 
-### GET /hub/survey/surveys/{survey_id}
-
-操作: 実施回詳細取得（リモート版freee-mcp限定）
-
-説明: 指定した実施回の詳細と回答対象者を取得します。
+指定した実施回の詳細と回答対象者を取得します。
 
 ### パラメータ
 
-| 名前 | 位置 | 必須 | 型 | 説明 |
-|------|------|------|-----|------|
-| company_id | query | はい | integer(int64) | 事業所ID |
-| survey_id | path | はい | integer(int64) | 実施回ID |
+- company_id*: integer(int64) - 事業所ID
+- id* (path): integer(int64) - 実施回ID
 
-### レスポンス (200)
+### レスポンス
 
 実施回詳細取得レスポンス
+- survey*: object - 実施回の詳細
+- survey_targets*: array[object] - 回答対象者のリスト
+- estimated_time*: integer(int32) - 回答所要時間の目安(分)
 
-- survey (必須): object - 実施回の詳細
-  - id (必須): integer(int64) - 実施回ID 例: `1`
-  - title (必須): string - タイトル 例: `2026年8月度`
-  - description (必須): string - 説明 例: `入社1ヶ月の従業員向けアンケートです`
-  - start_date (必須): string(date-time) - 開始日(ISO8601) 例: `2026-08-01T00:00:00Z`
-  - end_date (必須): string(date-time) - 終了日(ISO8601) 例: `2026-08-08T00:00:00Z`
-  - status (必須): string - 実施回のステータス (選択肢: in_progress, completed)
-  - answered_ratio (必須): number(float) - 回答率 例: `0.5`
-  - target_count (必須): integer(int32) - 対象者数 例: `20`
-  - unanswered_count (必須): integer(int32) - 未回答者数 例: `10`
-  - viewer_scope (必須): string - 閲覧範囲 例: `all`
-- survey_targets (必須): array[object] - 回答対象者のリスト
-  配列の要素:
-    - id (必須): integer(int64) 例: `1`
-    - employee_id (必須): integer(int64) - 従業員ID 例: `100`
-    - answered_at (必須): string(date-time) - 回答日時(ISO8601)。未回答の場合はnull 例: `2026-08-02T10:00:00Z`
-    - consecutive_unanswered_count (必須): integer(int32) - 連続未回答回数 例: `2`
-- estimated_time (必須): integer(int32) - 回答所要時間の目安(分) 例: `5`
+## GET /hub/survey/base_surveys/{base_survey_id}/company_survey_results — 全社平均一覧取得（リモート版freee-mcp限定）
 
+指定した実施回の全社平均を取得します。
 
+### パラメータ
 
-## 参考情報
+- company_id*: integer(int64) - 事業所ID
+- base_survey_id* (path): integer(int64) - サーベイ企画ID
+- survey_ids[]: array[integer] - 実施回IDでのフィルタ。指定しない場合は全件対象
+- page_token: string - ページネーションのトークン
+- page_size: integer(int32) - 1ページあたりの取得件数
 
-- freee API公式ドキュメント: https://developer.freee.co.jp/docs
+### レスポンス
+
+全社平均一覧取得レスポンス
+- data*: array[object] - 全社平均のリスト
+- next_page_token*: string - 次のページを取得するためのカーソルトークン。次ページがない場合はnull
+
+## GET /hub/survey/base_surveys/{base_survey_id}/employee_survey_results — サーベイ結果一覧取得（リモート版freee-mcp限定）
+
+指定した実施回の従業員別のサーベイ結果を取得します
+
+### パラメータ
+
+- company_id*: integer(int64) - 事業所ID
+- base_survey_id* (path): integer(int64) - サーベイ企画ID
+- employee_id: integer(int64) - 従業員IDでのフィルタ。指定しない場合は全従業員が対象
+- survey_ids[]: array[integer] - 実施回IDでのフィルタ。指定しない場合は指定サーベイ企画内の全実施回が対象
+- page_token: string - ページネーションのトークン
+- page_size: integer(int32) - 1ページあたりの取得件数
+
+### レスポンス
+
+サーベイ結果一覧取得レスポンス
+- data*: array[object] - サーベイ結果のリスト
+- next_page_token*: string - 次のページを取得するためのカーソルトークン。次ページがない場合はnull
+
+## GET /hub/survey/surveys/{survey_id}/result_summaries — AI個人分析一覧取得（リモート版freee-mcp限定）
+
+指定した実施回のAI個人分析の一覧を取得します。従業員IDを指定すると対象を絞り込みます。
+
+### パラメータ
+
+- survey_id* (path): integer(int64) - 実施回ID
+- company_id*: integer(int64) - 事業所ID
+- employee_id: integer(int64) - 従業員IDでのフィルタ。指定しない場合は全従業員が対象
+
+### レスポンス
+
+AI個人分析一覧取得レスポンス
+- data*: array[object] - AI個人分析のリスト
+
+## GET /hub/survey/surveys/{survey_id}/questions — 設問の取得（リモート版freee-mcp限定）
+
+指定した実施回の設問の一覧を取得します。
+
+### パラメータ
+
+- survey_id* (path): integer(int64) - 実施回ID
+- company_id*: integer(int64) - 事業所ID
+
+### レスポンス
+
+設問一覧取得レスポンス
+- data*: array[object] - 設問のリスト

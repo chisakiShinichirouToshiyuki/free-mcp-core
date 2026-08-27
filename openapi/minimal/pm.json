@@ -30,21 +30,24 @@
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "マネージャのユーザID"
+            "description": "マネージャのユーザID",
+            "explode": true
           },
           {
             "name": "orderer_ids[]",
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "発注元の取引先ID"
+            "description": "発注元の取引先ID",
+            "explode": true
           },
           {
             "name": "contractor_ids[]",
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "発注先の取引先ID"
+            "description": "発注先の取引先ID",
+            "explode": true
           },
           {
             "name": "limit",
@@ -88,6 +91,40 @@
             "description": "プロジェクトID"
           }
         ]
+      },
+      "delete": {
+        "summary": "プロジェクトの削除",
+        "description": "IDに該当するプロジェクトを削除します。 案件マスタとの連携がある場合は紐付けを解除します。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "プロジェクトID"
+          },
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "プロジェクトの編集",
+        "description": "IDに該当するプロジェクトを編集します。 リクエストに含まれているフィールドのみ更新され、含まれていないフィールドは更新されません。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "プロジェクトID"
+          }
+        ],
+        "hasJsonBody": true
       }
     },
     "/unit_costs": {
@@ -150,7 +187,8 @@
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "従業員ID"
+            "description": "従業員ID",
+            "explode": true
           },
           {
             "name": "limit",
@@ -222,14 +260,16 @@
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "取得対象従業員のユーザID"
+            "description": "取得対象従業員のユーザID",
+            "explode": true
           },
           {
             "name": "team_ids[]",
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "取得対象のチームID"
+            "description": "取得対象のチームID",
+            "explode": true
           },
           {
             "name": "year_month",
@@ -320,14 +360,16 @@
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "取得対象従業員のユーザID"
+            "description": "取得対象従業員のユーザID",
+            "explode": true
           },
           {
             "name": "team_ids[]",
             "in": "query",
             "type": "array",
             "required": false,
-            "description": "取得対象のチームID"
+            "description": "取得対象のチームID",
+            "explode": true
           },
           {
             "name": "year_month",
