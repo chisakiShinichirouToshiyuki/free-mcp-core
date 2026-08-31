@@ -5,7 +5,7 @@
  * Replaces the manual tally that used to be run by hand and pasted into Slack.
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -13,7 +13,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PROJECT_ROOT = join(__dirname, '..');
 const OPENAPI_DIR = join(PROJECT_ROOT, 'openapi');
-const SNAPSHOT_FILE = join(OPENAPI_DIR, 'api-count-snapshot.json');
 
 const HTTP_METHODS = ['get', 'post', 'put', 'delete', 'patch'] as const;
 type HttpMethod = (typeof HTTP_METHODS)[number];
@@ -36,10 +35,6 @@ export interface Totals {
   paths: number;
   operations: number;
   methods: Record<HttpMethod, number>;
-}
-
-interface Snapshot extends Totals {
-  generatedAt: string;
 }
 
 /** Schema files that make up the countable API surface (excludes `minimal/` and `tag-mappings.json`). */
@@ -123,25 +118,6 @@ function printReport(counts: ApiCount[], totals: Totals): void {
   );
 }
 
-function printDiff(current: Totals): void {
-  if (!existsSync(SNAPSHOT_FILE)) return;
-  const snapshot: Snapshot = JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf-8'));
-  console.log('');
-  console.log(`前回スナップショット (${snapshot.generatedAt}) からの差分`);
-  const opsDiff = current.operations - snapshot.operations;
-  const sign = opsDiff >= 0 ? '+' : '';
-  console.log(
-    `${snapshot.operations} → ${current.operations} 操作 (${sign}${opsDiff})、API ${snapshot.apis} → ${current.apis}、パス ${snapshot.paths} → ${current.paths}`,
-  );
-}
-
-function saveSnapshot(totals: Totals): void {
-  const snapshot: Snapshot = { ...totals, generatedAt: new Date().toISOString().slice(0, 10) };
-  writeFileSync(SNAPSHOT_FILE, `${JSON.stringify(snapshot, null, 2)}\n`);
-  console.log('');
-  console.log(`Saved snapshot to ${SNAPSHOT_FILE}`);
-}
-
 export function analyze(dir: string = OPENAPI_DIR): { counts: ApiCount[]; totals: Totals } {
   const counts = listSchemaFiles(dir).map((file) => {
     const schema: OpenAPISchema = JSON.parse(readFileSync(join(dir, file), 'utf-8'));
@@ -151,20 +127,14 @@ export function analyze(dir: string = OPENAPI_DIR): { counts: ApiCount[]; totals
 }
 
 function main(): void {
-  const args = process.argv.slice(2);
-  const asJson = args.includes('--json');
-  const shouldSave = args.includes('--save');
-
+  const asJson = process.argv.includes('--json');
   const { counts, totals } = analyze();
 
   if (asJson) {
     console.log(JSON.stringify({ counts, totals }, null, 2));
   } else {
     printReport(counts, totals);
-    printDiff(totals);
   }
-
-  if (shouldSave) saveSnapshot(totals);
 }
 
 if (import.meta.main) {
