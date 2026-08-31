@@ -62,7 +62,9 @@ freee-mcp takes issue-based contributions only and does not accept external pull
 
 このポリシーは freee-mcp（このリポジトリのコードおよび npm パッケージ）を対象とします。
 freee のサービス本体や freee API 自体の脆弱性については、freee の窓口を通じてご報告ください。
+freee 全体のセキュリティに対する取り組みは [freee のセキュリティ](https://www.freee.co.jp/security/) を参照してください。
 
 This policy covers freee-mcp: the code in this repository and the published npm package.
 Vulnerabilities in freee's services or in the freee API itself should be reported through freee's
-own channels.
+own channels. See [freee's security page](https://www.freee.co.jp/security/) for how freee
+approaches security across its services.
