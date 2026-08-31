@@ -352,6 +352,9 @@ bun run test:run      # テスト
 
 # API リファレンスの再生成
 bun run generate:references
+
+# OpenAPI スキーマの操作数・パス数を集計（プロダクト別の内訳も表示）
+bun run count:apis
 ```
 
 ### 技術スタック
