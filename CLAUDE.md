@@ -164,7 +164,7 @@ Common issues:
 新しく mcp-only 区分のエンドポイントがリリースされたとき:
 
 - それは必ず `mcponly.yml` に入るため、`bun run fetch:schemas` → `bun run generate:references` を流すだけでバナーと stdio ゲートは自動で反映される
-- 新しいドメインを `service` として増やす場合のみ、通常のドメイン追加と同様に `schema-loader.ts`（ApiType / API_METADATA）・`client-mode.ts`（enum / hint）・`tag-mappings.json` を配線する。バナーとゲートは provenance で自動
+- 新しいドメインを `service` として増やす場合のみ、通常のドメイン追加と同様に `schema-loader.ts`（ApiType / SERVICE_METADATA）・`client-mode.ts`（enum / hint）・`tag-mappings.json` を配線する。バナーとゲートは provenance で自動
 
 ## Writing Style
 

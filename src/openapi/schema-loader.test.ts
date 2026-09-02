@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
+import type { MinimalSchema } from './minimal-types.js';
 import {
   _resetApiConfigs,
   API_CONFIGS,
@@ -23,19 +25,6 @@ describe('schema-loader', () => {
       'tax_return',
     ];
 
-    const expectedPrefixes: Record<ApiType, string> = {
-      accounting: 'accounting',
-      hr: 'hr',
-      invoice: 'invoice',
-      pm: 'pm',
-      sm: 'sm',
-      it_management: 'it-management',
-      fixed_asset_management: 'fixed-asset-management',
-      partner_management: 'partner-management',
-      survey: 'survey',
-      tax_return: 'tax-return',
-    };
-
     it.each(apiTypes)('should return config for %s API', (apiType) => {
       const config = API_CONFIGS[apiType];
 
@@ -43,7 +32,6 @@ describe('schema-loader', () => {
       expect(config.schema).toBeDefined();
       expect(config.schema.paths).toBeDefined();
       expect(config.baseUrl).toMatch(/^https:\/\/api\.freee\.co\.jp/);
-      expect(config.prefix).toBe(expectedPrefixes[apiType]);
       expect(config.name).toContain('freee');
     });
 
@@ -345,6 +333,27 @@ describe('schema-loader', () => {
 
     it('should not match query-smuggling attempts against mcp-only paths', () => {
       expect(isMcpOnlyPath('/hub/survey/surveys/10?company_id=999')).toBe(false);
+    });
+  });
+
+  describe('mcponly schema source coverage', () => {
+    const mcponly: MinimalSchema = JSON.parse(
+      readFileSync(new URL('../../openapi/minimal/mcponly.json', import.meta.url), 'utf-8'),
+    );
+    const mcpOnlySchemaPaths = Object.keys(mcponly.paths);
+
+    function servicesClaiming(schemaPath: string): ApiType[] {
+      return (Object.keys(API_CONFIGS) as ApiType[]).filter(
+        (apiType) => schemaPath in API_CONFIGS[apiType].schema.paths,
+      );
+    }
+
+    it('should have at least one path to check', () => {
+      expect(mcpOnlySchemaPaths.length).toBeGreaterThan(0);
+    });
+
+    it.each(mcpOnlySchemaPaths)('should have exactly one service claiming %s', (schemaPath) => {
+      expect(servicesClaiming(schemaPath)).toHaveLength(1);
     });
   });
 });
