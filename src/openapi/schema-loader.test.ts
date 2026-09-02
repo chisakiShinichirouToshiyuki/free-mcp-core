@@ -22,6 +22,8 @@ describe('schema-loader', () => {
       'fixed_asset_management',
       'partner_management',
       'survey',
+      'launch',
+      'employee_evaluation',
       'tax_return',
     ];
 
@@ -32,7 +34,9 @@ describe('schema-loader', () => {
       expect(config.schema).toBeDefined();
       expect(config.schema.paths).toBeDefined();
       expect(config.baseUrl).toMatch(/^https:\/\/api\.freee\.co\.jp/);
-      expect(config.name).toContain('freee');
+      // 表示名は原則 freee 接頭辞付きだが、プロダクト名が無いドメイン（人事評価）は
+      // 接頭辞を付けない。共通する形は末尾の ' API' のみ。
+      expect(config.name).toMatch(/ API$/);
     });
 
     it('should return undefined for unknown API type', () => {
@@ -149,6 +153,47 @@ describe('schema-loader', () => {
       expect(result.baseUrl).toBe('https://api.freee.co.jp');
     });
 
+    it('should validate launch API paths', () => {
+      const result = validatePathForService('GET', '/hub/launch/kaigyo_application', 'launch');
+
+      expect(result.isValid).toBe(true);
+      expect(result.apiType).toBe('launch');
+      expect(result.baseUrl).toBe('https://api.freee.co.jp');
+    });
+
+    it('should validate the launch PATCH operation', () => {
+      const result = validatePathForService('PATCH', '/hub/launch/kaigyo_application', 'launch');
+
+      expect(result.isValid).toBe(true);
+      expect(result.apiType).toBe('launch');
+    });
+
+    it('should validate employee evaluation API paths', () => {
+      const result = validatePathForService(
+        'GET',
+        '/hub/employee_evaluation/evaluation_results',
+        'employee_evaluation',
+      );
+
+      expect(result.isValid).toBe(true);
+      expect(result.apiType).toBe('employee_evaluation');
+      expect(result.baseUrl).toBe('https://api.freee.co.jp');
+    });
+
+    it.each([
+      ['survey', '/hub/launch/kaigyo_application'],
+      ['survey', '/hub/employee_evaluation/evaluation_results'],
+      ['launch', '/hub/survey/base_surveys'],
+      ['employee_evaluation', '/hub/survey/base_surveys'],
+    ] as [
+      ApiType,
+      string,
+    ][])('should not resolve %s against another mcp-only domain path %s', (service, path) => {
+      const result = validatePathForService('GET', path, service);
+
+      expect(result.isValid).toBe(false);
+    });
+
     it.each([
       '/hub/tax_return/corporate',
       '/hub/tax_return/corporate/office_info/10',
@@ -227,6 +272,9 @@ describe('schema-loader', () => {
       'FREEE_API_BASE_URL_IT_MANAGEMENT',
       'FREEE_API_BASE_URL_FIXED_ASSET_MANAGEMENT',
       'FREEE_API_BASE_URL_PARTNER_MANAGEMENT',
+      'FREEE_API_BASE_URL_SURVEY',
+      'FREEE_API_BASE_URL_LAUNCH',
+      'FREEE_API_BASE_URL_EMPLOYEE_EVALUATION',
       'FREEE_API_BASE_URL_TAX_RETURN',
     ];
 
@@ -317,6 +365,13 @@ describe('schema-loader', () => {
   describe('isMcpOnlyPath', () => {
     it('should return true for mcp-only survey paths', () => {
       expect(isMcpOnlyPath('/hub/survey/base_surveys')).toBe(true);
+    });
+
+    // mcp-only 判定は service ではなくパス単位。pathPrefix でサービスを分けても
+    // mcponly ソース全体が対象であり続けることを担保する。
+    it('should return true for every mcp-only domain, not just survey', () => {
+      expect(isMcpOnlyPath('/hub/launch/kaigyo_application')).toBe(true);
+      expect(isMcpOnlyPath('/hub/employee_evaluation/evaluation_results')).toBe(true);
     });
 
     it('should match mcp-only paths with path parameters', () => {

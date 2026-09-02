@@ -20,7 +20,7 @@ import {
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
 const SERVICE_HINT =
-  'service: accounting/hr/invoice/pm/sm/it_management/fixed_asset_management/partner_management/survey/tax_return';
+  'service: accounting/hr/invoice/pm/sm/it_management/fixed_asset_management/partner_management/survey/launch/employee_evaluation/tax_return';
 const SKILL_HINT = '詳細ガイドはfreee-api-skill skillを参照';
 
 // mcp-only（freee-mcp リモート版限定）エンドポイントを stdio（ローカル）モードで
@@ -42,6 +42,8 @@ const serviceSchema = z
     'fixed_asset_management',
     'partner_management',
     'survey',
+    'launch',
+    'employee_evaluation',
     'tax_return',
   ])
   .describe('対象のfreeeサービス');
