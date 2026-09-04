@@ -129,7 +129,7 @@
       "post": {
         "operationId": "/projects/create",
         "summary": "プロジェクトの登録",
-        "description": "プロジェクトを登録することができます。",
+        "description": "プロジェクトを登録します。\nプロジェクト作成申請が有効な場合は利用できません。",
         "tags": [
           "Projects"
         ],
@@ -523,7 +523,7 @@
       "patch": {
         "operationId": "/projects/partial_update",
         "summary": "プロジェクトの編集",
-        "description": "IDに該当するプロジェクトを編集します。 リクエストに含まれているフィールドのみ更新され、含まれていないフィールドは更新されません。",
+        "description": "IDに該当するプロジェクトを編集します。\nプロジェクト変更申請が有効な場合は利用できません。\nリクエストに含まれているフィールドのみ更新され、含まれていないフィールドは更新されません。",
         "tags": [
           "Projects"
         ],
@@ -586,7 +586,7 @@
       "delete": {
         "operationId": "/projects/destroy",
         "summary": "プロジェクトの削除",
-        "description": "IDに該当するプロジェクトを削除します。 案件マスタとの連携がある場合は紐付けを解除します。",
+        "description": "IDに該当するプロジェクトを削除します。\nプロジェクト削除申請が有効な場合は利用できません。",
         "tags": [
           "Projects"
         ],

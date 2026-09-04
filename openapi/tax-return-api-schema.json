@@ -21,7 +21,7 @@
       "get": {
         "operationId": "list_tax_returns",
         "summary": "申告一覧取得",
-        "description": "事業所に紐づく法人税の申告一覧をカーソルページネーションで取得します。\n各申告データには利用可能な帳票一覧（available_sheets）が含まれており、帳票取得APIで使用するtax_return_idとsheet_keyを取得できます。",
+        "description": "事業所に紐づく法人税の申告一覧をカーソルページネーションで取得します。\n各申告データの id と、利用可能な帳票一覧（available_sheets）の sheet_code が、\n帳票取得APIのパスパラメータ tax_return_id と sheet_code にそれぞれ対応します。",
         "parameters": [
           {
             "$ref": "#/components/parameters/TaxReturn.Corporate.ListTaxReturnCorporateRequest.company_id"
@@ -81,19 +81,16 @@
                           "updated_at": "2026-04-20T09:45:12Z",
                           "available_sheets": [
                             {
-                              "sheet_key": "schedule_1_blue",
                               "title": "別表一青色申告",
                               "category": "national",
                               "sheet_code": "10100100"
                             },
                             {
-                              "sheet_key": "local_form_6",
                               "title": "第六号様式",
                               "category": "local",
                               "sheet_code": "206000000"
                             },
                             {
-                              "sheet_key": "bs",
                               "title": "貸借対照表",
                               "category": "financial_statements",
                               "sheet_code": "balance_sheet"
@@ -316,7 +313,7 @@
         ]
       }
     },
-    "/hub/tax_return/corporate/sheet/national/{tax_return_id}/{sheet_key}": {
+    "/hub/tax_return/corporate/sheet/national/{tax_return_id}/{sheet_code}": {
       "get": {
         "operationId": "get_tax_return_corporate_national_sheet",
         "summary": "国税帳票取得",
@@ -326,7 +323,7 @@
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetNationalSheetRequest.tax_return_id"
           },
           {
-            "$ref": "#/components/parameters/TaxReturn.Corporate.GetNationalSheetRequest.sheet_key"
+            "$ref": "#/components/parameters/TaxReturn.Corporate.GetNationalSheetRequest.sheet_code"
           },
           {
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetNationalSheetRequest.company_id"
@@ -436,7 +433,7 @@
         ]
       }
     },
-    "/hub/tax_return/corporate/sheet/local/{tax_return_id}/{sheet_key}/{prefecture_government_code}/{city_government_code}": {
+    "/hub/tax_return/corporate/sheet/local/{tax_return_id}/{sheet_code}/{prefecture_government_code}/{city_government_code}": {
       "get": {
         "operationId": "get_tax_return_corporate_local_sheet",
         "summary": "地方税帳票取得",
@@ -446,7 +443,7 @@
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetLocalSheetRequest.tax_return_id"
           },
           {
-            "$ref": "#/components/parameters/TaxReturn.Corporate.GetLocalSheetRequest.sheet_key"
+            "$ref": "#/components/parameters/TaxReturn.Corporate.GetLocalSheetRequest.sheet_code"
           },
           {
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetLocalSheetRequest.prefecture_government_code"
@@ -562,7 +559,7 @@
         ]
       }
     },
-    "/hub/tax_return/corporate/sheet/financial_statements/{tax_return_id}/{sheet_key}": {
+    "/hub/tax_return/corporate/sheet/financial_statements/{tax_return_id}/{sheet_code}": {
       "get": {
         "operationId": "get_tax_return_corporate_financial_statement_sheet",
         "summary": "決算書取得",
@@ -572,7 +569,7 @@
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetFinancialStatementSheetRequest.tax_return_id"
           },
           {
-            "$ref": "#/components/parameters/TaxReturn.Corporate.GetFinancialStatementSheetRequest.sheet_key"
+            "$ref": "#/components/parameters/TaxReturn.Corporate.GetFinancialStatementSheetRequest.sheet_code"
           },
           {
             "$ref": "#/components/parameters/TaxReturn.Corporate.GetFinancialStatementSheetRequest.company_id"
@@ -781,11 +778,11 @@
           "format": "int64"
         }
       },
-      "TaxReturn.Corporate.GetNationalSheetRequest.sheet_key": {
-        "name": "sheet_key",
+      "TaxReturn.Corporate.GetNationalSheetRequest.sheet_code": {
+        "name": "sheet_code",
         "in": "path",
         "required": true,
-        "description": "帳票キー",
+        "description": "帳票コード（申告一覧の available_sheets[].sheet_code）",
         "schema": {
           "type": "string"
         }
@@ -811,11 +808,11 @@
           "format": "int64"
         }
       },
-      "TaxReturn.Corporate.GetLocalSheetRequest.sheet_key": {
-        "name": "sheet_key",
+      "TaxReturn.Corporate.GetLocalSheetRequest.sheet_code": {
+        "name": "sheet_code",
         "in": "path",
         "required": true,
-        "description": "帳票キー",
+        "description": "帳票コード（申告一覧の available_sheets[].sheet_code）",
         "schema": {
           "type": "string"
         }
@@ -859,13 +856,13 @@
           "format": "int64"
         }
       },
-      "TaxReturn.Corporate.GetFinancialStatementSheetRequest.sheet_key": {
-        "name": "sheet_key",
+      "TaxReturn.Corporate.GetFinancialStatementSheetRequest.sheet_code": {
+        "name": "sheet_code",
         "in": "path",
         "required": true,
-        "description": "決算書種別キー",
+        "description": "決算書の種別キー（申告一覧の available_sheets[].sheet_code）",
         "schema": {
-          "$ref": "#/components/schemas/TaxReturn.Corporate.FinancialStatementSheetKey"
+          "$ref": "#/components/schemas/TaxReturn.Corporate.FinancialStatementSheetCode"
         }
       },
       "TaxReturn.Corporate.GetFinancialStatementSheetRequest.company_id": {
@@ -1097,9 +1094,9 @@
       "TaxReturn.Corporate.AvailableSheet": {
         "type": "object",
         "required": [
-          "sheet_key",
           "title",
-          "category"
+          "category",
+          "sheet_code"
         ],
         "properties": {
           "sheet_key": {
@@ -1286,14 +1283,14 @@
       "TaxReturn.Corporate.NationalTaxData": {
         "type": "object",
         "required": [
-          "sheet_key",
           "title",
           "version"
         ],
         "properties": {
           "sheet_key": {
             "type": "string",
-            "description": "帳票キー",
+            "description": "帳票キー（廃止予定。sheet_code を利用してください）",
+            "deprecated": true,
             "example": "schedule_1_blue"
           },
           "title": {
@@ -1348,7 +1345,6 @@
       "TaxReturn.Corporate.LocalTaxData": {
         "type": "object",
         "required": [
-          "sheet_key",
           "title",
           "version",
           "prefecture_government_code",
@@ -1357,7 +1353,8 @@
         "properties": {
           "sheet_key": {
             "type": "string",
-            "description": "帳票キー",
+            "description": "帳票キー（廃止予定。sheet_code を利用してください）",
+            "deprecated": true,
             "example": "local_form_6"
           },
           "title": {
@@ -1411,7 +1408,7 @@
         "description": "地方税帳票データ",
         "additionalProperties": false
       },
-      "TaxReturn.Corporate.FinancialStatementSheetKey": {
+      "TaxReturn.Corporate.FinancialStatementSheetCode": {
         "type": "string",
         "enum": [
           "balance_sheet",
@@ -1430,14 +1427,14 @@
       "TaxReturn.Corporate.FinancialStatementTaxData": {
         "type": "object",
         "required": [
-          "sheet_key",
           "title",
           "ctax_return_id"
         ],
         "properties": {
           "sheet_key": {
             "type": "string",
-            "description": "決算書種別キー",
+            "description": "決算書種別キー（廃止予定。sheet_code を利用してください）",
+            "deprecated": true,
             "example": "pl"
           },
           "title": {
