@@ -21,9 +21,9 @@
       "x-displayName": "開業"
     },
     {
-      "name": "employee_evaluation_evaluation_results",
-      "description": "evaluation_results",
-      "x-displayName": "人事評価結果"
+      "name": "employee_evaluation",
+      "description": "employee_evaluation",
+      "x-displayName": "人事評価"
     }
   ],
   "paths": {
@@ -1105,7 +1105,7 @@
           }
         },
         "tags": [
-          "employee_evaluation_evaluation_results"
+          "employee_evaluation"
         ]
       }
     }

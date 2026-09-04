@@ -32,7 +32,8 @@
     "General ledgers": "general-ledgers",
     "Account groups": "account-groups",
     "User matchers": "user-matchers",
-    "Purchase requests": "purchase-requests"
+    "Purchase requests": "purchase-requests",
+    "Expense application currencies": "expense-application-currencies"
   },
   "hr-api": {
     "ログインユーザー": "login-user",
@@ -112,7 +113,8 @@
   "mcponly-api": {
     "survey": "surveys",
     "launch_kaigyo_application": "launch-kaigyo-application",
-    "employee_evaluation_evaluation_results": "employee-evaluation-evaluation-results"
+    "employee_evaluation_evaluation_results": "employee-evaluation-evaluation-results",
+    "employee_evaluation": "employee-evaluation"
   },
   "sign-api": {
     "文書": "documents",
