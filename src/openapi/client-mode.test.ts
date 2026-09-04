@@ -185,6 +185,55 @@ describe('generateClientModeTool - privacy', () => {
     expect(result.content[0].text).toMatch(/issue_date は必須です/);
   });
 
+  // mcp-only（freee-mcp リモート版限定）ゲート:
+  // stdio（ローカル）モードでは mcp-only エンドポイントを API に到達させず、
+  // リモート版への切り替え案内を isError で返す。remote モードでは通常どおり通す。
+  it('blocks mcp-only endpoints in stdio mode without calling the API', async () => {
+    const schemaLoader = await import('./schema-loader.js');
+    const clientModule = await import('../api/client.js');
+    vi.mocked(schemaLoader.isMcpOnlyPath).mockReturnValueOnce(true);
+
+    const { generateClientModeTool } = await import('./client-mode.js');
+    generateClientModeTool(stubServer);
+    const getHandler = capturedHandlers.get('freee_api_get');
+    expect(getHandler).toBeDefined();
+
+    // transport は既定で stdio（src/server/user-agent.ts）
+    const result = (await getHandler?.(
+      { service: 'launch', path: '/hub/launch/kaigyo_application' },
+      undefined,
+    )) as { isError?: boolean; content: Array<{ type: string; text: string }> };
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/freee-mcp（リモート版）でのみ利用できます/);
+    expect(clientModule.makeApiRequest).not.toHaveBeenCalled();
+  });
+
+  it('allows mcp-only endpoints in remote mode', async () => {
+    // remote モードではゲート条件が transport 判定で短絡するため、
+    // isMcpOnlyPath はそもそも呼ばれない（モック不要）
+    const clientModule = await import('../api/client.js');
+    const { initUserAgentTransportMode } = await import('../server/user-agent.js');
+
+    const { generateClientModeTool } = await import('./client-mode.js');
+    generateClientModeTool(stubServer);
+    const getHandler = capturedHandlers.get('freee_api_get');
+    expect(getHandler).toBeDefined();
+
+    initUserAgentTransportMode('remote');
+    try {
+      const result = (await getHandler?.(
+        { service: 'launch', path: '/hub/launch/kaigyo_application' },
+        undefined,
+      )) as { isError?: boolean };
+
+      expect(result.isError).not.toBe(true);
+      expect(clientModule.makeApiRequest).toHaveBeenCalledTimes(1);
+    } finally {
+      initUserAgentTransportMode('stdio');
+    }
+  });
+
   it('returns isError: true when upstream API responds with 5xx', async () => {
     const clientModule = await import('../api/client.js');
     vi.mocked(clientModule.makeApiRequest).mockRejectedValueOnce(
