@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun run changeset` - Create a new changeset for version bumps
 - `bun run version` - Apply changesets to update versions and CHANGELOG
 - `bun run release` - Build and publish to npm
+- `bun run count:apis` - Count operations/paths per OpenAPI schema (`--json` for machine-readable output)
 
 ## Architecture
 
