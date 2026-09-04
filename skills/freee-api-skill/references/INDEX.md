@@ -137,7 +137,7 @@
 
 ## employee_evaluation - 人事評価
 
-- employee-evaluation-evaluation-results.md — ⚠ freee-mcp（リモート版） 限定 / evaluation_results
+- employee-evaluation-evaluation-results.md — ⚠ freee-mcp（リモート版） 限定 / employee_evaluation
 
 ## tax_return - freee申告
 

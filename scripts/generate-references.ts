@@ -958,7 +958,7 @@ const API_CONFIGS: ReferenceApiConfig[] = [
     tagServices: {
       survey: "survey",
       launch_kaigyo_application: "launch",
-      employee_evaluation_evaluation_results: "employee-evaluation",
+      employee_evaluation: "employee-evaluation",
     },
     outputDir: OUTPUT_DIR,
   },
