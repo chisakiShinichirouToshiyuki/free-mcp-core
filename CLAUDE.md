@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun run changeset` - Create a new changeset for version bumps
 - `bun run version` - Apply changesets to update versions and CHANGELOG
 - `bun run release` - Build and publish to npm
+- `bun run count:apis` - Count operations/paths per OpenAPI schema (`--json` for machine-readable output)
 
 ## Architecture
 
@@ -143,6 +144,7 @@ Common issues:
 - 開発環境では `freee_server_info` のバージョンが `dev` と返る（正常動作）。実際のバージョンは `package.json` の `version` を参照する
 - Skill の更新（レシピ・リファレンスの追加・修正など）は changeset で `patch` バージョンとする
 - `skills/freee-api-skill/references/INDEX.md` は `scripts/generate-references.ts` が自動生成する（手編集しないこと）。新しいドメインを追加する場合は同スクリプトの `SERVICE_LABELS` にも prefix を足す
+- `README.md` の「対応操作数」は `<!-- API-STATS-TOTAL-START -->` ～ `<!-- API-STATS-TOTAL-END -->` の間を同スクリプトが `API_CONFIGS` の全スキーマから再計算して埋める（手編集しないこと）。スキーマを更新したら `bun run fetch:schemas` → `bun run generate:references` で自動的に追従する
 - `SKILL.md` は実行時に毎回読まれるので、セットアップ手順（`SETUP.md`）や配色定義（`COLORS.md`）のように条件が揃ったときだけ必要な情報は別ファイルに置き、`SKILL.md` からは参照条件だけ書く
 
 ## Skill レシピの書き方
@@ -152,7 +154,7 @@ Common issues:
 
 ## mcp-only（freee-mcp リモート版限定）エンドポイントについて
 
-一部のエンドポイントは freee-mcp（リモート版）でのみ利用でき、ローカル（stdio）モードでは使えない。この区分は api-hub 側で `WithPublishTypeMcpOnly` を指定したもので、公開スキーマは必ず単一ファイル `mcponly.yml` に集約される。freee-mcp 側はこれを「出自（provenance）」として扱い、エンドポイント個別のフラグや手動リストは持たない。
+一部のエンドポイントは freee-mcp（リモート版）でのみ利用でき、ローカル（stdio）モードでは使えない。この区分は公開スキーマの配信元で mcp-only として指定され、必ず単一ファイル `mcponly.yml` に集約される。freee-mcp 側はこれを「出自（provenance）」として扱い、エンドポイント個別のフラグや手動リストは持たない。
 
 仕組み:
 

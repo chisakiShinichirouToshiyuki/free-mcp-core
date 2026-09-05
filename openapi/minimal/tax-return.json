@@ -3,28 +3,31 @@
     "/hub/tax_return/corporate": {
       "get": {
         "summary": "申告一覧取得",
-        "description": "事業所に紐づく法人税の申告一覧をカーソルページネーションで取得します。\n各申告データには利用可能な帳票一覧（available_sheets）が含まれており、帳票取得APIで使用するtax_return_idとsheet_keyを取得できます。",
+        "description": "事業所に紐づく法人税の申告一覧をカーソルページネーションで取得します。\n各申告データの id と、利用可能な帳票一覧（available_sheets）の sheet_code が、\n帳票取得APIのパスパラメータ tax_return_id と sheet_code にそれぞれ対応します。",
         "parameters": [
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID",
+            "explode": false
           },
           {
             "name": "page_size",
             "in": "query",
             "type": "integer",
             "required": false,
-            "description": "1ページあたりの取得件数（10〜50、デフォルト10）"
+            "description": "1ページあたりの取得件数（10〜50、デフォルト10）",
+            "explode": false
           },
           {
             "name": "page_token",
             "in": "query",
             "type": "string",
             "required": false,
-            "description": "次のページを取得するためのカーソルトークン"
+            "description": "次のページを取得するためのカーソルトークン",
+            "explode": false
           }
         ]
       }
@@ -46,29 +49,32 @@
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID",
+            "explode": false
           },
           {
             "name": "page_size",
             "in": "query",
             "type": "integer",
             "required": false,
-            "description": "1ページあたりの取得件数（10〜50、デフォルト10）"
+            "description": "1ページあたりの取得件数（10〜50、デフォルト10）",
+            "explode": false
           },
           {
             "name": "page_token",
             "in": "query",
             "type": "string",
             "required": false,
-            "description": "次のページを取得するためのカーソルトークン"
+            "description": "次のページを取得するためのカーソルトークン",
+            "explode": false
           }
         ]
       }
     },
-    "/hub/tax_return/corporate/sheet/national/{tax_return_id}/{sheet_key}": {
+    "/hub/tax_return/corporate/sheet/national/{tax_return_id}/{sheet_code}": {
       "get": {
         "summary": "国税帳票取得",
-        "description": "指定した申告データの国税帳票を XML 形式 (application/xml) で取得します。\nレスポンスボディの XML は api-hub では検証・加工せずそのまま返却します。\nJSON 形式 (application/json) のレスポンスは廃止予定です。application/xml を利用してください。",
+        "description": "指定した申告データの国税帳票を XML 形式 (application/xml) で取得します。\nレスポンスの XML は e-Tax の申告データ (XTX) 形式に準拠します。\nXML の各項目の仕様は [tax_return API v3 帳票項目マッピング](https://github.com/freee/freee-mcp/blob/main/skills/freee-api-skill/tax-return-references/index.md)で公開されている仕様書を参照してください。",
         "parameters": [
           {
             "name": "tax_return_id",
@@ -78,27 +84,28 @@
             "description": "申告ID"
           },
           {
-            "name": "sheet_key",
+            "name": "sheet_code",
             "in": "path",
             "type": "string",
             "required": true,
-            "description": "帳票キー"
+            "description": "帳票コード（申告一覧の available_sheets[].sheet_code）"
           },
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID",
+            "explode": false
           }
         ],
         "accept": "application/xml"
       }
     },
-    "/hub/tax_return/corporate/sheet/local/{tax_return_id}/{sheet_key}/{prefecture_government_code}/{city_government_code}": {
+    "/hub/tax_return/corporate/sheet/local/{tax_return_id}/{sheet_code}/{prefecture_government_code}/{city_government_code}": {
       "get": {
         "summary": "地方税帳票取得",
-        "description": "指定した申告データの地方税帳票を XML 形式 (application/xml) で取得します。\nレスポンスボディの XML は api-hub では検証・加工せずそのまま返却します。\n帳票のreport_unit（prefecture/city）に応じて、prefecture_government_codeまたはcity_government_codeが使用されます。\nJSON 形式 (application/json) のレスポンスは廃止予定です。application/xml を利用してください。",
+        "description": "指定した申告データの地方税帳票を XML 形式 (application/xml) で取得します。\nレスポンスの XML は eLTAX の申告データ形式に準拠します。\nXML の各項目の仕様は [tax_return API v3 帳票項目マッピング](https://github.com/freee/freee-mcp/blob/main/skills/freee-api-skill/tax-return-references/index.md)で案内されている公開仕様書を参照してください。\n帳票のreport_unit（prefecture/city）に応じて、prefecture_government_codeまたはcity_government_codeが使用されます。",
         "parameters": [
           {
             "name": "tax_return_id",
@@ -108,11 +115,11 @@
             "description": "申告ID"
           },
           {
-            "name": "sheet_key",
+            "name": "sheet_code",
             "in": "path",
             "type": "string",
             "required": true,
-            "description": "帳票キー"
+            "description": "帳票コード（申告一覧の available_sheets[].sheet_code）"
           },
           {
             "name": "prefecture_government_code",
@@ -133,16 +140,17 @@
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID",
+            "explode": false
           }
         ],
         "accept": "application/xml"
       }
     },
-    "/hub/tax_return/corporate/sheet/financial_statements/{tax_return_id}/{sheet_key}": {
+    "/hub/tax_return/corporate/sheet/financial_statements/{tax_return_id}/{sheet_code}": {
       "get": {
         "summary": "決算書取得",
-        "description": "指定した申告データの決算書を XML 形式 (application/xml) で取得します。\nレスポンスボディの XML は api-hub では検証・加工せずそのまま返却します。\nJSON 形式 (application/json) のレスポンスは廃止予定です。application/xml を利用してください。",
+        "description": "指定した申告データの決算書を XML 形式 (application/xml) で取得します。\nレスポンスの XML は e-Tax に提出する決算書 (XBRL) 形式に準拠します。\nXML の各項目の仕様は [tax_return API v3 帳票項目マッピング](https://github.com/freee/freee-mcp/blob/main/skills/freee-api-skill/tax-return-references/index.md)で公開されている仕様書を参照してください。",
         "parameters": [
           {
             "name": "tax_return_id",
@@ -152,18 +160,19 @@
             "description": "申告ID"
           },
           {
-            "name": "sheet_key",
+            "name": "sheet_code",
             "in": "path",
             "type": "string",
             "required": true,
-            "description": "決算書種別キー"
+            "description": "決算書の種別キー（申告一覧の available_sheets[].sheet_code）"
           },
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID",
+            "explode": false
           }
         ],
         "accept": "application/xml"

@@ -1,5 +1,31 @@
 # freee-mcp
 
+## 0.34.3
+
+### Patch Changes
+
+- [`bff3871`](https://github.com/freee/freee-mcp/commit/bff387163a1529ed73eba053831fbcc52be42730): OpenAPI スキーマを最新版に同期 ( 8 files changed, 1161 insertions(+), 178 deletions(-))
+
+## 0.34.2
+
+### Patch Changes
+
+- [`87b79b4`](https://github.com/freee/freee-mcp/commit/87b79b474e44b807901b015f140d4777f0be6da4): README を更新
+
+  - Agent Skills の内容一覧に固定資産・サーベイ・申告を追加し、IT 管理・業務委託管理のファイル数を実態に合わせて修正
+  - Contributors に未反映だった 19 名を追加
+
+- [`114c279`](https://github.com/freee/freee-mcp/commit/114c27951e737a26fd0d663bad817c9d2d1ae5fd): OpenAPI スキーマを最新版に同期 ( 5 files changed, 53 insertions(+), 497 deletions(-))
+
+## 0.34.1
+
+### Patch Changes
+
+- [`da88719`](https://github.com/freee/freee-mcp/commit/da8871950aa7feb00c82799d797bfef54d90eb28): README の対応操作数をスキーマから自動更新するようにした
+
+  - `bun run generate:references` が OpenAPI スキーマの操作数（パス × HTTP メソッド）を数え、README の該当箇所を書き換える
+  - スキーマ更新時に件数を手で数え直す必要がなくなった
+
 ## 0.34.0
 
 ### Minor Changes

@@ -132,7 +132,7 @@
     "/api/1/forms/selectables": {
       "get": {
         "summary": "フォーム用選択項目情報の取得",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のフォーム用選択項目情報を取得する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所で勘定科目の入力フォームを構築するための、勘定科目カテゴリー、勘定科目、デフォルト税区分、決算書表示名を取得します。</p>\n\n<h2 id=\"_2\">注意点</h2>\n\n<ul>\n  <li><code>includes</code> に <code>account_item</code> を指定した場合に、<code>account_categories</code> と <code>account_groups</code> を返します。</li>\n  <li><code>includes</code> を指定しない場合、レスポンスは空のオブジェクトになります。</li>\n</ul>",
         "parameters": [
           {
             "name": "company_id",
@@ -145,7 +145,7 @@
             "name": "includes",
             "in": "query",
             "type": "string",
-            "description": "取得する項目(項目: account_item)"
+            "description": "取得する選択項目\n* `account_item` - 勘定科目カテゴリー、勘定科目、デフォルト税区分、決算書表示名"
           }
         ]
       }
@@ -260,99 +260,99 @@
     "/api/1/tags": {
       "get": {
         "summary": "メモタグ一覧の取得",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のメモタグ一覧を取得する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所に登録されているメモタグの一覧を取得します。取引や口座振替の明細に付与するメモタグを確認する用途を想定しています。</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>start_update_date / end_update_date でメモタグの更新日を範囲指定して絞り込めます。JST の日付を <code>yyyy-mm-dd</code> で指定してください（どちらも指定日を含みます）。</li>\n  <li>結果はメモタグIDの昇順で返します。</li>\n</ul>",
         "parameters": [
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID。取得対象の事業所を指定します。"
           },
           {
             "name": "start_update_date",
             "in": "query",
             "type": "string",
-            "description": "更新日で絞り込み：開始日(yyyy-mm-dd)"
+            "description": "更新日で絞り込む開始日 (yyyy-mm-dd, JST)。指定日を含む、それ以降に更新されたメモタグを対象にします。"
           },
           {
             "name": "end_update_date",
             "in": "query",
             "type": "string",
-            "description": "更新日で絞り込み：終了日(yyyy-mm-dd)"
+            "description": "更新日で絞り込む終了日 (yyyy-mm-dd, JST)。指定日を含む、それ以前に更新されたメモタグを対象にします。"
           },
           {
             "name": "offset",
             "in": "query",
             "type": "integer",
-            "description": "取得レコードのオフセット (デフォルト: 0)"
+            "description": "取得レコードのオフセット (デフォルト: 0)。ページング用に、スキップする件数を指定します。"
           },
           {
             "name": "limit",
             "in": "query",
             "type": "integer",
-            "description": "取得レコードの件数 (デフォルト: 50, 最小: 1, 最大: 3000)"
+            "description": "取得レコードの件数 (デフォルト: 50, 最小: 1, 最大: 3000)。1 回のリクエストで取得する上限件数を指定します。"
           }
         ]
       },
       "post": {
         "summary": "メモタグの作成",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のメモタグを作成する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所に新しいメモタグを作成します。作成したメモタグは取引や口座振替の明細に付与できます。</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>メモタグ名（name）は事業所内で重複できません。既に同名のメモタグが存在する場合は 400 エラーになります。</li>\n  <li>shortcut1 / shortcut2 は、Web画面などでメモタグを検索する際のキーワードとして使用します。</li>\n</ul>",
         "hasJsonBody": true
       }
     },
     "/api/1/tags/{id}": {
       "get": {
         "summary": "メモタグの取得",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のメモタグを取得する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所のメモタグを 1 件取得します。メモタグID（id）はメモタグ一覧の取得 API で確認できます。</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>存在しないか既に削除されたメモタグIDを指定した場合は 404 を返します。</li>\n</ul>",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "type": "integer",
             "required": true,
-            "description": "タグID"
+            "description": "メモタグID。メモタグ一覧の取得 API のレスポンスに含まれる id を指定します。"
           },
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID。取得対象の事業所を指定します。"
           }
         ]
       },
       "put": {
         "summary": "メモタグの更新",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のメモタグを更新する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所のメモタグを更新します。</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>リクエストボディで shortcut1 / shortcut2 を省略した場合は未設定（null）に更新されます。値を維持したい場合は、現在の値も含めて指定してください。</li>\n  <li>メモタグ名（name）は事業所内で重複できません。別のメモタグと同名になる更新は 400 エラーになります。</li>\n  <li>存在しないか既に削除されたメモタグIDを指定した場合は 404 を返します。</li>\n</ul>",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "type": "integer",
             "required": true,
-            "description": "メモタグID"
+            "description": "メモタグID。メモタグ一覧の取得 API のレスポンスに含まれる id を指定します。"
           }
         ],
         "hasJsonBody": true
       },
       "delete": {
         "summary": "メモタグの削除",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所のメモタグを削除する</p>",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所のメモタグを削除します。</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>取引または配賦基準で使用されているメモタグは削除できず、400 エラーになります。</li>\n  <li>存在しないか既に削除されたメモタグIDを指定した場合は 404 を返します。</li>\n</ul>",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "type": "integer",
             "required": true,
-            "description": "タグID"
+            "description": "メモタグID。メモタグ一覧の取得 API のレスポンスに含まれる id を指定します。"
           },
           {
             "name": "company_id",
             "in": "query",
             "type": "integer",
             "required": true,
-            "description": "事業所ID"
+            "description": "事業所ID。削除対象のメモタグが属する事業所を指定します。"
           }
         ]
       }
@@ -4003,7 +4003,7 @@
     "/api/1/expense_applications/{id}": {
       "get": {
         "summary": "経費申請詳細の取得",
-        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所の経費申請を取得する</p>\n\n<p>経費精算APIの使い方については、<a href=\"https://developer.freee.co.jp/tips/accounting-expense-applications\" target=\"_blank\">freee会計経費精算APIの使い方</a>をご参照ください</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>本APIは駅すぱあと連携 (出発駅と到着駅から金額を自動入力する機能)には非対応です。駅すぱあと連携を使用した経費申請は取得できません。</li>\n  <li>本APIは外貨には非対応です。外貨を利用する経費申請は取得できません。</li>\n  <li>本APIはカスタム申請項目には非対応です。カスタム申請項目を使用した経費申請は取得できません。</li>\n  <li>本APIは金額計算方法には非対応です。金額計算方法を設定した経費申請は取得できません。</li>\n</ul>",
+        "description": "\n<h2 id=\"\">概要</h2>\n\n<p>指定した事業所の経費申請を取得する</p>\n\n<p>経費精算APIの使い方については、<a href=\"https://developer.freee.co.jp/tips/accounting-expense-applications\" target=\"_blank\">freee会計経費精算APIの使い方</a>をご参照ください</p>\n\n<h2 id=\"_2\">注意点</h2>\n<ul>\n  <li>本APIは外貨には非対応です。外貨を利用する経費申請は取得できません。</li>\n  <li>本APIはカスタム申請項目には非対応です。カスタム申請項目を使用した経費申請は取得できません。</li>\n  <li>本APIは金額計算方法には非対応です。金額計算方法を設定した経費申請は取得できません。</li>\n</ul>",
         "parameters": [
           {
             "name": "id",
@@ -4086,6 +4086,88 @@
           }
         ],
         "hasJsonBody": true
+      }
+    },
+    "/api/1/expense_applications/currencies": {
+      "get": {
+        "summary": "経費精算の外貨一覧の取得",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費精算で利用する外貨の一覧を取得します。</p>",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID"
+          },
+          {
+            "name": "search_status",
+            "in": "query",
+            "type": "string",
+            "description": "利用状態での絞り込み (usable: 利用可能, unusable: 利用不可)"
+          }
+        ]
+      },
+      "post": {
+        "summary": "経費精算の外貨の作成",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費精算で利用する外貨を作成します。</p>",
+        "hasJsonBody": true
+      }
+    },
+    "/api/1/expense_applications/currencies/{id}": {
+      "get": {
+        "summary": "経費精算の外貨の取得",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費精算で利用する外貨を取得します。</p>",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "外貨ID"
+          },
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID"
+          }
+        ]
+      },
+      "put": {
+        "summary": "経費精算の外貨の更新",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費精算で利用する外貨を更新します。</p>",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "外貨ID"
+          }
+        ],
+        "hasJsonBody": true
+      },
+      "delete": {
+        "summary": "経費精算の外貨の削除",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費精算で利用する外貨を削除します。</p>",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "外貨ID"
+          },
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID"
+          }
+        ]
       }
     },
     "/api/1/expense_application_line_templates": {
