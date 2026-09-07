@@ -28,7 +28,7 @@ MCP server that exposes freee API endpoints as MCP tools:
   - `sm-api-schema.json` - 販売API (https://api.freee.co.jp/sm)
   - `it-management-api-schema.json` - IT管理API (https://api.freee.co.jp、パスに `/hub/it_management/` プレフィックス)
   - `partner-management-api-schema.json` - 業務委託管理API (https://api.freee.co.jp、パスに `/hub/partner_management/` プレフィックス)
-  - `mcponly-api-schema.json` - mcp-only（freee-mcp リモート版限定）区分のエンドポイント集約スキーマ (https://api.freee.co.jp)。現状はサーベイAPI（パスに `/hub/survey/` プレフィックス）のみ
+  - `mcponly-api-schema.json` - mcp-only（freee-mcp リモート版限定）区分のエンドポイント集約スキーマ (https://api.freee.co.jp)。複数ドメインが同居する（サーベイ / 開業 / 人事評価。パスは `/hub/<domain>/` プレフィックス）
   - `sign-api-schema.json` - サイン（電子契約）API (https://ninja-sign.com)
 - Schema Loader: `src/openapi/schema-loader.ts` loads and manages all API schemas
 - Tool Generation: `generateClientModeTool()` in `src/openapi/client-mode.ts` creates method-specific tools
@@ -86,6 +86,10 @@ Sign development mode: Use `"command": "bun", "args": ["run", "src/sign/index.ts
 - `FREEE_API_BASE_URL_IT_MANAGEMENT` - IT管理API
 - `FREEE_API_BASE_URL_PARTNER_MANAGEMENT` - 業務委託管理API
 - `FREEE_API_BASE_URL_SURVEY` - サーベイAPI
+- `FREEE_API_BASE_URL_LAUNCH` - 開業API
+- `FREEE_API_BASE_URL_EMPLOYEE_EVALUATION` - 人事評価API
+- `FREEE_API_BASE_URL_TAX_RETURN` - 申告API
+- `FREEE_API_BASE_URL_FIXED_ASSET_MANAGEMENT` - 固定資産API
 - `FREEE_SIGN_API_URL` - サインAPI（`src/sign/config.ts` で処理）
 
 ### Remote モードのロギング (canonical log line)
@@ -165,6 +169,7 @@ Common issues:
 
 - それは必ず `mcponly.yml` に入るため、`bun run fetch:schemas` → `bun run generate:references` を流すだけでバナーと stdio ゲートは自動で反映される
 - 新しいドメインを `service` として増やす場合のみ、通常のドメイン追加と同様に `schema-loader.ts`（ApiType / SERVICE_METADATA）・`client-mode.ts`（enum / hint）・`tag-mappings.json` を配線する。バナーとゲートは provenance で自動
+- `mcponly.json` は複数ドメインが同居するため、`SERVICE_METADATA` の各エントリに `pathPrefix`（`/hub/<domain>/`）を必ず指定する。指定漏れは `schema-loader.test.ts` の「mcponly schema source coverage」が検出する
 
 ## Writing Style
 

@@ -101,6 +101,8 @@ export type ApiType =
   | 'fixed_asset_management'
   | 'partner_management'
   | 'survey'
+  | 'launch'
+  | 'employee_evaluation'
   | 'tax_return';
 
 interface ApiConfig {
@@ -164,13 +166,25 @@ const SERVICE_METADATA: Record<ApiType, ServiceMetadata> = {
     baseUrl: 'https://api.freee.co.jp',
     name: 'freee業務委託管理 API',
   },
-  // freee サーベイ。スキーマは mcp-only 集約ソース（mcponly）を使う。
-  // survey のエンドポイントは freee-mcp（リモート版）限定で、
-  // stdio モードでは isMcpOnlyPath で弾かれる。
+  // 以下 3 つは mcponly ソースを pathPrefix で分け合う（1 ファイルに複数ドメインが同居する）。
+  // いずれも freee-mcp（リモート版）限定で、stdio モードでは isMcpOnlyPath で弾かれる。
   survey: {
     source: 'mcponly',
+    pathPrefix: '/hub/survey/',
     baseUrl: 'https://api.freee.co.jp',
-    name: 'freee-survey API',
+    name: 'freeeサーベイ API',
+  },
+  launch: {
+    source: 'mcponly',
+    pathPrefix: '/hub/launch/',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freee開業 API',
+  },
+  employee_evaluation: {
+    source: 'mcponly',
+    pathPrefix: '/hub/employee_evaluation/',
+    baseUrl: 'https://api.freee.co.jp',
+    name: '人事評価 API',
   },
   tax_return: {
     source: 'tax_return',

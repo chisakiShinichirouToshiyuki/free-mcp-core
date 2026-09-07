@@ -1,8 +1,8 @@
-# employee_evaluation_evaluation_results
+# employee_evaluation
 
 ⚠ freee-mcp（リモート版） 限定: このAPIは 「freee-mcp（リモート版）」でのみ利用できます。freee_server_info の transport が stdio の場合は呼び出せません。その際はユーザーに freee-mcp（リモート版）の設定（https://support.freee.co.jp/hc/ja/articles/56390747520537）を案内してください。
 
-evaluation_results
+employee_evaluation
 
 ## GET /hub/employee_evaluation/evaluation_results — 人事評価結果一覧取得（リモート版freee-mcp限定）
 

@@ -129,9 +129,15 @@
 
 ## survey - freeeサーベイ
 
-- survey-employee-evaluation-evaluation-results.md — ⚠ freee-mcp（リモート版） 限定 / evaluation_results
-- survey-launch-kaigyo-application.md — ⚠ freee-mcp（リモート版） 限定 / launch_kaigyo_application
 - survey-surveys.md — ⚠ freee-mcp（リモート版） 限定 / survey
+
+## launch - freee開業
+
+- launch-kaigyo-application.md — ⚠ freee-mcp（リモート版） 限定 / launch_kaigyo_application
+
+## employee_evaluation - 人事評価
+
+- employee-evaluation-evaluation-results.md — ⚠ freee-mcp（リモート版） 限定 / employee_evaluation
 
 ## tax_return - freee申告
 
