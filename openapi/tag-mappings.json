@@ -112,9 +112,8 @@
   },
   "mcponly-api": {
     "survey": "surveys",
-    "launch_kaigyo_application": "launch-kaigyo-application",
-    "employee_evaluation_evaluation_results": "employee-evaluation-evaluation-results",
-    "employee_evaluation": "employee-evaluation"
+    "launch_kaigyo_application": "kaigyo-application",
+    "employee_evaluation": "evaluation-results"
   },
   "sign-api": {
     "文書": "documents",

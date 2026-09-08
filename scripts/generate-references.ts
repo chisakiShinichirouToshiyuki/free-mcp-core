@@ -883,7 +883,8 @@ async function syncTagMappings(
 async function processApi(
   apiKey: string,
   schemaFile: string,
-  prefix: string,
+  prefix: string | undefined,
+  tagServices: Record<string, string> | undefined,
   mappings: TagMappings,
   outputDir: string
 ): Promise<IndexEntry[]> {
@@ -905,8 +906,15 @@ async function processApi(
   const entries: IndexEntry[] = [];
   for (const [tagName, englishName] of Object.entries(tagMappings)) {
     if (englishName) {
+      const filePrefix = prefix ?? tagServices?.[tagName];
+      if (filePrefix === undefined) {
+        throw new Error(
+          `Tag "${tagName}" in ${apiKey} has no service. ` +
+            `Add it to tagServices in API_CONFIGS (and to SERVICE_LABELS).`
+        );
+      }
       entries.push(
-        await generateReference(apiKey, schema, tagName, englishName, prefix, outputDir)
+        await generateReference(apiKey, schema, tagName, englishName, filePrefix, outputDir)
       );
     }
   }
@@ -916,7 +924,22 @@ async function processApi(
 }
 
 // API configurations
-const API_CONFIGS = [
+interface ReferenceApiConfig {
+  apiKey: string;
+  schemaFile: string;
+  /** このスキーマ全体が属する service。複数 service を含むスキーマでは tagServices を使う。 */
+  prefix?: string;
+  /**
+   * タグ → service。複数 service を含むスキーマ用で、prefix の代わりに使う。
+   * タグはリファレンスのグルーピング単位で service とは目的が違い、タグ名からは
+   * ドメインの区切りを判定できないため、導出せず対応表で持つ。
+   * ここに無いタグは生成時にエラーになる。値は SERVICE_LABELS のキーと一致させること。
+   */
+  tagServices?: Record<string, string>;
+  outputDir: string;
+}
+
+const API_CONFIGS: ReferenceApiConfig[] = [
   { apiKey: "accounting-api", schemaFile: join(OPENAPI_DIR, "accounting-api-schema.json"), prefix: "accounting", outputDir: OUTPUT_DIR },
   { apiKey: "hr-api", schemaFile: join(OPENAPI_DIR, "hr-api-schema.json"), prefix: "hr", outputDir: OUTPUT_DIR },
   { apiKey: "invoice-api", schemaFile: join(OPENAPI_DIR, "invoice-api-schema.json"), prefix: "invoice", outputDir: OUTPUT_DIR },
@@ -926,14 +949,25 @@ const API_CONFIGS = [
   { apiKey: "fixed-asset-management-api", schemaFile: join(OPENAPI_DIR, "fixed-asset-management-api-schema.json"), prefix: "fixed-asset-management", outputDir: OUTPUT_DIR },
   { apiKey: "partner-management-api", schemaFile: join(OPENAPI_DIR, "partner-management-api-schema.json"), prefix: "partner-management", outputDir: OUTPUT_DIR },
   { apiKey: "tax-return-api", schemaFile: join(OPENAPI_DIR, "tax-return-api-schema.json"), prefix: "tax-return", outputDir: OUTPUT_DIR },
-  // mcp-only 集約スキーマ。現状は survey のみ。ここ由来のパスは mcp-only とみなされ、
-  // 生成される各リファレンス冒頭に MCP_ONLY_BANNER が自動挿入される（generateReference 参照）。
-  { apiKey: "mcponly-api", schemaFile: MCPONLY_SCHEMA_FILE, prefix: "survey", outputDir: OUTPUT_DIR },
+  // ここ由来のパスは mcp-only とみなされ、各リファレンス冒頭に MCP_ONLY_BANNER が
+  // 自動挿入される（generateReference 参照）。複数 service が 1 ファイルに同居するため
+  // prefix ではなく tagServices を使う。
+  {
+    apiKey: "mcponly-api",
+    schemaFile: MCPONLY_SCHEMA_FILE,
+    tagServices: {
+      survey: "survey",
+      launch_kaigyo_application: "launch",
+      employee_evaluation: "employee-evaluation",
+    },
+    outputDir: OUTPUT_DIR,
+  },
   { apiKey: "sign-api", schemaFile: join(OPENAPI_DIR, "sign-api-schema.json"), prefix: "sign", outputDir: SIGN_OUTPUT_DIR },
 ];
 
 // ファイル名 prefix -> freee_api_* ツールの service パラメータと日本語ラベル。
-// prefix は API_CONFIGS のものと一致させること（新しいドメインを足したらここも足す）。
+// キーは API_CONFIGS の prefix または tagServices の値と一致させること
+// （新しいドメインを足したらここも足す）。
 const SERVICE_LABELS: Record<string, { service: string; label: string }> = {
   accounting: { service: "accounting", label: "freee会計" },
   hr: { service: "hr", label: "freee人事労務" },
@@ -944,8 +978,33 @@ const SERVICE_LABELS: Record<string, { service: string; label: string }> = {
   "fixed-asset-management": { service: "fixed_asset_management", label: "freee固定資産" },
   "partner-management": { service: "partner_management", label: "freee業務委託管理" },
   survey: { service: "survey", label: "freeeサーベイ" },
+  launch: { service: "launch", label: "freee開業" },
+  "employee-evaluation": { service: "employee_evaluation", label: "人事評価" },
   "tax-return": { service: "tax_return", label: "freee申告" },
 };
+
+/**
+ * API_CONFIGS が使う service のうち、SERVICE_LABELS に無いものを返す。
+ *
+ * writeReferenceIndex は SERVICE_LABELS を起点に走査するため、綴りが違うと
+ * リファレンスは生成されるのに INDEX.md から黙って漏れる。テストで担保する。
+ */
+export function findServicesMissingFromIndex(): string[] {
+  const known = new Set(Object.keys(SERVICE_LABELS));
+  const missing: string[] = [];
+
+  for (const { prefix, tagServices, outputDir } of API_CONFIGS) {
+    // sign は SIGN-GUIDE.md がリファレンス一覧を持つので索引の対象外。
+    if (outputDir !== OUTPUT_DIR) continue;
+
+    const services = tagServices ? Object.values(tagServices) : prefix ? [prefix] : [];
+    for (const service of services) {
+      if (!known.has(service)) missing.push(service);
+    }
+  }
+
+  return missing;
+}
 
 /**
  * 索引の1行に埋め込める文字列にする（改行と区切り文字を潰す）
@@ -1114,8 +1173,15 @@ async function main(): Promise<void> {
 
     // Process each API
     const indexEntries: IndexEntry[] = [];
-    for (const { apiKey, schemaFile, prefix, outputDir } of API_CONFIGS) {
-      const entries = await processApi(apiKey, schemaFile, prefix, mappings, outputDir);
+    for (const { apiKey, schemaFile, prefix, tagServices, outputDir } of API_CONFIGS) {
+      const entries = await processApi(
+        apiKey,
+        schemaFile,
+        prefix,
+        tagServices,
+        mappings,
+        outputDir
+      );
       // sign は SIGN-GUIDE.md がリファレンス一覧を持っているので索引の対象外。
       if (outputDir === OUTPUT_DIR) {
         indexEntries.push(...entries);

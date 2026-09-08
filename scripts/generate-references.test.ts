@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildEndpointsMarkdown,
   countOperations,
+  findServicesMissingFromIndex,
   replaceOperationCount,
   type OpenAPISchema,
   type PathData,
@@ -427,5 +428,11 @@ describe("replaceOperationCount", () => {
     expect(
       replaceOperationCount("<!-- API-STATS-TOTAL-START -->485\n", 485)
     ).toBeNull();
+  });
+});
+
+describe("API_CONFIGS と SERVICE_LABELS の整合", () => {
+  it("索引対象の service がすべて SERVICE_LABELS に存在する", () => {
+    expect(findServicesMissingFromIndex()).toEqual([]);
   });
 });
