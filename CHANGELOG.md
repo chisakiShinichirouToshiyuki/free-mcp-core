@@ -1,5 +1,15 @@
 # freee-mcp
 
+## 0.35.1
+
+### Patch Changes
+
+- [`cc66a65`](https://github.com/freee/freee-mcp/commit/cc66a659a4e4fe0016f17e36873a86acf2d8ff27): 申告帳票マッピングのドキュメント記載を整理した
+
+  - `tax-return-references/index.md` の「出典と注意事項」を出典・対象様式バージョン・テンプレートである旨の 3 点に集約
+  - 決算書カスタム項目の説明から不要な補足を削除
+  - レシピ側の重複記述を削除し、注意事項は `index.md` への参照に一本化
+
 ## 0.35.0
 
 ### Minor Changes
