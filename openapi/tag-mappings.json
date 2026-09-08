@@ -32,7 +32,8 @@
     "General ledgers": "general-ledgers",
     "Account groups": "account-groups",
     "User matchers": "user-matchers",
-    "Purchase requests": "purchase-requests"
+    "Purchase requests": "purchase-requests",
+    "Expense application currencies": "expense-application-currencies"
   },
   "hr-api": {
     "ログインユーザー": "login-user",

@@ -16,6 +16,7 @@
 - accounting-banks.md — 連携サービス
 - accounting-companies.md — 事業所
 - accounting-deals.md — 取引（収入・支出）
+- accounting-expense-application-currencies.md — 経費精算の外貨
 - accounting-expense-application-line-templates.md — 経費科目
 - accounting-expense-applications.md — 経費精算
 - accounting-fixed-assets.md — 固定資産台帳
