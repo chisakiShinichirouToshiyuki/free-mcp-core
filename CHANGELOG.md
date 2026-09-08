@@ -1,5 +1,40 @@
 # freee-mcp
 
+## 0.35.0
+
+### Minor Changes
+
+- [`70ed5f9`](https://github.com/freee/freee-mcp/commit/70ed5f97b0e4a3fff890b04223a89d130fa9cf2c): mcp-only API のサービスをドメインごとに分割し、freee 開業（`launch`）と人事評価（`employee_evaluation`）を `freee_api_*` の `service` として追加しました。
+
+  mcp-only なエンドポイントはドメイン横断で 1 つのスキーマに集約されて配信されるため、これまで `survey` サービスがその全体を掴んでおり、開業・人事評価のエンドポイントが `service: "survey"` として扱われていました。各サービスがスキーマ内の担当パス範囲だけを見るようになり、以下が変わります。
+
+  - `service: "launch"` / `service: "employee_evaluation"` を指定できるようになりました
+  - `service: "survey"` で開業・人事評価のパスを呼ぶとパス検証エラーになります（従来は通っていました）
+  - `freee_api_list_paths` が各ドメインを正しいサービス名の下に列挙します
+  - `FREEE_API_BASE_URL_SURVEY` が開業・人事評価の向き先まで変えてしまう問題が解消し、`FREEE_API_BASE_URL_LAUNCH` / `FREEE_API_BASE_URL_EMPLOYEE_EVALUATION` で個別に指定できます
+
+  Agent Skills 側では、リファレンスのファイル名がサービスに揃います。
+
+  - `survey-launch-kaigyo-application.md` → `launch-kaigyo-application.md`
+  - `survey-employee-evaluation-evaluation-results.md` → `employee-evaluation-evaluation-results.md`
+
+  あわせて開業のレシピ `recipes/launch-operations.md` を追加しました（`family_employees` が全件置き換えである点など、PATCH の注意点を含みます）。
+
+  いずれも freee-mcp（リモート版）限定のエンドポイントで、ローカル（stdio）モードでの扱いは変わりません。
+
+### Patch Changes
+
+- [`184baa3`](https://github.com/freee/freee-mcp/commit/184baa3c17e063a3a1e893d404bc1be0c35dc4b3): freee-api-skill のレシピの API 呼び出し例に、必須の `company_id` を追加
+
+  - 会計・人事労務の 11 例で `company_id` が抜けており、そのまま実行すると失敗していた
+  - 人事労務では欠落時に権限エラー扱いの 401 が返り原因を取り違えやすいため、レシピに注意事項を追記
+
+- [`a84f495`](https://github.com/freee/freee-mcp/commit/a84f4950383dc7c15e467fbcdf459f797f4f868b): freee 開業のレシピを拡充し、開業の eval と mcp-only ゲートのテストを追加しました。
+
+  - `recipes/launch-operations.md` に、`completion_hint` を使った入力補完の流れ、提出が Web 画面限定であること、422 の `invalid_fields[]` によるエラー処理、e-Tax の文字数制限、電話番号・住所を組み合わせで送る必要があることを追記
+  - `company_id` の指定場所が GET（クエリ）と PATCH（ボディ）で異なる点を明記
+  - 開業の eval ケースを 3 件追加
+
 ## 0.34.3
 
 ### Patch Changes
