@@ -26,6 +26,14 @@ freee-mcp では AI を活用した開発フローを採用しています。
 
 この仕組みにより、コードの一貫性と品質を保ちながら迅速に開発を進めています。
 
+## 脆弱性の報告 / Reporting a Vulnerability
+
+脆弱性は公開の Issue ではなく、非公開の経路で報告してください。
+報告方法と対応の流れは [SECURITY.md](./SECURITY.md) に記載しています。
+
+Security vulnerabilities must not be reported in public issues. See [SECURITY.md](./SECURITY.md)
+for the private reporting channel and what to expect.
+
 ## Issue の書き方 / How to Write Issues
 
 Issue を作成する際は、テンプレートに沿って記入してください。
