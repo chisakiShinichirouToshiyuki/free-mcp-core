@@ -4170,6 +4170,26 @@
         ]
       }
     },
+    "/api/1/expense_applications/form": {
+      "get": {
+        "summary": "経費申請フォームの取得",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費申請フォームの設定を取得します。設定が未作成の場合は初期値を返します。</p>",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID"
+          }
+        ]
+      },
+      "put": {
+        "summary": "経費申請フォームの更新",
+        "description": "\n<h2 id=\"_1\">概要</h2>\n\n<p>指定した事業所の経費申請フォームの設定を更新します。設定が未作成の場合は作成します。</p>",
+        "hasJsonBody": true
+      }
+    },
     "/api/1/expense_application_line_templates": {
       "get": {
         "summary": "経費科目一覧の取得",

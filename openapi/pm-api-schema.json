@@ -1746,6 +1746,91 @@
           }
         }
       }
+    },
+    "/sales_order_statuses": {
+      "get": {
+        "operationId": "/sales_order_statuses/index",
+        "summary": "受注ステータスの取得",
+        "description": "事業所の受注ステータスの一覧を取得します。",
+        "tags": [
+          "SalesOrderStatuses"
+        ],
+        "parameters": [
+          {
+            "description": "事業所ID",
+            "in": "query",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "取得レコードの件数（デフォルト：50, 最小：1, 最大：100）",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "description": "取得レコードのオフセット（デフォルト：0）",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854776000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功時",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sales_order_statuses": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/sales_order_status"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/paths/~1projects/get/responses/200/content/application~1json/schema/properties/meta"
+                    }
+                  },
+                  "required": [
+                    "sales_order_statuses",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/paths/~1users~1me/get/responses/400"
+          },
+          "401": {
+            "$ref": "#/paths/~1projects/post/responses/401"
+          },
+          "403": {
+            "$ref": "#/paths/~1projects/post/responses/403"
+          },
+          "404": {
+            "$ref": "#/paths/~1projects/post/responses/404"
+          },
+          "500": {
+            "$ref": "#/paths/~1users~1me/get/responses/500"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2138,7 +2223,7 @@
                   "example": 11
                 },
                 "unit_cost_id": {
-                  "description": "このプロジェクトで使用する従業員単価マスタID\n`use_standard_unit_cost: true` の場合は無視されます",
+                  "description": "このプロジェクトで使用する従業員単価マスタID\n`use_standard_unit_cost: true` の場合は無視されます（その場合でも値の指定が必要です）",
                   "format": "int32",
                   "type": "integer",
                   "example": 3
@@ -2275,13 +2360,13 @@
             "nullable": true
           },
           "manager_person_id": {
-            "description": "プロジェクトマネージャーの従業員ID\nこのパラメータはシステム管理者かプロジェクトマネージャーでログインしているときのみ指定可能。",
+            "description": "プロジェクトマネージャーの従業員ID\n指定する場合、 `pm_budgets_cost` の同時指定が必要。\nこのパラメータはシステム管理者かプロジェクトマネージャーでログインしているときのみ指定可能。",
             "format": "int32",
             "type": "integer",
             "example": 10
           },
           "pm_budgets_cost": {
-            "description": "プロジェクトマネージャーのコスト(円)",
+            "description": "プロジェクトマネージャーのコスト(円)\n指定する場合、 `manager_person_id` の同時指定が必要。",
             "format": "int32",
             "type": "integer",
             "example": 4000
@@ -2306,7 +2391,7 @@
                   "example": 11
                 },
                 "unit_cost_id": {
-                  "description": "このプロジェクトで使用する従業員単価マスタID\n`use_standard_unit_cost: true` の場合は無視されます",
+                  "description": "このプロジェクトで使用する従業員単価マスタID\n`use_standard_unit_cost: true` の場合は無視されます（その場合でも値の指定が必要です）",
                   "format": "int32",
                   "type": "integer",
                   "example": 3
@@ -3303,6 +3388,26 @@
           "id",
           "name",
           "member_count"
+        ]
+      },
+      "sales_order_status": {
+        "type": "object",
+        "description": "受注ステータス",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "受注ステータスID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "受注ステータス名",
+            "example": "受注済み"
+          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       },
       "workload_tag_group": {

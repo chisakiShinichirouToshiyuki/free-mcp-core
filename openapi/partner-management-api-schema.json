@@ -24,6 +24,26 @@
       "name": "partner_management_orderer_partners",
       "description": "partner_management_orderer_partners",
       "x-displayName": "パートナー"
+    },
+    {
+      "name": "partner_management_orderer_projects",
+      "description": "partner_management_orderer_projects",
+      "x-displayName": "プロジェクト"
+    },
+    {
+      "name": "partner_management_orderer_project_business_partners",
+      "description": "partner_management_orderer_project_business_partners",
+      "x-displayName": "プロジェクトのログインなしパートナー"
+    },
+    {
+      "name": "partner_management_orderer_project_company_users",
+      "description": "partner_management_orderer_project_company_users",
+      "x-displayName": "プロジェクト担当者"
+    },
+    {
+      "name": "partner_management_orderer_project_partners",
+      "description": "partner_management_orderer_project_partners",
+      "x-displayName": "プロジェクトパートナー"
     }
   ],
   "paths": {
@@ -330,6 +350,216 @@
         },
         "tags": [
           "partner_management_orderer_partners"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{id}": {
+      "get": {
+        "operationId": "get_partner_management_orderer_project",
+        "summary": "プロジェクト詳細取得（β版）",
+        "description": "プロジェクト情報を取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.GetRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.GetRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "プロジェクト詳細レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerManagement.Orderer.Projects.Project"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_projects"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{project_id}/project_business_partners": {
+      "get": {
+        "operationId": "list_partner_management_orderer_project_business_partners",
+        "summary": "プロジェクトのログインなしパートナー一覧取得（β版）",
+        "description": "指定プロジェクトにアサインされているログインなしパートナー一覧を取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.project_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "プロジェクトのログインなしパートナー一覧レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PartnerManagement.Orderer.ProjectBusinessPartners.ProjectBusinessPartner"
+                      },
+                      "description": "ログインなしパートナーのリスト"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページのカーソルトークン。最終ページは null",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_project_business_partners"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{project_id}/project_company_users": {
+      "get": {
+        "operationId": "list_partner_management_orderer_project_company_users",
+        "summary": "プロジェクト担当者一覧取得（β版）",
+        "description": "指定プロジェクトの担当者（アサインされている企業ユーザー）の一覧を取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.project_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "プロジェクトの担当者一覧レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PartnerManagement.Orderer.ProjectCompanyUsers.ProjectAssignedCompanyUser"
+                      },
+                      "description": "担当者一覧"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページのカーソルトークン。最終ページは null",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_project_company_users"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{project_id}/project_partners": {
+      "get": {
+        "operationId": "list_partner_management_orderer_project_partners",
+        "summary": "プロジェクトパートナー一覧取得（β版）",
+        "description": "指定したプロジェクトにアサインされているパートナーの一覧を取得する。\n\n## 注意点\n\n- パートナーの詳細情報は返さないため、必要な場合はレスポンスの `partner_id` を使って\n  パートナー詳細取得 API を呼び出す。\n- 招待を承諾していないパートナーもプロジェクトにアサインできるため、一覧に含まれる。\n  その場合 `name` には招待時に指定した名前を返す。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectPartners.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectPartners.ListRequest.project_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectPartners.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.ProjectPartners.ListRequest.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "プロジェクトパートナー一覧レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PartnerManagement.Orderer.ProjectPartners.ProjectPartner"
+                      },
+                      "description": "プロジェクトパートナーのリスト"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページのカーソルトークン。最終ページは null",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_project_partners"
         ]
       }
     }
@@ -753,6 +983,162 @@
           "type": "integer",
           "format": "int32"
         }
+      },
+      "PartnerManagement.Orderer.Projects.GetRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Projects.GetRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "取得対象のプロジェクトID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.project_id": {
+        "name": "project_id",
+        "in": "path",
+        "required": true,
+        "description": "取得対象のプロジェクトID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectBusinessPartners.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.project_id": {
+        "name": "project_id",
+        "in": "path",
+        "required": true,
+        "description": "取得対象のプロジェクト ID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectCompanyUsers.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectPartners.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectPartners.ListRequest.project_id": {
+        "name": "project_id",
+        "in": "path",
+        "required": true,
+        "description": "取得対象のプロジェクトID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "PartnerManagement.Orderer.ProjectPartners.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.ProjectPartners.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
       }
     },
     "schemas": {
@@ -1255,6 +1641,174 @@
           }
         },
         "description": "パートナー",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.Projects.Project": {
+        "type": "object",
+        "required": [
+          "id",
+          "is_archived",
+          "archived_at",
+          "name",
+          "description",
+          "require_hide_other_freelancers",
+          "default_inspection_date_days",
+          "default_task_order_note",
+          "default_invoice_note",
+          "approval_flow_pattern_task_order_id",
+          "approval_flow_pattern_task_submit_id",
+          "approval_flow_pattern_invoice_submit_id",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "プロジェクトID",
+            "example": 123
+          },
+          "is_archived": {
+            "type": "boolean",
+            "description": "アーカイブ済みかどうか",
+            "example": false
+          },
+          "archived_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "アーカイブ日時",
+            "example": "2026-06-30T18:00:00+09:00"
+          },
+          "name": {
+            "type": "string",
+            "description": "プロジェクト名",
+            "example": "サンプルプロジェクト"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "説明",
+            "example": "説明文"
+          },
+          "require_hide_other_freelancers": {
+            "type": "boolean",
+            "description": "他パートナーのアカウントを非表示にするか",
+            "example": true
+          },
+          "default_inspection_date_days": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "検収日のデフォルト設定",
+            "example": 7
+          },
+          "default_task_order_note": {
+            "type": "string",
+            "nullable": true,
+            "description": "発注書の備考欄のデフォルト設定",
+            "example": "発注時の注意事項"
+          },
+          "default_invoice_note": {
+            "type": "string",
+            "nullable": true,
+            "description": "請求書の備考欄のデフォルト設定",
+            "example": "請求時の注意事項"
+          },
+          "approval_flow_pattern_task_order_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "タスク発注の社内承認フローID",
+            "example": 1
+          },
+          "approval_flow_pattern_task_submit_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "タスク検収の社内承認フローID",
+            "example": 2
+          },
+          "approval_flow_pattern_invoice_submit_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "請求書の社内承認フローID",
+            "example": 3
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "作成日時",
+            "example": "2026-04-01T09:00:00+09:00"
+          }
+        },
+        "description": "プロジェクト",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.ProjectBusinessPartners.ProjectBusinessPartner": {
+        "type": "object",
+        "required": [
+          "business_partner_id",
+          "name"
+        ],
+        "properties": {
+          "business_partner_id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ログインなしパートナーID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "ログインなしパートナー名",
+            "example": "山田太郎"
+          }
+        },
+        "description": "プロジェクトにアサインされているログインなしパートナー",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.ProjectCompanyUsers.ProjectAssignedCompanyUser": {
+        "type": "object",
+        "required": [
+          "company_user_id",
+          "name"
+        ],
+        "properties": {
+          "company_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "企業ユーザー ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "氏名",
+            "example": "山田太郎"
+          }
+        },
+        "description": "プロジェクトの担当者（アサインされている企業ユーザー）",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.ProjectPartners.ProjectPartner": {
+        "type": "object",
+        "required": [
+          "partner_id",
+          "name"
+        ],
+        "properties": {
+          "partner_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "パートナーID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "パートナー名。招待未承諾時は招待時に指定した名前を返す",
+            "example": "山田太郎"
+          }
+        },
+        "description": "プロジェクトにアサインされているパートナー",
         "additionalProperties": false
       }
     },
