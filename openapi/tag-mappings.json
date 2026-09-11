@@ -33,7 +33,8 @@
     "Account groups": "account-groups",
     "User matchers": "user-matchers",
     "Purchase requests": "purchase-requests",
-    "Expense application currencies": "expense-application-currencies"
+    "Expense application currencies": "expense-application-currencies",
+    "Expense application forms": "expense-application-forms"
   },
   "hr-api": {
     "ログインユーザー": "login-user",
@@ -82,7 +83,8 @@
     "UnitCosts": "unit-costs",
     "Workloads": "workloads",
     "LaborBudgets": "labor-budgets",
-    "WorkloadTagGroups": "workload-tag-groups"
+    "WorkloadTagGroups": "workload-tag-groups",
+    "SalesOrderStatuses": "sales-order-statuses"
   },
   "sm-api": {
     "businesses": "businesses",
@@ -128,6 +130,10 @@
   "partner-management-api": {
     "partner_management_orderer_company_users": "orderer-company-users",
     "partner_management_orderer_sections": "orderer-sections",
-    "partner_management_orderer_partners": "partner-management-orderer-partners"
+    "partner_management_orderer_partners": "partner-management-orderer-partners",
+    "partner_management_orderer_project_business_partners": "partner-management-orderer-project-business-partners",
+    "partner_management_orderer_project_company_users": "partner-management-orderer-project-company-users",
+    "partner_management_orderer_project_partners": "partner-management-orderer-project-partners",
+    "partner_management_orderer_projects": "partner-management-orderer-projects"
   }
 }
