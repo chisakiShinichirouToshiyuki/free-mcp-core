@@ -1,5 +1,16 @@
 # freee-mcp
 
+## 0.35.2
+
+### Patch Changes
+
+- [`3305587`](https://github.com/freee/freee-mcp/commit/33055879177a15e79117cbd039ba009c5d8d750f): 工数管理スキルのレシピに受注ステータス（pm-sales-order-statuses）リファレンスへのリンクを追加
+- [`f5d1212`](https://github.com/freee/freee-mcp/commit/f5d1212d2e739db834bd15d12cb4cae8146439c3): スキルのアップロード上限（200 ファイル）に収めるため、freee-api-skill のファイル数を削減
+
+  - `tax-return-references/` は別表の系列・内訳書・税務代理権限証書を 1 ファイルにまとめた。`index.md` の帳票一覧から `sheet_code` で引く
+
+- [`f5e26ce`](https://github.com/freee/freee-mcp/commit/f5e26ced16dfaa36ea0ed69fc07e4669a7141dca): OpenAPI スキーマを最新版に同期 ( 7 files changed, 1722 insertions(+), 236 deletions(-))
+
 ## 0.35.1
 
 ### Patch Changes
