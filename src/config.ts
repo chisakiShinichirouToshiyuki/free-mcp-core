@@ -216,6 +216,10 @@ interface RemoteServerConfig {
   freeeApiUrl: string;
   redisUrl: string;
   corsAllowedOrigins?: string;
+  // Token served at /.well-known/openai-apps-challenge to prove ownership of the MCP
+  // hostname to the OpenAI Plugin Directory. Scoped to one plugin draft, so it is
+  // injected per environment; the endpoint stays 404 where it is unset.
+  openaiAppsChallengeToken?: string;
   rateLimitEnabled: boolean;
   logLevel: string;
   // HTTP server timeouts for long-lived MCP Streamable-HTTP / SSE connections.
@@ -298,6 +302,7 @@ const RemoteServerEnvSchema = z.object({
   FREEE_API_BASE_URL: z.string().url('FREEE_API_BASE_URL must be a valid URL.').optional(),
   REDIS_URL: z.string().min(1).optional(),
   CORS_ALLOWED_ORIGINS: z.string().optional(),
+  OPENAI_APPS_CHALLENGE_TOKEN: z.string().min(1).optional(),
   RATE_LIMIT_ENABLED: z.string().optional(),
   LOG_LEVEL: z.enum(VALID_LOG_LEVELS).optional(),
   HTTP_REQUEST_TIMEOUT_MS: positiveIntEnv('HTTP_REQUEST_TIMEOUT_MS'),
@@ -328,6 +333,7 @@ export function loadRemoteServerConfig(): RemoteServerConfig {
     FREEE_API_BASE_URL: process.env.FREEE_API_BASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     CORS_ALLOWED_ORIGINS: process.env.CORS_ALLOWED_ORIGINS,
+    OPENAI_APPS_CHALLENGE_TOKEN: process.env.OPENAI_APPS_CHALLENGE_TOKEN,
     RATE_LIMIT_ENABLED: process.env.RATE_LIMIT_ENABLED,
     LOG_LEVEL: process.env.LOG_LEVEL,
     HTTP_REQUEST_TIMEOUT_MS: process.env.HTTP_REQUEST_TIMEOUT_MS,
@@ -390,6 +396,7 @@ export function loadRemoteServerConfig(): RemoteServerConfig {
     freeeApiUrl: env.FREEE_API_BASE_URL?.replace(/\/+$/, '') || FREEE_API_URL,
     redisUrl: env.REDIS_URL || 'redis://localhost:6379',
     corsAllowedOrigins: env.CORS_ALLOWED_ORIGINS,
+    openaiAppsChallengeToken: env.OPENAI_APPS_CHALLENGE_TOKEN,
     rateLimitEnabled,
     logLevel: env.LOG_LEVEL || 'info',
     httpRequestTimeoutMs,
@@ -412,7 +419,7 @@ function maskSecret(value: string | undefined): string {
 
 /**
  * Build a log-safe summary of the resolved remote server config.
- * Secrets (jwtSecret, freeeClientSecret) are masked.
+ * Secrets (jwtSecret, freeeClientSecret, openaiAppsChallengeToken) are masked.
  */
 export function summarizeRemoteServerConfig(
   config: RemoteServerConfig,
@@ -431,6 +438,7 @@ export function summarizeRemoteServerConfig(
     freeeApiUrl: config.freeeApiUrl,
     redisUrl: config.redisUrl,
     corsAllowedOrigins: config.corsAllowedOrigins,
+    openaiAppsChallengeToken: maskSecret(config.openaiAppsChallengeToken),
     rateLimitEnabled: config.rateLimitEnabled,
     logLevel: config.logLevel,
     httpRequestTimeoutMs: config.httpRequestTimeoutMs,
