@@ -22,6 +22,7 @@ import { createLivenessHandler, createReadinessHandler } from './health-endpoint
 import { initLogger } from './logger.js';
 import { FreeeOAuthProvider } from './oauth-provider.js';
 import { OAuthStateStore } from './oauth-store.js';
+import { createOpenAIAppsChallengeHandler } from './openai-apps-challenge.js';
 import { getCurrentRecorder } from './request-context.js';
 import { initUserAgentTransportMode } from './user-agent.js';
 
@@ -213,6 +214,14 @@ export async function startHttpServer(options?: {
 
   // freee OAuth callback (browser redirect, no MCP auth required)
   app.get(FREEE_CALLBACK_PATH, freeeCallbackHandler);
+
+  // OpenAI Plugin Directory domain-ownership challenge (no auth required).
+  // Mounted before mcpAuthRouter so Express first-match-wins keeps this
+  // /.well-known path out of the SDK router.
+  app.get(
+    '/.well-known/openai-apps-challenge',
+    createOpenAIAppsChallengeHandler(remoteConfig.openaiAppsChallengeToken),
+  );
 
   // MCP Auth Router: /.well-known/*, /authorize, /token, /register, /revoke
   const { mcpAuthRouter } = await import('@modelcontextprotocol/sdk/server/auth/router.js');
