@@ -528,10 +528,10 @@
             "$ref": "#/components/parameters/cost_budget_no"
           },
           {
-            "$ref": "#/components/parameters/parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-2"
           },
           {
             "$ref": "#/components/parameters/canceled"
@@ -1348,10 +1348,10 @@
             "$ref": "#/components/parameters/end_registered_date"
           },
           {
-            "$ref": "#/components/parameters/components-parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-3"
           },
           {
-            "$ref": "#/components/parameters/components-parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-3"
           },
           {
             "$ref": "#/components/parameters/start_quotation_date"
@@ -1384,6 +1384,18 @@
           },
           {
             "$ref": "#/components/parameters/quotation_no"
+          },
+          {
+            "$ref": "#/components/parameters/start_gross_profit_amount_excluding_tax"
+          },
+          {
+            "$ref": "#/components/parameters/end_gross_profit_amount_excluding_tax"
+          },
+          {
+            "$ref": "#/components/parameters/start_gross_profit_rate"
+          },
+          {
+            "$ref": "#/components/parameters/end_gross_profit_rate"
           },
           {
             "$ref": "#/components/parameters/quotation_status"
@@ -1705,10 +1717,10 @@
             "$ref": "#/components/parameters/company_id"
           },
           {
-            "$ref": "#/components/parameters/parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-2"
           },
           {
             "$ref": "#/components/parameters/start_sales_order_date"
@@ -1971,16 +1983,16 @@
             "$ref": "#/components/parameters/company_id"
           },
           {
-            "$ref": "#/components/parameters/parameters-start_registered_date"
+            "$ref": "#/components/parameters/start_registered_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-end_registered_date"
+            "$ref": "#/components/parameters/end_registered_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-2"
           },
           {
             "$ref": "#/components/parameters/start_delivery_date"
@@ -2374,10 +2386,10 @@
             "$ref": "#/components/parameters/company_id"
           },
           {
-            "$ref": "#/components/parameters/components-parameters-start_registered_date"
+            "$ref": "#/components/parameters/start_registered_date-3"
           },
           {
-            "$ref": "#/components/parameters/components-parameters-end_registered_date"
+            "$ref": "#/components/parameters/end_registered_date-3"
           },
           {
             "$ref": "#/components/parameters/start_revenue_recognition_date"
@@ -2392,7 +2404,7 @@
             "$ref": "#/components/parameters/customer_ids"
           },
           {
-            "$ref": "#/components/parameters/parameters-billing_status"
+            "$ref": "#/components/parameters/billing_status-2"
           },
           {
             "$ref": "#/components/parameters/collection_status"
@@ -3015,10 +3027,10 @@
             "$ref": "#/components/parameters/business_ids"
           },
           {
-            "$ref": "#/components/parameters/sales_schedules_controller.openapi_components-parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-4"
           },
           {
-            "$ref": "#/components/parameters/sales_schedules_controller.openapi_components-parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-4"
           },
           {
             "$ref": "#/components/parameters/limit"
@@ -3317,10 +3329,10 @@
             "$ref": "#/components/parameters/canceled"
           },
           {
-            "$ref": "#/components/parameters/parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-2"
           },
           {
-            "$ref": "#/components/parameters/parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-2"
           },
           {
             "name": "start_incurred_date",
@@ -3640,16 +3652,16 @@
             "$ref": "#/components/parameters/company_id"
           },
           {
-            "$ref": "#/components/parameters/procurements_controller.openapi_components-parameters-start_registered_date"
+            "$ref": "#/components/parameters/start_registered_date-4"
           },
           {
-            "$ref": "#/components/parameters/procurements_controller.openapi_components-parameters-end_registered_date"
+            "$ref": "#/components/parameters/end_registered_date-4"
           },
           {
-            "$ref": "#/components/parameters/procurements_controller.openapi_components-parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-5"
           },
           {
-            "$ref": "#/components/parameters/procurements_controller.openapi_components-parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-5"
           },
           {
             "$ref": "#/components/parameters/start_procurement_date"
@@ -3664,13 +3676,13 @@
             "$ref": "#/components/parameters/supplier_ids"
           },
           {
-            "$ref": "#/components/parameters/parameters-business_ids"
+            "$ref": "#/components/parameters/business_ids-2"
           },
           {
             "$ref": "#/components/parameters/procurement_no"
           },
           {
-            "$ref": "#/components/parameters/parameters-payment_status"
+            "$ref": "#/components/parameters/payment_status-2"
           },
           {
             "$ref": "#/components/parameters/canceled"
@@ -3927,16 +3939,16 @@
             "$ref": "#/components/parameters/end_advance_receipt_date"
           },
           {
-            "$ref": "#/components/parameters/advance_receipts_controller.openapi_components-parameters-start_registered_date"
+            "$ref": "#/components/parameters/start_registered_date-5"
           },
           {
-            "$ref": "#/components/parameters/advance_receipts_controller.openapi_components-parameters-end_registered_date"
+            "$ref": "#/components/parameters/end_registered_date-5"
           },
           {
-            "$ref": "#/components/parameters/advance_receipts_controller.openapi_components-parameters-start_last_updated_date"
+            "$ref": "#/components/parameters/start_last_updated_date-6"
           },
           {
-            "$ref": "#/components/parameters/advance_receipts_controller.openapi_components-parameters-end_last_updated_date"
+            "$ref": "#/components/parameters/end_last_updated_date-6"
           },
           {
             "$ref": "#/components/parameters/customer_ids"
@@ -3951,7 +3963,7 @@
             "$ref": "#/components/parameters/billing_status"
           },
           {
-            "$ref": "#/components/parameters/parameters-collection_status"
+            "$ref": "#/components/parameters/collection_status-2"
           },
           {
             "$ref": "#/components/parameters/canceled"
@@ -4778,7 +4790,7 @@
           "example": "CB-2024-0001"
         }
       },
-      "parameters-start_last_updated_date": {
+      "start_last_updated_date-2": {
         "name": "start_last_updated_date",
         "description": "更新日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -4789,7 +4801,7 @@
           "example": "2025-01-01"
         }
       },
-      "parameters-end_last_updated_date": {
+      "end_last_updated_date-2": {
         "name": "end_last_updated_date",
         "description": "更新日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -4938,7 +4950,7 @@
           "example": "2025-05-01"
         }
       },
-      "components-parameters-start_last_updated_date": {
+      "start_last_updated_date-3": {
         "name": "start_last_updated_date",
         "description": "見積更新日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -4949,7 +4961,7 @@
           "example": "2025-01-01"
         }
       },
-      "components-parameters-end_last_updated_date": {
+      "end_last_updated_date-3": {
         "name": "end_last_updated_date",
         "description": "見積更新日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -4990,6 +5002,58 @@
         "schema": {
           "type": "string",
           "example": "Q-2024-0001"
+        }
+      },
+      "start_gross_profit_amount_excluding_tax": {
+        "name": "start_gross_profit_amount_excluding_tax",
+        "description": "粗利額計(税抜)で絞込：下限",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double",
+          "maximum": 999999999999,
+          "minimum": -999999999999,
+          "example": 10000
+        }
+      },
+      "end_gross_profit_amount_excluding_tax": {
+        "name": "end_gross_profit_amount_excluding_tax",
+        "description": "粗利額計(税抜)で絞込：上限",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double",
+          "maximum": 999999999999,
+          "minimum": -999999999999,
+          "example": 500000
+        }
+      },
+      "start_gross_profit_rate": {
+        "name": "start_gross_profit_rate",
+        "description": "粗利率(%)で絞込：下限",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double",
+          "maximum": 99999.999,
+          "minimum": -99999.999,
+          "example": 10
+        }
+      },
+      "end_gross_profit_rate": {
+        "name": "end_gross_profit_rate",
+        "description": "粗利率(%)で絞込：上限",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "format": "double",
+          "maximum": 99999.999,
+          "minimum": -99999.999,
+          "example": 50
         }
       },
       "quotation_status": {
@@ -5055,7 +5119,7 @@
           "example": "SO-2024-0001"
         }
       },
-      "parameters-start_registered_date": {
+      "start_registered_date-2": {
         "name": "start_registered_date",
         "description": "登録日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5066,7 +5130,7 @@
           "example": "2025-01-01"
         }
       },
-      "parameters-end_registered_date": {
+      "end_registered_date-2": {
         "name": "end_registered_date",
         "description": "登録日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5145,7 +5209,7 @@
           "example": "not_delivered"
         }
       },
-      "components-parameters-start_registered_date": {
+      "start_registered_date-3": {
         "name": "start_registered_date",
         "description": "売上登録日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5156,7 +5220,7 @@
           "example": "2024-01-01"
         }
       },
-      "components-parameters-end_registered_date": {
+      "end_registered_date-3": {
         "name": "end_registered_date",
         "description": "売上登録日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5189,7 +5253,7 @@
           "example": "2024-12-31"
         }
       },
-      "parameters-billing_status": {
+      "billing_status-2": {
         "name": "billing_status",
         "description": "請求書送付ステータス (未送付: not_billed, 送付済: billed, 対象外: none)",
         "in": "query",
@@ -5426,7 +5490,7 @@
           "example": "2025-12-31"
         }
       },
-      "sales_schedules_controller.openapi_components-parameters-start_last_updated_date": {
+      "start_last_updated_date-4": {
         "name": "start_last_updated_date",
         "description": "変更日時で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5437,7 +5501,7 @@
           "example": "2025-01-01"
         }
       },
-      "sales_schedules_controller.openapi_components-parameters-end_last_updated_date": {
+      "end_last_updated_date-4": {
         "name": "end_last_updated_date",
         "description": "変更日時で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5458,7 +5522,7 @@
           "example": "OC-2024-0001"
         }
       },
-      "procurements_controller.openapi_components-parameters-start_registered_date": {
+      "start_registered_date-4": {
         "name": "start_registered_date",
         "description": "仕入登録日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5469,7 +5533,7 @@
           "example": "2025-01-01"
         }
       },
-      "procurements_controller.openapi_components-parameters-end_registered_date": {
+      "end_registered_date-4": {
         "name": "end_registered_date",
         "description": "仕入登録日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5480,7 +5544,7 @@
           "example": "2025-05-01"
         }
       },
-      "procurements_controller.openapi_components-parameters-start_last_updated_date": {
+      "start_last_updated_date-5": {
         "name": "start_last_updated_date",
         "description": "仕入更新日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5491,7 +5555,7 @@
           "example": "2025-01-01"
         }
       },
-      "procurements_controller.openapi_components-parameters-end_last_updated_date": {
+      "end_last_updated_date-5": {
         "name": "end_last_updated_date",
         "description": "仕入更新日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5524,7 +5588,7 @@
           "example": "2025-05-01"
         }
       },
-      "parameters-business_ids": {
+      "business_ids-2": {
         "name": "business_ids[]",
         "description": "案件ID<br>\n※ 複数の案件が紐づく仕入は本パラメータでヒットしません",
         "in": "query",
@@ -5551,7 +5615,7 @@
           "example": "PR-2024-0001"
         }
       },
-      "parameters-payment_status": {
+      "payment_status-2": {
         "name": "payment_status",
         "description": "決済ステータス (未決済: not_settled, 一部決済済: partially_settled, 決済済: settled, 対象外: none)",
         "in": "query",
@@ -5600,7 +5664,7 @@
           "example": "2025-05-01"
         }
       },
-      "advance_receipts_controller.openapi_components-parameters-start_registered_date": {
+      "start_registered_date-5": {
         "name": "start_registered_date",
         "description": "前受金登録日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5611,7 +5675,7 @@
           "example": "2025-01-01"
         }
       },
-      "advance_receipts_controller.openapi_components-parameters-end_registered_date": {
+      "end_registered_date-5": {
         "name": "end_registered_date",
         "description": "前受金登録日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5622,7 +5686,7 @@
           "example": "2025-05-01"
         }
       },
-      "advance_receipts_controller.openapi_components-parameters-start_last_updated_date": {
+      "start_last_updated_date-6": {
         "name": "start_last_updated_date",
         "description": "前受金更新日で絞込：開始日(yyyy-mm-dd)",
         "in": "query",
@@ -5633,7 +5697,7 @@
           "example": "2025-01-01"
         }
       },
-      "advance_receipts_controller.openapi_components-parameters-end_last_updated_date": {
+      "end_last_updated_date-6": {
         "name": "end_last_updated_date",
         "description": "前受金更新日で絞込：終了日(yyyy-mm-dd)",
         "in": "query",
@@ -5644,7 +5708,7 @@
           "example": "2025-05-01"
         }
       },
-      "parameters-collection_status": {
+      "collection_status-2": {
         "name": "collection_status",
         "description": "決済ステータス (未決済: not_settled, 一部決済済: partially_settled, 決済済: settled, 無効: invalidated, 対象外: none)",
         "in": "query",
@@ -7469,7 +7533,7 @@
         ],
         "additionalProperties": false
       },
-      "schemas-BusinessPhase": {
+      "BusinessPhase-2": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -7489,7 +7553,7 @@
           "name"
         ]
       },
-      "schemas-SalesProgression": {
+      "SalesProgression-2": {
         "type": "object",
         "properties": {
           "id": {
@@ -7667,7 +7731,7 @@
         ],
         "additionalProperties": false
       },
-      "schemas-Employee": {
+      "Employee-2": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -9239,18 +9303,93 @@
         ],
         "additionalProperties": false
       },
+      "QuotationListItem": {
+        "description": "見積一覧の要素",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/QuotationDigest"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gross_profit_amount_excluding_tax": {
+                "description": "粗利額計(税抜)。税込入力の見積、または粗利情報を持つ明細が1件もない見積では null",
+                "type": "number",
+                "format": "double",
+                "nullable": true,
+                "minimum": -999999999999,
+                "maximum": 999999999999,
+                "example": 30000
+              },
+              "gross_profit_rate": {
+                "description": "粗利率(%)。粗利額計が null の場合、または原価計・売価計のいずれかが0以下の場合は null",
+                "type": "number",
+                "format": "double",
+                "nullable": true,
+                "minimum": -99999.999,
+                "maximum": 99999.999,
+                "example": 30
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "QuotationGrossProfitParams": {
+        "description": "明細の粗利情報<br>\n※ 集計軸は粗利率固定です。売価は明細の単価が使われ、粗利額・各率は原価と売価から自動計算されます<br>\n※ 税方式が外税の顧客でのみ登録されます。内税の場合は指定しても無視されます",
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "cost": {
+            "description": "原価(単価)",
+            "format": "double",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999999999,
+            "example": 700
+          },
+          "memo": {
+            "description": "社内メモ",
+            "type": "string",
+            "nullable": true,
+            "maxLength": 255,
+            "example": "仕入先A社の見積による"
+          }
+        },
+        "required": [
+          "cost"
+        ],
+        "additionalProperties": false
+      },
+      "QuotationBasicLineParams": {
+        "description": "見積通常明細パラメータ",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicLineParams"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gross_profit": {
+                "$ref": "#/components/schemas/QuotationGrossProfitParams"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
       "QuotationLineParams": {
         "description": "明細パラメータ",
         "discriminator": {
           "propertyName": "line_type",
           "mapping": {
-            "basic": "#/components/schemas/BasicLineParams",
+            "basic": "#/components/schemas/QuotationBasicLineParams",
             "text": "#/components/schemas/TextLineParams"
           }
         },
         "oneOf": [
           {
-            "$ref": "#/components/schemas/BasicLineParams"
+            "$ref": "#/components/schemas/QuotationBasicLineParams"
           },
           {
             "$ref": "#/components/schemas/TextLineParams"
@@ -9383,23 +9522,143 @@
         ],
         "additionalProperties": false
       },
-      "LineDetail": {
+      "QuotationGrossProfitDetail": {
+        "description": "明細の粗利情報<br>\n※ 原価が未入力の明細は原価・原価計・各率が null になります",
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "cost": {
+            "description": "原価(単価)",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 700
+          },
+          "sales_price": {
+            "description": "売価(単価)",
+            "format": "double",
+            "type": "number",
+            "example": 1000
+          },
+          "memo": {
+            "description": "社内メモ",
+            "type": "string",
+            "nullable": true,
+            "example": "仕入先A社の見積による"
+          },
+          "profit_amount": {
+            "description": "粗利額(単価。売価 − 原価)",
+            "format": "double",
+            "type": "number",
+            "example": 300
+          },
+          "total_cost": {
+            "description": "原価計(原価 × 数量)。原価未入力の場合は null",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 70000
+          },
+          "total_price": {
+            "description": "売価計(売価 × 数量)",
+            "format": "double",
+            "type": "number",
+            "example": 100000
+          },
+          "total_gross_profit": {
+            "description": "粗利額計(売価計 − 原価計)",
+            "format": "double",
+            "type": "number",
+            "example": 30000
+          },
+          "cost_rate": {
+            "description": "原価率(%)。売価計・原価計のいずれかが0以下の場合は null",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 70
+          },
+          "profit_rate": {
+            "description": "粗利率(%)。売価計・原価計のいずれかが0以下の場合は null",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 30
+          },
+          "markup_rate": {
+            "description": "上乗せ率(%)。売価計・原価計のいずれかが0以下の場合は null",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 42.86
+          }
+        },
+        "required": [
+          "sales_price",
+          "profit_amount",
+          "total_price",
+          "total_gross_profit"
+        ],
+        "additionalProperties": false
+      },
+      "QuotationBasicLineDetail": {
+        "description": "見積通常明細詳細",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicLineDetail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gross_profit": {
+                "$ref": "#/components/schemas/QuotationGrossProfitDetail"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "QuotationLineDetail": {
         "description": "明細詳細",
         "discriminator": {
           "propertyName": "line_type",
           "mapping": {
-            "basic": "#/components/schemas/BasicLineDetail",
+            "basic": "#/components/schemas/QuotationBasicLineDetail",
             "text": "#/components/schemas/TextLineDetail"
           }
         },
         "oneOf": [
           {
-            "$ref": "#/components/schemas/BasicLineDetail"
+            "$ref": "#/components/schemas/QuotationBasicLineDetail"
           },
           {
             "$ref": "#/components/schemas/TextLineDetail"
           }
         ]
+      },
+      "QuotationGrossProfitSummary": {
+        "description": "見積全体の粗利合計<br>\n※ 粗利情報を持つ明細が1件もない場合は null",
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "gross_profit_amount_excluding_tax": {
+            "description": "粗利額計(税抜)",
+            "format": "double",
+            "type": "number",
+            "example": 30000
+          },
+          "gross_profit_rate": {
+            "description": "粗利率(%)。原価計・売価計のいずれかが0以下の場合は null",
+            "format": "double",
+            "type": "number",
+            "nullable": true,
+            "example": 30
+          }
+        },
+        "required": [
+          "gross_profit_amount_excluding_tax"
+        ],
+        "additionalProperties": false
       },
       "QuotationDetail": {
         "allOf": [
@@ -9427,8 +9686,11 @@
                 "description": "明細リスト",
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/LineDetail"
+                  "$ref": "#/components/schemas/QuotationLineDetail"
                 }
+              },
+              "gross_profit_summary": {
+                "$ref": "#/components/schemas/QuotationGrossProfitSummary"
               }
             },
             "required": [
@@ -9855,6 +10117,24 @@
           "last_updated_at"
         ],
         "additionalProperties": false
+      },
+      "LineDetail": {
+        "description": "明細詳細",
+        "discriminator": {
+          "propertyName": "line_type",
+          "mapping": {
+            "basic": "#/components/schemas/BasicLineDetail",
+            "text": "#/components/schemas/TextLineDetail"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BasicLineDetail"
+          },
+          {
+            "$ref": "#/components/schemas/TextLineDetail"
+          }
+        ]
       },
       "SalesOrderDetail": {
         "allOf": [
@@ -10899,7 +11179,7 @@
           }
         ]
       },
-      "schemas-LineParams": {
+      "LineParams-2": {
         "description": "明細パラメータ",
         "discriminator": {
           "propertyName": "line_type",
@@ -11025,7 +11305,7 @@
             "description": "明細リスト",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/schemas-LineParams"
+              "$ref": "#/components/schemas/LineParams-2"
             }
           }
         },
@@ -12802,11 +13082,12 @@
         "additionalProperties": false
       },
       "ProcurementPaymentStatus": {
-        "description": "決済ステータス (未決済: not_settled, 一部決済済: partially_settled, 決済済: settled)",
+        "description": "決済ステータス (未決済: not_settled, 一部決済済: partially_settled, 決済済: settled, 対象外: none)",
         "enum": [
           "not_settled",
           "partially_settled",
-          "settled"
+          "settled",
+          "none"
         ],
         "type": "string",
         "example": "not_settled"
@@ -14870,7 +15151,7 @@
                 "business_phases": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/schemas-BusinessPhase"
+                    "$ref": "#/components/schemas/BusinessPhase-2"
                   }
                 }
               },
@@ -14891,7 +15172,7 @@
                 "sales_progressions": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/schemas-SalesProgression"
+                    "$ref": "#/components/schemas/SalesProgression-2"
                   }
                 }
               },
@@ -14958,7 +15239,7 @@
                 "employees": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/schemas-Employee"
+                    "$ref": "#/components/schemas/Employee-2"
                   }
                 }
               },
@@ -15167,7 +15448,7 @@
                 "quotations": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/QuotationDigest"
+                    "$ref": "#/components/schemas/QuotationListItem"
                   }
                 },
                 "meta": {

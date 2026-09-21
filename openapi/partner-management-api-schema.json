@@ -44,6 +44,11 @@
       "name": "partner_management_orderer_project_partners",
       "description": "partner_management_orderer_project_partners",
       "x-displayName": "プロジェクトパートナー"
+    },
+    {
+      "name": "partner_management_orderer_tasks",
+      "description": "partner_management_orderer_tasks",
+      "x-displayName": "タスク"
     }
   ],
   "paths": {
@@ -353,6 +358,80 @@
         ]
       }
     },
+    "/hub/partner_management/orderer/projects": {
+      "get": {
+        "operationId": "list_partner_management_orderer_projects",
+        "summary": "プロジェクト一覧取得（β版）",
+        "description": "プロジェクトを一覧で取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.company_user_ids"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.partner_ids"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.business_partner_ids"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.project_ids"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.name_contains"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.description_contains"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Projects.ListRequest.page_token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "プロジェクト一覧レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PartnerManagement.Orderer.Projects.Project"
+                      },
+                      "description": "プロジェクトの一覧"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページのカーソルトークン。最終ページは null",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_projects"
+        ]
+      }
+    },
     "/hub/partner_management/orderer/projects/{id}": {
       "get": {
         "operationId": "get_partner_management_orderer_project",
@@ -560,6 +639,158 @@
         },
         "tags": [
           "partner_management_orderer_project_partners"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/tasks": {
+      "get": {
+        "operationId": "list_partner_management_orderer_tasks",
+        "summary": "タスク一覧取得（β版）",
+        "description": "タスク（発注書）の一覧を取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.page_token"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.project_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.assignee_type"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.assignee_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.company_user_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.status"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.title"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.estimate_grand_total_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.estimate_grand_total_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.deadline_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.deadline_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.assigned_at_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.assigned_at_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.submitted_at_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.submitted_at_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.last_submitted_at_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.last_submitted_at_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.inspection_date_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.inspection_date_to"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.created_at_from"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.ListRequest.created_at_to"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "タスク一覧レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.Task"
+                      },
+                      "description": "タスクの一覧"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページのカーソルトークン。最終ページは null",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_tasks"
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{project_id}/tasks/{id}": {
+      "get": {
+        "operationId": "get_partner_management_orderer_task",
+        "summary": "タスク詳細取得（β版）",
+        "description": "タスク（発注書）情報を取得する",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.GetRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.GetRequest.project_id"
+          },
+          {
+            "$ref": "#/components/parameters/PartnerManagement.Orderer.Tasks.GetRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "タスク詳細レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.Task"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partner_management_orderer_tasks"
         ]
       }
     }
@@ -984,6 +1215,117 @@
           "format": "int32"
         }
       },
+      "PartnerManagement.Orderer.Projects.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.company_user_ids": {
+        "name": "company_user_ids[]",
+        "in": "query",
+        "required": false,
+        "description": "担当者（企業ユーザー）のIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxItems": 10
+        }
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.partner_ids": {
+        "name": "partner_ids[]",
+        "in": "query",
+        "required": false,
+        "description": "パートナー（ログインあり）のIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxItems": 10
+        }
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.business_partner_ids": {
+        "name": "business_partner_ids[]",
+        "in": "query",
+        "required": false,
+        "description": "ログインなしパートナーのIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxItems": 10
+        }
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.project_ids": {
+        "name": "project_ids[]",
+        "in": "query",
+        "required": false,
+        "description": "プロジェクトIDで絞り込む。指定したいずれかのIDに一致するプロジェクトを返す（OR条件）",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxItems": 10
+        }
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.name_contains": {
+        "name": "name_contains",
+        "in": "query",
+        "required": false,
+        "description": "プロジェクト名で絞り込む（部分一致）",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.description_contains": {
+        "name": "description_contains",
+        "in": "query",
+        "required": false,
+        "description": "説明で絞り込む（部分一致）",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Projects.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
       "PartnerManagement.Orderer.Projects.GetRequest.company_id": {
         "name": "company_id",
         "in": "query",
@@ -1139,6 +1481,291 @@
           "type": "string"
         },
         "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.project_id": {
+        "name": "project_id",
+        "in": "query",
+        "required": false,
+        "description": "プロジェクトのIDで絞り込む",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.assignee_type": {
+        "name": "assignee_type",
+        "in": "query",
+        "required": false,
+        "description": "アサインされているパートナーの種別で絞り込む。assignee_id と必ずセットで指定する（単独指定は不可）",
+        "schema": {
+          "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.AssigneeType"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.assignee_id": {
+        "name": "assignee_id",
+        "in": "query",
+        "required": false,
+        "description": "アサインされているパートナーのIDで絞り込み、そのパートナーがアサインされているタスクのみを返す。\n指定できるのは1人のみ（複数指定は不可）。assignee_type と必ずセットで指定する（単独指定は不可）。\n利用停止中・削除済みのパートナーを指定した場合も、該当タスクを検索結果として返す",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.company_user_id": {
+        "name": "company_user_id",
+        "in": "query",
+        "required": false,
+        "description": "担当者（企業ユーザー）のIDで絞り込む",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.status": {
+        "name": "status[]",
+        "in": "query",
+        "required": false,
+        "description": "ステータスで絞り込む（複数指定。OR 条件）。opened / not_accepted は廃止済みステータスのため、通常は該当なし",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaskStatus"
+          }
+        }
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.title": {
+        "name": "title",
+        "in": "query",
+        "required": false,
+        "description": "タスクタイトルで絞り込む（部分一致）",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.estimate_grand_total_from": {
+        "name": "estimate_grand_total_from",
+        "in": "query",
+        "required": false,
+        "description": "発注額（税込）の下限で絞り込む",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.estimate_grand_total_to": {
+        "name": "estimate_grand_total_to",
+        "in": "query",
+        "required": false,
+        "description": "発注額（税込）の上限で絞り込む",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.deadline_from": {
+        "name": "deadline_from",
+        "in": "query",
+        "required": false,
+        "description": "納期の下限で絞り込む。submit_date_type が period のタスクは submit_period_end_date（終了日）で判定する",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.deadline_to": {
+        "name": "deadline_to",
+        "in": "query",
+        "required": false,
+        "description": "納期の上限で絞り込む。submit_date_type が period のタスクは submit_period_end_date（終了日）で判定する",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.assigned_at_from": {
+        "name": "assigned_at_from",
+        "in": "query",
+        "required": false,
+        "description": "発行日の下限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.assigned_at_to": {
+        "name": "assigned_at_to",
+        "in": "query",
+        "required": false,
+        "description": "発行日の上限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.submitted_at_from": {
+        "name": "submitted_at_from",
+        "in": "query",
+        "required": false,
+        "description": "初回提出日の下限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.submitted_at_to": {
+        "name": "submitted_at_to",
+        "in": "query",
+        "required": false,
+        "description": "初回提出日の上限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.last_submitted_at_from": {
+        "name": "last_submitted_at_from",
+        "in": "query",
+        "required": false,
+        "description": "最終提出日の下限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.last_submitted_at_to": {
+        "name": "last_submitted_at_to",
+        "in": "query",
+        "required": false,
+        "description": "最終提出日の上限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.inspection_date_from": {
+        "name": "inspection_date_from",
+        "in": "query",
+        "required": false,
+        "description": "検収日の下限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.inspection_date_to": {
+        "name": "inspection_date_to",
+        "in": "query",
+        "required": false,
+        "description": "検収日の上限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.created_at_from": {
+        "name": "created_at_from",
+        "in": "query",
+        "required": false,
+        "description": "作成日時の下限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.ListRequest.created_at_to": {
+        "name": "created_at_to",
+        "in": "query",
+        "required": false,
+        "description": "作成日時の上限で絞り込む",
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.GetRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "freee事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "PartnerManagement.Orderer.Tasks.GetRequest.project_id": {
+        "name": "project_id",
+        "in": "path",
+        "required": true,
+        "description": "所属プロジェクトのID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "PartnerManagement.Orderer.Tasks.GetRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "取得対象のタスクID",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
       }
     },
     "schemas": {
@@ -1809,6 +2436,569 @@
           }
         },
         "description": "プロジェクトにアサインされているパートナー",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.Tasks.AssigneeType": {
+        "type": "string",
+        "enum": [
+          "Partner",
+          "BusinessPartner"
+        ],
+        "description": "パートナー (Partner: パートナー, BusinessPartner: ログインなしパートナー)"
+      },
+      "PartnerManagement.Orderer.Tasks.TaskStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "opened",
+          "assigned",
+          "accepted",
+          "not_accepted",
+          "in_progress",
+          "submitted",
+          "remanded",
+          "completed",
+          "canceled"
+        ],
+        "description": "タスクステータス"
+      },
+      "PartnerManagement.Orderer.Tasks.SubmitDateType": {
+        "type": "string",
+        "enum": [
+          "deadline",
+          "period"
+        ],
+        "description": "提出期日の指定方式 (deadline: 納期, period: 期間)"
+      },
+      "PartnerManagement.Orderer.Tasks.PaymentDateType": {
+        "type": "string",
+        "enum": [
+          "note",
+          "next_month_end",
+          "days_from_deadline",
+          "fixed_date"
+        ],
+        "description": "支払期日の指定方式 (note: テキスト, next_month_end: 納期/終了日の翌月末日を反映, days_from_deadline: 納期/終了日から日数反映, fixed_date: 指定日)"
+      },
+      "PartnerManagement.Orderer.Tasks.DeliveryType": {
+        "type": "string",
+        "enum": [
+          "file",
+          "url",
+          "other",
+          "work_report",
+          "work_report_quantity"
+        ],
+        "description": "納品形式 (file: ファイル, url: URL, other: その他, work_report: 作業報告書 (時間), work_report_quantity: 作業報告書 (品目数量))"
+      },
+      "PartnerManagement.Orderer.Tasks.UnitGroupType": {
+        "type": "string",
+        "enum": [
+          "date",
+          "month",
+          "all"
+        ],
+        "description": "作業報告書の集計単位 (date: 日単位, month: 月単位, all: 全期間)"
+      },
+      "PartnerManagement.Orderer.Tasks.FractionType": {
+        "type": "string",
+        "enum": [
+          "floor",
+          "ceil",
+          "round"
+        ],
+        "description": "端数処理 (floor: 切り捨て, ceil: 切り上げ, round: 四捨五入)"
+      },
+      "PartnerManagement.Orderer.Tasks.TaskWorkReportConfiguration": {
+        "type": "object",
+        "required": [
+          "id",
+          "unit_group_type",
+          "unit_minutes",
+          "unit_fraction_type"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "設定ID",
+            "example": 4321
+          },
+          "unit_group_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.UnitGroupType"
+              }
+            ],
+            "description": "集計単位 (date: 日毎, month: 月毎, all: 合算)"
+          },
+          "unit_minutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "丸め単位 (分)",
+            "example": 15
+          },
+          "unit_fraction_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.FractionType"
+              }
+            ],
+            "description": "端数処理 (floor: 切り捨て, ceil: 切り上げ, round: 四捨五入)"
+          }
+        },
+        "description": "作業報告書 (時間) 集計設定",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.Tasks.Assignee": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.AssigneeType"
+              }
+            ],
+            "description": "パートナー種別 (Partner: パートナー, BusinessPartner: ログインなしパートナー)"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID",
+            "example": 789
+          }
+        },
+        "description": "パートナー",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.Tasks.TaxExpression": {
+        "type": "string",
+        "enum": [
+          "external",
+          "internal"
+        ],
+        "description": "消費税表示 (external: 外税, internal: 内税)"
+      },
+      "PartnerManagement.Orderer.Tasks.TaskDeliveryData": {
+        "type": "object",
+        "required": [
+          "product_url",
+          "product_files"
+        ],
+        "properties": {
+          "product_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "description": "納品URL",
+            "example": "https://example.com/deliverables/lp"
+          },
+          "product_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "納品ファイル名の配列",
+            "example": [
+              "lp_design_v2.psd",
+              "lp_spec.pdf"
+            ]
+          }
+        },
+        "description": "納品データ",
+        "additionalProperties": false
+      },
+      "PartnerManagement.Orderer.Tasks.TaxCalculationType": {
+        "type": "string",
+        "enum": [
+          "gross",
+          "each_item"
+        ],
+        "description": "消費税の計算単位 (gross: 総額まとめ, each_item: 明細行ごと)"
+      },
+      "PartnerManagement.Orderer.Tasks.Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "status",
+          "title",
+          "submit_date_type",
+          "deadline",
+          "submit_period_start_date",
+          "submit_period_end_date",
+          "inspection_date",
+          "payment_date_type",
+          "payment_date_note",
+          "payment_date",
+          "delivery_types",
+          "task_work_report_configuration",
+          "deliverables_detail",
+          "delivery_place",
+          "subcontracted",
+          "client_name",
+          "client_contract_due_date",
+          "body",
+          "enable_change_quantity_on_submit",
+          "enable_undecided_amount_order",
+          "undecided_amount_reason",
+          "amount_decided_date",
+          "orderer_company_user_id",
+          "watcher_company_user_ids",
+          "assignee",
+          "watcher_partner_ids",
+          "worker_partner_id",
+          "order_note",
+          "estimate_total",
+          "estimate_grand_total",
+          "total",
+          "grand_total",
+          "tax_expression",
+          "delivery_data",
+          "special_note",
+          "tax_calculation_type",
+          "sales_tax_fraction_type",
+          "task_line_item_ids",
+          "task_order_approval_flow_id",
+          "task_submit_approval_flow_id",
+          "created_at",
+          "assigned_at",
+          "submitted_at",
+          "last_submitted_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "タスクID",
+            "example": 12345
+          },
+          "project_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "プロジェクトID",
+            "example": 678
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaskStatus"
+              }
+            ],
+            "description": "ステータス"
+          },
+          "title": {
+            "type": "string",
+            "description": "タスクタイトル",
+            "example": "LP デザイン一式"
+          },
+          "submit_date_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.SubmitDateType"
+              }
+            ],
+            "description": "納期または期間 (deadline: 納期, period: 期間)"
+          },
+          "deadline": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "納期。submit_date_type が deadline のときに入る",
+            "example": "2026-09-30T18:00:00+09:00"
+          },
+          "submit_period_start_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "description": "提出期間の開始日。submit_date_type が period のときに入る",
+            "example": "2026-09-01"
+          },
+          "submit_period_end_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "description": "提出期間の終了日。submit_date_type が period のときに入る",
+            "example": "2026-09-30"
+          },
+          "inspection_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "description": "検収日",
+            "example": "2026-10-05"
+          },
+          "payment_date_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.PaymentDateType"
+              }
+            ],
+            "description": "支払期日の指定方式 (note: テキスト, next_month_end: 納期/終了日の翌月末日を反映, days_from_deadline: 納期/終了日から日数反映, fixed_date: 指定日)"
+          },
+          "payment_date_note": {
+            "type": "string",
+            "nullable": true,
+            "description": "支払期日（テキスト）。payment_date_type が note のときに入り、それ以外のときは null",
+            "example": "月末締め翌月末払い"
+          },
+          "payment_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "description": "支払期日 (日付)。payment_date_type が next_month_end / days_from_deadline / fixed_date のときに指定方式に即して計算された日付が入る",
+            "example": "2026-10-31"
+          },
+          "delivery_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.DeliveryType"
+            },
+            "description": "納品形式"
+          },
+          "task_work_report_configuration": {
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaskWorkReportConfiguration"
+              }
+            ],
+            "nullable": true,
+            "description": "稼働時間の丸め設定。delivery_types に work_report / work_report_quantity が含まれるときに入る"
+          },
+          "deliverables_detail": {
+            "type": "string",
+            "description": "納品内容",
+            "example": "納品用データ一式"
+          },
+          "delivery_place": {
+            "type": "string",
+            "description": "納品場所",
+            "example": "共有ドライブ /projects/lp/"
+          },
+          "subcontracted": {
+            "type": "boolean",
+            "description": "再委託ありかどうか",
+            "example": true
+          },
+          "client_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "元委託者の氏名又は名称。subcontracted が true のときに入る",
+            "example": "株式会社サンプル"
+          },
+          "client_contract_due_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "元委託業務の対価の支払期日。subcontracted が true のときに入る",
+            "example": "2026-08-01"
+          },
+          "body": {
+            "type": "string",
+            "description": "タスク内容",
+            "example": "LP デザインを1式作成してください。"
+          },
+          "enable_change_quantity_on_submit": {
+            "type": "boolean",
+            "description": "提出時の数量変更を可能にするか",
+            "example": false
+          },
+          "enable_undecided_amount_order": {
+            "type": "boolean",
+            "description": "発注額を未定で発注するか",
+            "example": false
+          },
+          "undecided_amount_reason": {
+            "type": "string",
+            "nullable": true,
+            "description": "発注額未定の理由。enable_undecided_amount_order が true のときに入る",
+            "example": "要件確定待ち"
+          },
+          "amount_decided_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date",
+            "description": "発注額確定予定日。enable_undecided_amount_order が true のときに入る",
+            "example": "2026-09-15"
+          },
+          "orderer_company_user_id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "担当者の企業ユーザーID",
+            "example": 55
+          },
+          "watcher_company_user_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "担当者（参加）の企業ユーザーIDの配列",
+            "example": [
+              56,
+              57
+            ]
+          },
+          "assignee": {
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.Assignee"
+              }
+            ],
+            "nullable": true,
+            "description": "パートナー"
+          },
+          "watcher_partner_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "パートナー（参加）",
+            "example": [
+              790,
+              791
+            ]
+          },
+          "worker_partner_id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "パートナー（タスク実行）",
+            "example": 792
+          },
+          "order_note": {
+            "type": "string",
+            "description": "備考",
+            "example": "参考リンクは Slack を参照"
+          },
+          "estimate_total": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "見積小計 (税抜)。金額の閲覧権限が無い場合は null",
+            "example": 300000
+          },
+          "estimate_grand_total": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "見積総額 (税込)。金額の閲覧権限が無い場合は null",
+            "example": 330000
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "実績小計 (税抜)。金額の閲覧権限が無い場合は null",
+            "example": 300000
+          },
+          "grand_total": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "実績総額 (税込)。金額の閲覧権限が無い場合は null",
+            "example": 330000
+          },
+          "tax_expression": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaxExpression"
+              }
+            ],
+            "description": "消費税表示 (external: 外税, internal: 内税)"
+          },
+          "delivery_data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaskDeliveryData"
+              }
+            ],
+            "description": "納品データ"
+          },
+          "special_note": {
+            "type": "string",
+            "nullable": true,
+            "description": "特記事項",
+            "example": "特記事項なし"
+          },
+          "tax_calculation_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.TaxCalculationType"
+              }
+            ],
+            "description": "消費税の計算単位 (gross: 総額まとめ, each_item: 明細行ごと)"
+          },
+          "sales_tax_fraction_type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerManagement.Orderer.Tasks.FractionType"
+              }
+            ],
+            "description": "消費税端数処理 (floor: 切り捨て, ceil: 切り上げ, round: 四捨五入)"
+          },
+          "task_line_item_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "タスク明細のIDの配列。明細の表示順 (row_order) の昇順で返す",
+            "example": [
+              45001,
+              45002
+            ]
+          },
+          "task_order_approval_flow_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "発注承認フローID",
+            "example": 98765
+          },
+          "task_submit_approval_flow_id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "検収承認フローID",
+            "example": 98766
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "作成日時",
+            "example": "2026-08-01T09:00:00+09:00"
+          },
+          "assigned_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "発注時刻",
+            "example": "2026-08-02T10:00:00+09:00"
+          },
+          "submitted_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "直近の提出時刻",
+            "example": "2026-09-25T17:00:00+09:00"
+          },
+          "last_submitted_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "最終提出時刻",
+            "example": "2026-09-28T11:00:00+09:00"
+          }
+        },
+        "description": "タスク",
         "additionalProperties": false
       }
     },
