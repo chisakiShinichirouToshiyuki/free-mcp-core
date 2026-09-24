@@ -136,6 +136,7 @@
 - partner-management-partner-management-orderer-project-company-users.md — partner_management_orderer_project_company_users
 - partner-management-partner-management-orderer-project-partners.md — partner_management_orderer_project_partners
 - partner-management-partner-management-orderer-projects.md — partner_management_orderer_projects
+- partner-management-partner-management-orderer-tasks.md — partner_management_orderer_tasks
 
 ## survey - freeeサーベイ
 

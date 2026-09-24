@@ -137,6 +137,7 @@
     "partner_management_orderer_project_business_partners": "partner-management-orderer-project-business-partners",
     "partner_management_orderer_project_company_users": "partner-management-orderer-project-company-users",
     "partner_management_orderer_project_partners": "partner-management-orderer-project-partners",
-    "partner_management_orderer_projects": "partner-management-orderer-projects"
+    "partner_management_orderer_projects": "partner-management-orderer-projects",
+    "partner_management_orderer_tasks": "partner-management-orderer-tasks"
   }
 }

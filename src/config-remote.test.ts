@@ -38,12 +38,29 @@ describe('loadRemoteServerConfig', () => {
       freeeApiUrl: 'https://api.freee.co.jp',
       redisUrl: 'redis://localhost:6379',
       corsAllowedOrigins: undefined,
+      openaiAppsChallengeToken: undefined,
       rateLimitEnabled: true,
       logLevel: 'info',
       httpRequestTimeoutMs: 10 * 60 * 1000,
       httpHeadersTimeoutMs: 65 * 1000,
       httpKeepAliveTimeoutMs: 60 * 1000,
       allowInsecureLocalhostCimd: false,
+    });
+  });
+
+  describe('OPENAI_APPS_CHALLENGE_TOKEN', () => {
+    it('surfaces the token on the config', async () => {
+      process.env.OPENAI_APPS_CHALLENGE_TOKEN = 'challenge-token-for-test';
+      const { loadRemoteServerConfig } = await import('./config.js');
+
+      expect(loadRemoteServerConfig().openaiAppsChallengeToken).toBe('challenge-token-for-test');
+    });
+
+    it('leaves the token undefined when the variable is unset', async () => {
+      delete process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+      const { loadRemoteServerConfig } = await import('./config.js');
+
+      expect(loadRemoteServerConfig().openaiAppsChallengeToken).toBeUndefined();
     });
   });
 
@@ -307,6 +324,7 @@ describe('summarizeRemoteServerConfig', () => {
 
     expect(summary.jwtSecret).toBe('<redacted>');
     expect(summary.freeeClientSecret).toBe('<redacted>');
+    expect(summary.openaiAppsChallengeToken).toBe('<unset>');
     expect(summary.freeeClientId).toBe('cid');
     expect(summary.rateLimitEnabled).toBe(true);
     expect(summary.httpRequestTimeoutMs).toBe(600_000);
