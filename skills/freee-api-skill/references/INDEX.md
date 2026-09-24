@@ -117,10 +117,10 @@
 ## it_management - freeeIT管理
 
 - it-management-application-account.md — application_accounts
+- it-management-asset-categories.md — asset_categories
+- it-management-asset-statuses.md — asset_statuses
 - it-management-assets.md — assets
-- it-management-it-management-asset-categories.md — asset_categories
-- it-management-it-management-asset-statuses.md — asset_statuses
-- it-management-it-management-departments.md — departments
+- it-management-departments.md — departments
 - it-management-members.md — members
 
 ## fixed_asset_management - freee固定資産

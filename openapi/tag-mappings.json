@@ -105,9 +105,9 @@
     "it_management_application_accounts": "application-account",
     "it_management_assets": "assets",
     "it_management_members": "members",
-    "it_management_asset_categories": "it-management-asset-categories",
-    "it_management_asset_statuses": "it-management-asset-statuses",
-    "it_management_departments": "it-management-departments"
+    "it_management_asset_categories": "asset-categories",
+    "it_management_asset_statuses": "asset-statuses",
+    "it_management_departments": "departments"
   },
   "fixed-asset-management-api": {
     "fixed_asset_management_fixed_assets": "fixed-assets"
