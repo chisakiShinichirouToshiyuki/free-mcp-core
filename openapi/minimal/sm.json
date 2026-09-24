@@ -872,6 +872,34 @@
             "description": "見積No.で絞込"
           },
           {
+            "name": "start_gross_profit_amount_excluding_tax",
+            "in": "query",
+            "type": "number",
+            "required": false,
+            "description": "粗利額計(税抜)で絞込：下限"
+          },
+          {
+            "name": "end_gross_profit_amount_excluding_tax",
+            "in": "query",
+            "type": "number",
+            "required": false,
+            "description": "粗利額計(税抜)で絞込：上限"
+          },
+          {
+            "name": "start_gross_profit_rate",
+            "in": "query",
+            "type": "number",
+            "required": false,
+            "description": "粗利率(%)で絞込：下限"
+          },
+          {
+            "name": "end_gross_profit_rate",
+            "in": "query",
+            "type": "number",
+            "required": false,
+            "description": "粗利率(%)で絞込：上限"
+          },
+          {
             "name": "quotation_status",
             "in": "query",
             "type": "string",

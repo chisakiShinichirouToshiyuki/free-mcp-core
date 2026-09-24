@@ -334,6 +334,82 @@
         ]
       }
     },
+    "/hub/partner_management/orderer/projects": {
+      "get": {
+        "summary": "プロジェクト一覧取得（β版）",
+        "description": "プロジェクトを一覧で取得する",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "freee事業所ID",
+            "explode": false
+          },
+          {
+            "name": "company_user_ids[]",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "担当者（企業ユーザー）のIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）"
+          },
+          {
+            "name": "partner_ids[]",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "パートナー（ログインあり）のIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）"
+          },
+          {
+            "name": "business_partner_ids[]",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "ログインなしパートナーのIDで絞り込む。指定したIDをすべて含むプロジェクトだけを返す（AND条件）"
+          },
+          {
+            "name": "project_ids[]",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "プロジェクトIDで絞り込む。指定したいずれかのIDに一致するプロジェクトを返す（OR条件）"
+          },
+          {
+            "name": "name_contains",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "プロジェクト名で絞り込む（部分一致）",
+            "explode": false
+          },
+          {
+            "name": "description_contains",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "説明で絞り込む（部分一致）",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+            "explode": false
+          }
+        ]
+      }
+    },
     "/hub/partner_management/orderer/projects/{id}": {
       "get": {
         "summary": "プロジェクト詳細取得（β版）",
@@ -470,6 +546,227 @@
             "required": false,
             "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
             "explode": false
+          }
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/tasks": {
+      "get": {
+        "summary": "タスク一覧取得（β版）",
+        "description": "タスク（発注書）の一覧を取得する",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "freee事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト20、最大100）",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "カーソルトークン。前回レスポンスの next_page_token を指定する",
+            "explode": false
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "プロジェクトのIDで絞り込む",
+            "explode": false
+          },
+          {
+            "name": "assignee_type",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "アサインされているパートナーの種別で絞り込む。assignee_id と必ずセットで指定する（単独指定は不可）",
+            "explode": false
+          },
+          {
+            "name": "assignee_id",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "アサインされているパートナーのIDで絞り込み、そのパートナーがアサインされているタスクのみを返す。\n指定できるのは1人のみ（複数指定は不可）。assignee_type と必ずセットで指定する（単独指定は不可）。\n利用停止中・削除済みのパートナーを指定した場合も、該当タスクを検索結果として返す",
+            "explode": false
+          },
+          {
+            "name": "company_user_id",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "担当者（企業ユーザー）のIDで絞り込む",
+            "explode": false
+          },
+          {
+            "name": "status[]",
+            "in": "query",
+            "type": "array",
+            "required": false,
+            "description": "ステータスで絞り込む（複数指定。OR 条件）。opened / not_accepted は廃止済みステータスのため、通常は該当なし"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "タスクタイトルで絞り込む（部分一致）",
+            "explode": false
+          },
+          {
+            "name": "estimate_grand_total_from",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "発注額（税込）の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "estimate_grand_total_to",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "発注額（税込）の上限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "deadline_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "納期の下限で絞り込む。submit_date_type が period のタスクは submit_period_end_date（終了日）で判定する",
+            "explode": false
+          },
+          {
+            "name": "deadline_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "納期の上限で絞り込む。submit_date_type が period のタスクは submit_period_end_date（終了日）で判定する",
+            "explode": false
+          },
+          {
+            "name": "assigned_at_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "発行日の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "assigned_at_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "発行日の上限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "submitted_at_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "初回提出日の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "submitted_at_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "初回提出日の上限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "last_submitted_at_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "最終提出日の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "last_submitted_at_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "最終提出日の上限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "inspection_date_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "検収日の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "inspection_date_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "検収日の上限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "created_at_from",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "作成日時の下限で絞り込む",
+            "explode": false
+          },
+          {
+            "name": "created_at_to",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "作成日時の上限で絞り込む",
+            "explode": false
+          }
+        ]
+      }
+    },
+    "/hub/partner_management/orderer/projects/{project_id}/tasks/{id}": {
+      "get": {
+        "summary": "タスク詳細取得（β版）",
+        "description": "タスク（発注書）情報を取得する",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "freee事業所ID",
+            "explode": false
+          },
+          {
+            "name": "project_id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "所属プロジェクトのID"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "取得対象のタスクID"
           }
         ]
       }

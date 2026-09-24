@@ -104,7 +104,10 @@
   "it-management-api": {
     "it_management_application_accounts": "application-account",
     "it_management_assets": "assets",
-    "it_management_members": "members"
+    "it_management_members": "members",
+    "it_management_asset_categories": "it-management-asset-categories",
+    "it_management_asset_statuses": "it-management-asset-statuses",
+    "it_management_departments": "it-management-departments"
   },
   "fixed-asset-management-api": {
     "fixed_asset_management_fixed_assets": "fixed-assets"
@@ -134,6 +137,7 @@
     "partner_management_orderer_project_business_partners": "partner-management-orderer-project-business-partners",
     "partner_management_orderer_project_company_users": "partner-management-orderer-project-company-users",
     "partner_management_orderer_project_partners": "partner-management-orderer-project-partners",
-    "partner_management_orderer_projects": "partner-management-orderer-projects"
+    "partner_management_orderer_projects": "partner-management-orderer-projects",
+    "partner_management_orderer_tasks": "partner-management-orderer-tasks"
   }
 }
