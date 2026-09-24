@@ -21,6 +21,21 @@
       "x-displayName": "備品"
     },
     {
+      "name": "it_management_asset_categories",
+      "description": "asset_categories",
+      "x-displayName": "備品種別"
+    },
+    {
+      "name": "it_management_asset_statuses",
+      "description": "asset_statuses",
+      "x-displayName": "備品ステータス"
+    },
+    {
+      "name": "it_management_departments",
+      "description": "departments",
+      "x-displayName": "部署"
+    },
+    {
       "name": "it_management_members",
       "description": "members",
       "x-displayName": "メンバー"
@@ -629,6 +644,744 @@
         },
         "tags": [
           "it_management_assets"
+        ]
+      }
+    },
+    "/hub/it_management/asset_categories": {
+      "get": {
+        "operationId": "list_it_management_asset_categories",
+        "summary": "備品種別一覧取得（β版）",
+        "description": "備品種別の一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.ListRequest.page_token"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.ListRequest.page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品種別一覧取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ItManagement.AssetCategories.AssetCategory"
+                      },
+                      "description": "備品種別のリスト"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次のページを取得するためのカーソルトークン。次ページがない場合はnull",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_categories"
+        ]
+      },
+      "post": {
+        "operationId": "create_it_management_asset_category",
+        "summary": "備品種別作成（β版）",
+        "description": "備品種別を作成します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "備品種別作成レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetCategories.AssetCategory"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_categories"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "備品種別名",
+                    "example": "ノートPC"
+                  }
+                },
+                "required": [
+                  "company_id",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      }
+    },
+    "/hub/it_management/asset_categories/{id}": {
+      "get": {
+        "operationId": "get_it_management_asset_category",
+        "summary": "備品種別詳細取得（β版）",
+        "description": "備品種別の詳細を取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.GetRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.GetRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品種別詳細取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetCategories.AssetCategory"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_categories"
+        ]
+      },
+      "patch": {
+        "operationId": "partial_update_it_management_asset_category",
+        "summary": "備品種別部分更新（β版）",
+        "description": "備品種別を部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.PartialUpdateRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品種別部分更新レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetCategories.AssetCategory"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_categories"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "備品種別名",
+                    "example": "ノートPC"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      },
+      "delete": {
+        "operationId": "delete_it_management_asset_category",
+        "summary": "備品種別削除（β版）",
+        "description": "備品種別を削除します。備品が紐付いている、または system-managed な種別は削除できません。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.DeleteRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetCategories.DeleteRequest.id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "備品種別削除レスポンス"
+          }
+        },
+        "tags": [
+          "it_management_asset_categories"
+        ]
+      }
+    },
+    "/hub/it_management/asset_statuses": {
+      "get": {
+        "operationId": "list_it_management_asset_statuses",
+        "summary": "備品ステータス一覧取得（β版）",
+        "description": "備品ステータスの一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.ListRequest.page_token"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.ListRequest.page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品ステータス一覧取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ItManagement.AssetStatuses.AssetStatus"
+                      },
+                      "description": "備品ステータスのリスト"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次のページを取得するためのカーソルトークン。次ページがない場合はnull",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_statuses"
+        ]
+      },
+      "post": {
+        "operationId": "create_it_management_asset_status",
+        "summary": "備品ステータス作成（β版）",
+        "description": "備品ステータスを作成します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "備品ステータス作成レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetStatuses.AssetStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_statuses"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "備品ステータス名",
+                    "example": "使用中"
+                  },
+                  "color": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 7,
+                    "pattern": "^#[0-9A-Fa-f]{6}$",
+                    "description": "表示色 (HEXカラーコード)",
+                    "example": "#4CAF50"
+                  }
+                },
+                "required": [
+                  "company_id",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      }
+    },
+    "/hub/it_management/asset_statuses/{id}": {
+      "get": {
+        "operationId": "get_it_management_asset_status",
+        "summary": "備品ステータス詳細取得（β版）",
+        "description": "備品ステータスの詳細を取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.GetRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.GetRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品ステータス詳細取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetStatuses.AssetStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_statuses"
+        ]
+      },
+      "patch": {
+        "operationId": "partial_update_it_management_asset_status",
+        "summary": "備品ステータス部分更新（β版）",
+        "description": "備品ステータスを部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.PartialUpdateRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "備品ステータス部分更新レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.AssetStatuses.AssetStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_asset_statuses"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "備品ステータス名",
+                    "example": "使用中"
+                  },
+                  "color": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 7,
+                    "pattern": "^#[0-9A-Fa-f]{6}$",
+                    "description": "表示色 (HEXカラーコード)",
+                    "example": "#4CAF50"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      },
+      "delete": {
+        "operationId": "delete_it_management_asset_status",
+        "summary": "備品ステータス削除（β版）",
+        "description": "備品ステータスを削除します。備品が紐付いているステータスは削除できません。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.DeleteRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.AssetStatuses.DeleteRequest.id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "備品ステータス削除レスポンス"
+          }
+        },
+        "tags": [
+          "it_management_asset_statuses"
+        ]
+      }
+    },
+    "/hub/it_management/departments": {
+      "get": {
+        "operationId": "list_it_management_departments",
+        "summary": "部署一覧取得（β版）",
+        "description": "部署の一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.ListRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.ListRequest.page_token"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.ListRequest.page_size"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.ListRequest.keyword"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.ListRequest.code"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "部署一覧取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ItManagement.Departments.Department"
+                      },
+                      "description": "部署のリスト"
+                    },
+                    "next_page_token": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次のページを取得するためのカーソルトークン。次ページがない場合はnull",
+                      "example": "eyJvcmRlciI6W10sImlkIjoiYWJjIn0"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "next_page_token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_departments"
+        ]
+      },
+      "post": {
+        "operationId": "create_it_management_department",
+        "summary": "部署作成（β版）",
+        "description": "部署を作成します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "部署作成レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.Departments.Department"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_departments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 300,
+                    "description": "部署名",
+                    "example": "開発部"
+                  },
+                  "code": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 30,
+                    "description": "部署コード",
+                    "example": "DEV"
+                  },
+                  "parent_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "uuid",
+                    "description": "親部署ID",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                  },
+                  "manager_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 1,
+                    "description": "マネージャーのメンバーID (最大 1 名)",
+                    "example": [
+                      "550e8400-e29b-41d4-a716-446655440003"
+                    ]
+                  }
+                },
+                "required": [
+                  "company_id",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      }
+    },
+    "/hub/it_management/departments/{id}": {
+      "get": {
+        "operationId": "get_it_management_department",
+        "summary": "部署詳細取得（β版）",
+        "description": "部署の詳細を取得します。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.GetRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.GetRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "部署詳細取得レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.Departments.Department"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_departments"
+        ]
+      },
+      "patch": {
+        "operationId": "partial_update_it_management_department",
+        "summary": "部署部分更新（β版）",
+        "description": "部署を部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.PartialUpdateRequest.id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "部署部分更新レスポンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItManagement.Departments.Department"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "it_management_departments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "事業所ID",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 300,
+                    "description": "部署名",
+                    "example": "開発部"
+                  },
+                  "code": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 30,
+                    "description": "部署コード",
+                    "example": "DEV"
+                  },
+                  "parent_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "uuid",
+                    "description": "親部署ID",
+                    "example": "550e8400-e29b-41d4-a716-446655440001"
+                  },
+                  "manager_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 1,
+                    "description": "マネージャーのメンバーID (最大 1 名)",
+                    "example": [
+                      "550e8400-e29b-41d4-a716-446655440003"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The body type of the operation request or response."
+        }
+      },
+      "delete": {
+        "operationId": "delete_it_management_department",
+        "summary": "部署削除（β版）",
+        "description": "部署を削除します。子部署が存在する、または利用中の場合は削除できません。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FreeeUsingBetaHeader"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.DeleteRequest.company_id"
+          },
+          {
+            "$ref": "#/components/parameters/ItManagement.Departments.DeleteRequest.id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "部署削除レスポンス"
+          }
+        },
+        "tags": [
+          "it_management_departments"
         ]
       }
     },
@@ -1324,6 +2077,284 @@
           "format": "uuid"
         }
       },
+      "ItManagement.AssetCategories.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetCategories.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "ページネーションのトークン",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetCategories.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "explode": false
+      },
+      "ItManagement.AssetCategories.GetRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetCategories.GetRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品種別ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.AssetCategories.PartialUpdateRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品種別ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.AssetCategories.DeleteRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetCategories.DeleteRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品種別ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.AssetStatuses.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetStatuses.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "ページネーションのトークン",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetStatuses.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "explode": false
+      },
+      "ItManagement.AssetStatuses.GetRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetStatuses.GetRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品ステータスID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.AssetStatuses.PartialUpdateRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品ステータスID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.AssetStatuses.DeleteRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.AssetStatuses.DeleteRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "備品ステータスID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.Departments.ListRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.ListRequest.page_token": {
+        "name": "page_token",
+        "in": "query",
+        "required": false,
+        "description": "ページネーションのトークン",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.ListRequest.page_size": {
+        "name": "page_size",
+        "in": "query",
+        "required": false,
+        "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.ListRequest.keyword": {
+        "name": "keyword",
+        "in": "query",
+        "required": false,
+        "description": "キーワード検索（部署名に部分一致）",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.ListRequest.code": {
+        "name": "code",
+        "in": "query",
+        "required": false,
+        "description": "部署コードでフィルター（完全一致）",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.GetRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.GetRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "部署ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.Departments.PartialUpdateRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "部署ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ItManagement.Departments.DeleteRequest.company_id": {
+        "name": "company_id",
+        "in": "query",
+        "required": true,
+        "description": "事業所ID",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "explode": false
+      },
+      "ItManagement.Departments.DeleteRequest.id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "部署ID",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
       "ItManagement.Members.ListRequest.company_id": {
         "name": "company_id",
         "in": "query",
@@ -1976,6 +3007,187 @@
           }
         },
         "description": "備品",
+        "additionalProperties": false
+      },
+      "ItManagement.AssetCategories.AssetCategory": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "備品種別ID",
+            "example": "550e8400-e29b-41d4-a716-446655440002"
+          },
+          "name": {
+            "type": "string",
+            "description": "備品種別名",
+            "example": "ノートPC"
+          }
+        },
+        "description": "備品種別",
+        "additionalProperties": false
+      },
+      "ItManagement.AssetStatuses.AssetStatus": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "備品ステータスID",
+            "example": "550e8400-e29b-41d4-a716-446655440001"
+          },
+          "name": {
+            "type": "string",
+            "description": "備品ステータス名",
+            "example": "使用中"
+          }
+        },
+        "description": "備品ステータス",
+        "additionalProperties": false
+      },
+      "ItManagement.Departments.DepartmentRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "部署ID",
+            "example": "550e8400-e29b-41d4-a716-446655440001"
+          },
+          "name": {
+            "type": "string",
+            "description": "部署名",
+            "example": "親部署"
+          }
+        },
+        "description": "部署参照",
+        "additionalProperties": false
+      },
+      "ItManagement.Departments.CompanyRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "会社ID",
+            "example": "550e8400-e29b-41d4-a716-446655440002"
+          },
+          "name": {
+            "type": "string",
+            "description": "会社名",
+            "example": "株式会社Freee"
+          }
+        },
+        "description": "会社参照",
+        "additionalProperties": false
+      },
+      "ItManagement.Departments.MemberRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "メンバーID",
+            "example": "550e8400-e29b-41d4-a716-446655440003"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "表示名",
+            "example": "山田 太郎"
+          }
+        },
+        "description": "メンバー参照",
+        "additionalProperties": false
+      },
+      "ItManagement.Departments.Department": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "code",
+          "parent",
+          "company",
+          "managers",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "部署ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "部署名",
+            "example": "開発部"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true,
+            "description": "部署コード",
+            "example": "DEV"
+          },
+          "parent": {
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ItManagement.Departments.DepartmentRef"
+              }
+            ],
+            "nullable": true,
+            "description": "親部署"
+          },
+          "company": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ItManagement.Departments.CompanyRef"
+              }
+            ],
+            "description": "所属会社"
+          },
+          "managers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItManagement.Departments.MemberRef"
+            },
+            "description": "マネージャー一覧"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "作成日時(ISO8601)",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新日時(ISO8601)",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "description": "部署",
         "additionalProperties": false
       },
       "ItManagement.Members.MemberStatus": {
