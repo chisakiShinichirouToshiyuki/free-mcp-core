@@ -1,5 +1,19 @@
 # freee-mcp
 
+## 0.36.0
+
+### Minor Changes
+
+- [`2355e23`](https://github.com/freee/freee-mcp/commit/2355e232c5b65be2b9c9747cf2cd7e67b784809a): freeeIT 管理 API に備品ステータス・備品種別・部署の 3 リソース（それぞれ CRUD）のサポートを追加
+- [`6c39175`](https://github.com/freee/freee-mcp/commit/6c3917500841de399169e7ad19b5e734f33de605): OpenAI Plugin Directory のドメイン所有確認用エンドポイント `/.well-known/openai-apps-challenge` を追加
+
+  - 環境変数 `OPENAI_APPS_CHALLENGE_TOKEN` に設定されたトークンを、認証なしの GET に対して `text/plain` で返す
+  - トークンはプラグインのドラフトごとに変わるため環境変数で注入する。未設定の環境では 404 を返す
+
+### Patch Changes
+
+- [`5e2e867`](https://github.com/freee/freee-mcp/commit/5e2e8670cce4feeab9bfb8e08fc75fea4b6f9579): OpenAPI スキーマを最新版に同期 ( 9 files changed, 3742 insertions(+), 429 deletions(-))
+
 ## 0.35.2
 
 ### Patch Changes
