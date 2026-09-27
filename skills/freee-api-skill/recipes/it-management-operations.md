@@ -1,49 +1,30 @@
 # IT管理の操作
 
-freeeIT管理APIを使った SaaSアカウント・備品・メンバー管理ガイド。
-
-各リソースの詳細なエンドポイント仕様は以下のリファレンスを参照。
-
-- `references/it-management-members.md` - メンバー
-- `references/it-management-application-account.md` - SaaSアカウント
-- `references/it-management-assets.md` - 備品
+freeeIT管理APIを使った SaaSアカウント・備品・メンバー管理ガイド。IT管理 API はオープンベータで、仕様は予告なく変更される可能性がある。
 
 ## リソース
 
-| リソース | path 接頭辞 | 用途 |
-|----------|-------------|------|
-| メンバー | `/hub/it_management/members` | 従業員（IT管理上の利用者） |
-| SaaSアカウント | `/hub/it_management/application_accounts` | 各 SaaS 上のアカウント。メンバーに紐付く |
-| 備品 | `/hub/it_management/assets` | PC・周辺機器など物理資産。メンバーに利用者として割当 |
-
-## オープンベータについて
-
-IT管理 API はオープンベータ。仕様は予告なく変更される可能性がある。
+- メンバー: `/hub/it_management/members` — 従業員（IT管理上の利用者）
+- SaaSアカウント: `/hub/it_management/application_accounts` — 各 SaaS 上のアカウント。メンバーに紐付く
+- 備品: `/hub/it_management/assets` — PC・周辺機器など物理資産。メンバーに利用者として割当
+- 備品ステータス: `/hub/it_management/asset_statuses` — 備品の状態ラベル（例: 使用中 / 保管中）。備品の `asset_status_id` から参照される
+- 備品種別: `/hub/it_management/asset_categories` — 備品の種類ラベル（例: ノートPC）。備品の `asset_category_id` から参照される
+- 部署: `/hub/it_management/departments` — 組織階層上の部署。メンバーの `department_ids` から参照される
 
 ## 認証と事業所スコープ
 
 - 認証は OAuth2（`read` / `write` スコープ）。freee 共通の認可フローを利用する
-- 他の freee API と同様、操作対象の事業所を `company_id` で指定する。指定値は現在の事業所（`freee_get_current_company`）と一致する必要があり、不一致だとエラーになる。切り替えは `freee_set_current_company` を使う
-- メソッドにより `company_id` の位置が異なる:
-  - GET（一覧・単体取得）/ DELETE: クエリパラメータ `company_id`（必須）
-  - POST / PATCH（作成・更新）: リクエストボディ `company_id`（必須）
+- 操作対象の事業所を `company_id` で指定する。指定値は現在の事業所（`freee_get_current_company`）と一致する必要があり、不一致だとエラーになる。切り替えは `freee_set_current_company` を使う
+- `company_id` の位置はメソッドで異なる。GET（一覧・単体取得）/ DELETE はクエリパラメータ、POST / PATCH はリクエストボディ（いずれも必須）
 
 ## ページネーション
 
-一覧取得（GET）はすべてカーソルベース。従来の `offset` / `limit` ではない点に注意。
+一覧取得（GET）はすべてカーソルベース。`offset` / `limit` ではない点に注意。
 
 - 1ページ目: `company_id`（必須）のみで GET
-- 2ページ目以降: 直前のレスポンス `next_page_token` を query `page_token` に渡す
-- `next_page_token` が `null` のときは末尾
+- 2ページ目以降: 直前のレスポンスの `next_page_token` を query `page_token` に渡す
 
 ```
-freee_api_get {
-  "service": "it_management",
-  "path": "/hub/it_management/members",
-  "query": { "company_id": 123456 }
-}
-# → response.next_page_token = "eyJ..."
-
 freee_api_get {
   "service": "it_management",
   "path": "/hub/it_management/members",
@@ -51,12 +32,8 @@ freee_api_get {
 }
 ```
 
-`page_size` で1ページの件数も指定できる（共通 query パラメータ）。`keyword`, `application_id`, `status_id` 等のフィルタは一覧エンドポイントごとに異なるため、リファレンスを参照。
-
-## ページサイズと並び順の制約
-
-- `page_size` の上限は 100。超過すると `AHB-3003-0002`。未指定時は 25。
-- 並び順は `created_at DESC` 固定。`updated_at` / `name` 等のソート指定には対応していない。
+- `page_size` 上限は 100。超過すると `AHB-3003-0002`
+- 並び順は `created_at DESC` 固定。`updated_at` / `name` 等のソート指定には対応していない
 
 ## キーワード検索の対象
 
@@ -70,13 +47,12 @@ freee_api_get {
 
 ## 削除の挙動
 
-API ごとに削除の意味が違うので注意:
+API ごとに削除の意味が違うので注意。
 
-- メンバー削除（`DELETE /hub/it_management/members/{id}`）: ソフトデリート
-- SaaSアカウント削除（`DELETE /hub/it_management/application_accounts/{id}`）: ソフトデリート
-- 備品削除（`DELETE /hub/it_management/assets/{id}`）: ハードデリート（復元不可）
-
-備品は誤削除すると戻せないため、削除前にユーザー確認を行うこと。
+- メンバー削除・SaaSアカウント削除: ソフトデリート
+- 備品削除: ハードデリート（復元不可）。誤削除すると戻せないため、削除前にユーザー確認を行うこと
+- 備品ステータス・備品種別: 該当マスタを参照している備品が1件でも残っていると削除できない（`system-managed` な備品種別も削除不可）。移行が必要なら先に対象備品の `asset_status_id` / `asset_category_id` を別のマスタに付け替える
+- 部署: 子部署が存在する、またはメンバーの `department_ids` に含まれている場合は削除できない
 
 ## SaaSアカウント (application_accounts) の特殊仕様
 
@@ -94,9 +70,8 @@ API ごとに削除の意味が違うので注意:
 
 カスタムアプリは「アカウントID / 表示名 / 権限 / ライセンス / ステータス / …」などの動的属性を持つ。
 
-- 属性スキーマは `GET /application_accounts/{id}` レスポンスの `application.attributes` 配列で取得できる（`id` / `title` / `data_type` / `is_identity` / `is_display` / `is_status` / `entitlement_kind` / `order`）。AI はこれを参照して有効な title を把握する。
-- 更新リクエストの `attributes` キーは UUID（attribute.id）または title 名のどちらでも OK。同一アプリ内で title はユニーク制約があるため安全に逆引きされる。
-- レスポンスの `data` フィールドは title キーで値が返る。
+- 属性スキーマは `GET /application_accounts/{id}` レスポンスの `application.attributes` から取得できる。有効な title はこれを参照して把握する
+- 更新リクエストの `attributes` キーは UUID（attribute.id）または title 名のどちらでもよい。同一アプリ内で title はユニーク制約があるため安全に逆引きされる
 
 ```json
 PATCH /hub/it_management/application_accounts/{id}
@@ -106,16 +81,16 @@ PATCH /hub/it_management/application_accounts/{id}
 }
 ```
 
-- 部分更新では送信していない attribute は既存値が維持される。明示的に `null` を送れば NULL クリア可能。
-- `is_display: true` の属性は必須。既存値が無い状態で省略すると `ITM-05-02-0001 表示名を入力してください` (422)。一度値をセットすれば、以降の部分更新で省略しても既存値が保持される。
-- `is_status: true` の属性に値をセットすると `status.id` が連動切替（指定文字列に対応する `ApplicationAccountStatus` が `find_or_create_by` される）。
-- 未知の title キーは無音で無視される（エラーにならない）。タイポに気付けないため、AI は `application.attributes` メタデータの title セットに含まれていることを確認してから送ること。
+- 部分更新では送信していない attribute は既存値が維持される。明示的に `null` を送れば NULL クリア可能
+- `is_display: true` の属性は必須。既存値が無い状態で省略すると `ITM-05-02-0001 表示名を入力してください` (422)。一度値をセットすれば、以降の部分更新で省略しても既存値が保持される
+- `is_status: true` の属性に値をセットすると `status.id` が連動切替される
+- 未知の title キーは無音で無視される（エラーにならない）。タイポに気付けないため、送信前に `application.attributes` の title セットに含まれていることを確認すること
 
 ### ステータス・ロール
 
-- `application_account_status_id` / `application_account_role_id` を PATCH ボディで指定可能。
-- 不正な UUID は `ITM-05-02-0001` + `invalid_fields.application_account_status_id`（or `application_account_role_id`）で 422。
-- `application_account_role_id: null` で既存ロールをクリア。
+- `application_account_status_id` / `application_account_role_id` を PATCH ボディで指定可能
+- 不正な UUID は `ITM-05-02-0001` + `invalid_fields` で 422
+- `application_account_role_id: null` で既存ロールをクリア
 
 ## よくある操作の流れ
 
@@ -124,7 +99,7 @@ PATCH /hub/it_management/application_accounts/{id}
 1. メンバーを作成（POST `/hub/it_management/members`）
 2. レスポンスの `id` を `application_account` の `member_id` 系フィールドに利用してアカウント作成（POST `/hub/it_management/application_accounts`、カスタムアプリのみ）
 
-メンバーの `position_id` / `employment_type_id` / `department_ids` 等の参照 ID には、対応する一覧取得エンドポイントが提供されていない。事前に値を持っている前提で扱う。不正な ID は `ITM-05-03-0001` の 422 で返り、`fields` 配列で具体的なフィールド名が判別できる。
+メンバーの `department_ids` は `GET /hub/it_management/departments` で参照可能。同様に、備品の `asset_status_id` は `/asset_statuses`、`asset_category_id` は `/asset_categories` で一覧を取得してから割り当てられる。`position_id` / `employment_type_id` には対応する一覧取得エンドポイントが提供されていないため、事前に値を持っている前提で扱う。不正な ID は `ITM-05-03-0001` の 422 で返り、`fields` 配列で具体的なフィールド名が判別できる。
 
 メンバーの primary email（`PATCH /members/{id}` の `email`）は API での更新に対応していない。
 
@@ -134,42 +109,44 @@ PATCH /hub/it_management/application_accounts/{id}
 
 1. SaaSアカウント: GET `/hub/it_management/application_accounts` を `member_id`（アカウントホルダー）で絞り込み
 2. 備品: GET `/hub/it_management/assets` を `member_id`（利用者）で絞り込み
-3. メンバー一覧自体は雇用形態（`employment_type_id`）・入社日/退職日の範囲でも絞り込める（GET `/hub/it_management/members`）。退職者の洗い出しは退職日の範囲指定が使える
+3. メンバー一覧自体は雇用形態（`employment_type_id`）・入社日/退職日の範囲でも絞り込める。退職者の洗い出しは退職日の範囲指定が使える
 
-各フィルタの型・指定方法はリファレンスを参照。`employment_type_id` のように対応するマスタ一覧 API がない参照 ID は、既存メンバーの一覧レスポンス（`employment_type.id`）から値を取得する。
+`employment_type_id` のように対応するマスタ一覧 API がない参照 ID は、既存メンバーの一覧レスポンス（`employment_type.id`）から値を取得する。
 
 ### 備品の貸与状況を更新
 
 1. 備品一覧を取得し対象を特定（GET `/hub/it_management/assets`）
-2. PATCH `/hub/it_management/assets/{id}` で更新可能フィールドを変更（リファレンス参照）
+2. PATCH `/hub/it_management/assets/{id}` で更新する
 
 備品 PATCH のリクエストボディに `current_member_id` を含めるとゲートウェイで `AHB-3003-0002 unsupported` で拒否される。API からメンバーへの貸与状況変更は不可で、UI 側での操作が必要。
 
 ### 部分更新
 
-更新系（PATCH）は指定したフィールドのみが更新される。SaaS アカウントの `attributes` についても上記の通り部分更新が機能する。null クリアの挙動はフィールドごとに異なるため、必ず差分のみを送る。
+更新系（PATCH）は指定したフィールドのみが更新される。null クリアの挙動はフィールドごとに異なるため、必ず差分のみを送る。
 
-## エラー形式
+## エラーコードの読み方
 
-`code` を見れば発生源と扱い方が分かる。
+`code` を見れば発生源と扱い方が分かる。`ITM-` 系と `AHB-3003-0002` はいずれも `fields` を持つので、具体的なフィールドエラーはそこから取得する。
 
-- `ITM-05-01-XXXX` は備品 API 由来。形式は `{ message, code, fields: [{ name, message, user_message }] }`
-- `ITM-05-02-XXXX` は SaaS アカウント API 由来。形式は同上
-- `ITM-05-03-XXXX` はメンバー API 由来。形式は同上
-- `AHB-3003-0002` は API ゲートウェイ層のスキーマ違反（必須項目欠落 / 型不一致 / `unsupported` フィールド送信 / `page_size` 上限超過 等）。形式は `{ message, code, fields: [{ name, message }] }`
-- `AHB-1002-9001` はシステムエラー（5xx）。形式は `{ message, code }`。通常運用では発生しない
+- `ITM-05-01-XXXX` は備品 API、`ITM-05-02-XXXX` は SaaS アカウント API、`ITM-05-03-XXXX` はメンバー API 由来
+- `AHB-3003-0002` は API ゲートウェイ層のスキーマ違反（必須項目欠落 / 型不一致 / `unsupported` フィールド送信 / `page_size` 上限超過 等）
+- `AHB-1002-9001` はシステムエラー（5xx）。通常運用では発生しない
 
-具体例:
-
-- 存在しない ID へのアクセス → `ITM-05-XX-0002` (404)
-- 不正な参照 ID（status_id / role_id / position_id 等） → `ITM-05-XX-0001` + `fields` (422)
-- 一意制約違反（`external_id` 重複等） → `ITM-05-XX-0001` + `fields` (400)
-- カスタムアプリでない SaaS アカウントへの Write → `ITM-05-02-0003` (400)
-
-AI 利用時は `ITM-` プレフィックスのとき `fields` を経由して具体的なフィールドエラーを取得することを推奨。`AHB-3003-0002` も `fields` を持つので同様に利用可能。
-
-## エラー対応
+よくあるケース:
 
 - 401/403: 認証エラー。`freee_auth_status` で確認。Remote MCP は再認証を促される。ローカルは `freee_clear_auth` → `freee_authenticate`
-- 404: 指定 ID のリソースが存在しない、または既にソフトデリート済みのケース。レスポンスは `ITM-05-XX-0002`
-- 一意制約違反（`asset_number`, `serial_number`, `external_id`, `code` 等のチーム内一意フィールド）は 400 + `ITM-05-XX-0001` + `fields` で返る
+- 404 + `ITM-05-XX-0002`: 指定 ID のリソースが存在しない、または既にソフトデリート済み
+- 422 + `ITM-05-XX-0001`: 不正な参照 ID（status_id / role_id / position_id 等）
+- 400 + `ITM-05-XX-0001`: 一意制約違反（`asset_number`, `serial_number`, `external_id`, `code` 等のチーム内一意フィールド）
+- 400 + `ITM-05-02-0003`: カスタムアプリでない SaaS アカウントへの Write
+
+## リファレンス
+
+パス一覧・パラメータ・レスポンスの詳細は以下を参照:
+
+- `references/it-management-members.md` - メンバー
+- `references/it-management-application-account.md` - SaaSアカウント
+- `references/it-management-assets.md` - 備品
+- `references/it-management-asset-statuses.md` - 備品ステータス
+- `references/it-management-asset-categories.md` - 備品種別
+- `references/it-management-departments.md` - 部署

@@ -8,6 +8,8 @@ Model Context Protocol server for the freee API:
 
 Copyright 2024-present freee K.K.
 
+Upstream baseline: freee/freee-mcp v0.36.0.
+
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use this file except in compliance with the License. You may obtain
 a copy of the License at
@@ -22,7 +24,7 @@ in this derivative work:
 
   - package.json: added "main", "types", and "exports" fields so the
     package is consumable as a library, in addition to its existing
-    CLI binaries. Renamed the package to "freee-mcp-core" to avoid
+    CLI binaries. Renamed the package to "free-mcp-core" to avoid
     npm namespace conflict with the upstream "freee-mcp" package.
   - src/lib.ts: new file. Re-exports the public library API (createMcpServer,
     addAuthenticationTools, addFileUploadTool, registerSkillResources,

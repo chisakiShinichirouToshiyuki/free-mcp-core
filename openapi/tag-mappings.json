@@ -31,7 +31,10 @@
     "Fixed assets": "fixed-assets",
     "General ledgers": "general-ledgers",
     "Account groups": "account-groups",
-    "User matchers": "user-matchers"
+    "User matchers": "user-matchers",
+    "Purchase requests": "purchase-requests",
+    "Expense application currencies": "expense-application-currencies",
+    "Expense application forms": "expense-application-forms"
   },
   "hr-api": {
     "ログインユーザー": "login-user",
@@ -68,7 +71,8 @@
     "Quotations": "quotations",
     "DeliverySlips": "delivery-slips",
     "Receipts": "receipts",
-    "PurchaseOrders": "purchase-orders"
+    "PurchaseOrders": "purchase-orders",
+    "PaymentNotices": "payment-notices"
   },
   "pm-api": {
     "Users": "users",
@@ -77,7 +81,10 @@
     "Projects": "projects",
     "Teams": "teams",
     "UnitCosts": "unit-costs",
-    "Workloads": "workloads"
+    "Workloads": "workloads",
+    "LaborBudgets": "labor-budgets",
+    "WorkloadTagGroups": "workload-tag-groups",
+    "SalesOrderStatuses": "sales-order-statuses"
   },
   "sm-api": {
     "businesses": "businesses",
@@ -89,12 +96,29 @@
     "other_costs": "other-costs",
     "quotations": "quotations",
     "procurements": "procurements",
-    "purchase_orders": "purchase-orders"
+    "purchase_orders": "purchase-orders",
+    "advance_receipts": "advance-receipts",
+    "periodic_sales": "periodic-sales",
+    "sales_schedules": "sales-schedules"
   },
   "it-management-api": {
     "it_management_application_accounts": "application-account",
     "it_management_assets": "assets",
-    "it_management_members": "members"
+    "it_management_members": "members",
+    "it_management_asset_categories": "asset-categories",
+    "it_management_asset_statuses": "asset-statuses",
+    "it_management_departments": "departments"
+  },
+  "fixed-asset-management-api": {
+    "fixed_asset_management_fixed_assets": "fixed-assets"
+  },
+  "tax-return-api": {
+    "tax_return_corporate": "corporate"
+  },
+  "mcponly-api": {
+    "survey": "surveys",
+    "launch_kaigyo_application": "kaigyo-application",
+    "employee_evaluation": "evaluation-results"
   },
   "sign-api": {
     "文書": "documents",
@@ -105,5 +129,15 @@
     "チーム": "teams",
     "入力項目・検索項目": "items",
     "Kintone": "kintone"
+  },
+  "partner-management-api": {
+    "partner_management_orderer_company_users": "orderer-company-users",
+    "partner_management_orderer_sections": "orderer-sections",
+    "partner_management_orderer_partners": "partner-management-orderer-partners",
+    "partner_management_orderer_project_business_partners": "partner-management-orderer-project-business-partners",
+    "partner_management_orderer_project_company_users": "partner-management-orderer-project-company-users",
+    "partner_management_orderer_project_partners": "partner-management-orderer-project-partners",
+    "partner_management_orderer_projects": "partner-management-orderer-projects",
+    "partner_management_orderer_tasks": "partner-management-orderer-tasks"
   }
 }

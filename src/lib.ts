@@ -41,6 +41,19 @@ export {
   getUserAgent,
   initUserAgentTransportMode,
 } from './server/user-agent.js';
+export {
+  getSignCredentials,
+  loadSignConfig,
+  type SignConfig,
+} from './sign/config.js';
+// Sign (電子契約) server primitives, mirroring the accounting-side surface
+// above so downstream wrappers can compose a Sign MCP server too.
+export { addSignFileUploadTool } from './sign/file-upload-tool.js';
+export { createSignMcpServer } from './sign/handlers.js';
+export {
+  addSignApiTools,
+  addSignAuthenticationTools,
+} from './sign/tools.js';
 // Skill bundle directory resolution helper for consumers that want to install
 // or expose the bundled skills/ from this package.
 export { getBundledSkillsDir } from './skills-path.js';

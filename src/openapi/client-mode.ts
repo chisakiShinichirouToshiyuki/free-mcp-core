@@ -4,23 +4,90 @@ import { isBinaryFileResponse, makeApiRequest } from '../api/client.js';
 import { makeErrorChain, serializeErrorChain } from '../server/error-serializer.js';
 import { sanitizePath } from '../server/logger.js';
 import { getCurrentRecorder } from '../server/request-context.js';
+import { getTransportMode } from '../server/user-agent.js';
 import type { AuthExtra } from '../storage/context.js';
 import { extractTokenContext } from '../storage/context.js';
 import { registerTracedTool, setToolAttributes } from '../telemetry/tool-tracer.js';
 import { createTextResponse, formatErrorMessage } from '../utils/error.js';
 import { getHttpMethodToolAnnotations } from '../utils/http-method-annotations.js';
-import { type ApiType, listAllAvailablePaths, validatePathForService } from './schema-loader.js';
+import {
+  type ApiType,
+  isMcpOnlyPath,
+  listAllAvailablePaths,
+  validatePathForService,
+} from './schema-loader.js';
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
-const SERVICE_HINT = 'service: accounting/hr/invoice/pm/sm/it_management';
+const SERVICE_HINT =
+  'service: accounting/hr/invoice/pm/sm/it_management/fixed_asset_management/partner_management/survey/launch/employee_evaluation/tax_return';
 const SKILL_HINT = '詳細ガイドはfreee-api-skill skillを参照';
 
+// mcp-only（freee-mcp リモート版限定）エンドポイントを stdio（ローカル）モードで
+// 呼んだときに返すメッセージ。文言は skill のバナー・reference と揃える。
+const MCP_ONLY_LOCAL_MESSAGE =
+  'このエンドポイントは freee-mcp（リモート版）でのみ利用できます。' +
+  '現在の接続はローカルモード（transport: stdio）のため呼び出せません。' +
+  'ユーザーに freee-mcp（リモート版）への切り替え' +
+  '（https://support.freee.co.jp/hc/ja/articles/56390747520537）を案内してください。';
+
 const serviceSchema = z
-  .enum(['accounting', 'hr', 'invoice', 'pm', 'sm', 'it_management'])
+  .enum([
+    'accounting',
+    'hr',
+    'invoice',
+    'pm',
+    'sm',
+    'it_management',
+    'fixed_asset_management',
+    'partner_management',
+    'survey',
+    'launch',
+    'employee_evaluation',
+    'tax_return',
+  ])
   .describe('対象のfreeeサービス');
 
 const UTF8_BOM = String.fromCharCode(0xfeff);
+const XML_UTF8_ERROR_MESSAGE = 'XMLレスポンスをUTF-8として読み取れませんでした。';
+
+function isUtf8Encoding(value: string): boolean {
+  return value.trim().toLowerCase().replace(/[-_]/g, '') === 'utf8';
+}
+
+function decodeUtf8Xml(data: Buffer, mimeType: string): string {
+  const charsetMatch = mimeType.match(/;\s*charset\s*=\s*(?:"([^"]+)"|'([^']+)'|([^;\s]+))/i);
+  const charset = charsetMatch?.[1] ?? charsetMatch?.[2] ?? charsetMatch?.[3];
+  if (charset && !isUtf8Encoding(charset)) {
+    throw new Error(XML_UTF8_ERROR_MESSAGE);
+  }
+
+  const hasUtf16OrUtf32Bom =
+    (data[0] === 0xff && data[1] === 0xfe) ||
+    (data[0] === 0xfe && data[1] === 0xff) ||
+    (data[0] === 0x00 && data[1] === 0x00 && data[2] === 0xfe && data[3] === 0xff);
+  if (hasUtf16OrUtf32Bom) {
+    throw new Error(XML_UTF8_ERROR_MESSAGE);
+  }
+
+  let xml: string;
+  try {
+    xml = new TextDecoder('utf-8', { fatal: true }).decode(data);
+  } catch {
+    throw new Error(XML_UTF8_ERROR_MESSAGE);
+  }
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: XMLで禁止されている制御文字を検出するために必要
+  if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/.test(xml)) {
+    throw new Error(XML_UTF8_ERROR_MESSAGE);
+  }
+
+  const declarationEncoding = xml.match(/^\s*<\?xml[^>]*\bencoding\s*=\s*["']([^"']+)["']/i)?.[1];
+  if (declarationEncoding && !isUtf8Encoding(declarationEncoding)) {
+    throw new Error(XML_UTF8_ERROR_MESSAGE);
+  }
+
+  return xml;
+}
 
 // Top-level union (record | string-decoding-to-record) rather than
 // `z.preprocess(..., z.record(...))` so the JSON Schema published via
@@ -113,6 +180,24 @@ function createMethodTool(method: string) {
       }
 
       const actualPath = validation.actualPath ?? path;
+
+      // mcp-only エンドポイントはローカル（stdio）モードでは freee API 側で拒否される。
+      // 往復を避け、ユーザーへの案内を確実にするため、ここで API を叩かずに弾く。
+      if (getTransportMode() === 'stdio' && isMcpOnlyPath(actualPath)) {
+        recorder?.recordToolCall({
+          tool: toolName,
+          service,
+          status: 'error',
+          duration_ms: Date.now() - startTime,
+        });
+        recorder?.recordError({
+          source: 'validation',
+          error_type: 'mcp_only_endpoint_local_mode',
+          chain: makeErrorChain('McpOnlyEndpointError', MCP_ONLY_LOCAL_MESSAGE),
+        });
+        return createTextResponse(MCP_ONLY_LOCAL_MESSAGE, { isError: true });
+      }
+
       const result = await makeApiRequest(
         method,
         actualPath,
@@ -120,7 +205,19 @@ function createMethodTool(method: string) {
         body,
         validation.baseUrl,
         tokenContext,
+        validation.operation?.parameters,
+        validation.operation?.accept,
       );
+
+      let baseMimeType: string | undefined;
+      let xmlText: string | undefined;
+      const isBinaryResponse = isBinaryFileResponse(result);
+      if (isBinaryResponse) {
+        baseMimeType = result.mimeType.split(';')[0].trim().toLowerCase();
+        if (baseMimeType === 'application/xml' || baseMimeType === 'text/xml') {
+          xmlText = decodeUtf8Xml(result.data, result.mimeType);
+        }
+      }
 
       recorder?.recordToolCall({
         tool: toolName,
@@ -129,25 +226,29 @@ function createMethodTool(method: string) {
         duration_ms: Date.now() - startTime,
       });
 
-      if (isBinaryFileResponse(result)) {
-        const baseMimeType = result.mimeType.split(';')[0].trim();
+      if (isBinaryResponse) {
+        const resolvedBaseMimeType = baseMimeType as string;
 
-        if (SUPPORTED_IMAGE_MIME_TYPES.has(baseMimeType)) {
+        if (SUPPORTED_IMAGE_MIME_TYPES.has(resolvedBaseMimeType)) {
           return {
             content: [
-              { type: 'image', data: result.data.toString('base64'), mimeType: baseMimeType },
+              {
+                type: 'image',
+                data: result.data.toString('base64'),
+                mimeType: resolvedBaseMimeType,
+              },
             ],
           };
         }
 
-        if (baseMimeType === 'application/pdf') {
+        if (resolvedBaseMimeType === 'application/pdf') {
           return {
             content: [
               {
                 type: 'resource',
                 resource: {
                   uri: `freee://api${actualPath}`,
-                  mimeType: baseMimeType,
+                  mimeType: resolvedBaseMimeType,
                   blob: result.data.toString('base64'),
                 },
               },
@@ -155,12 +256,16 @@ function createMethodTool(method: string) {
           };
         }
 
-        if (baseMimeType === 'text/csv') {
+        if (resolvedBaseMimeType === 'text/csv') {
           return createTextResponse(result.data.toString('utf-8'));
         }
 
+        if (resolvedBaseMimeType === 'application/xml' || resolvedBaseMimeType === 'text/xml') {
+          return createTextResponse(xmlText as string);
+        }
+
         return createTextResponse(
-          `バイナリファイルを受信しました。このファイル形式（${baseMimeType}）は表示できません。\n\n` +
+          `バイナリファイルを受信しました。このファイル形式（${resolvedBaseMimeType}）は表示できません。\n\n` +
             `Content-Type: ${result.mimeType}\n` +
             `ファイルサイズ: ${result.size} bytes\n\n` +
             `このファイルを取得するには、freee Webアプリから直接ダウンロードしてください。`,

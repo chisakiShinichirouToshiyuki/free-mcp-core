@@ -3,7 +3,65 @@
     "/hub/it_management/application_accounts": {
       "get": {
         "summary": "アカウント一覧取得（β版）",
-        "description": "アカウントの一覧をカーソルページネーションで取得します。"
+        "description": "アカウントの一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          },
+          {
+            "name": "application_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "アプリケーションIDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "キーワード検索（account に部分一致）",
+            "explode": false
+          },
+          {
+            "name": "status_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ステータスIDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "member_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "アカウントホルダーのメンバーIDでフィルタ",
+            "explode": false
+          }
+        ]
       },
       "post": {
         "summary": "アカウント作成（β版）",
@@ -14,22 +72,123 @@
     "/hub/it_management/application_accounts/{id}": {
       "get": {
         "summary": "アカウント詳細取得（β版）",
-        "description": "アカウントの詳細を取得します。"
+        "description": "アカウントの詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "アカウントID"
+          }
+        ]
       },
       "delete": {
         "summary": "アカウント削除（β版）",
-        "description": "アカウントを削除します（ソフトデリート）。"
+        "description": "アカウントを削除します（ソフトデリート）。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "アカウントID"
+          }
+        ]
       },
       "patch": {
         "summary": "アカウント部分更新（β版）",
         "description": "アカウントを部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメータのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "アカウントID"
+          }
+        ],
         "hasJsonBody": true
       }
     },
     "/hub/it_management/assets": {
       "get": {
         "summary": "備品一覧取得（β版）",
-        "description": "備品の一覧をカーソルページネーションで取得します。"
+        "description": "備品の一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "キーワード検索（name, asset_number, serial_number に部分一致）",
+            "explode": false
+          },
+          {
+            "name": "asset_status_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ステータスIDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "asset_category_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "種別IDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "member_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "利用者のメンバーIDでフィルタ",
+            "explode": false
+          }
+        ]
       },
       "post": {
         "summary": "備品作成（β版）",
@@ -40,22 +199,456 @@
     "/hub/it_management/assets/{id}": {
       "get": {
         "summary": "備品詳細取得（β版）",
-        "description": "備品の詳細を取得します。"
+        "description": "備品の詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ID"
+          }
+        ]
       },
       "delete": {
         "summary": "備品削除（β版）",
-        "description": "備品を削除します。"
+        "description": "備品を削除します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ID"
+          }
+        ]
       },
       "patch": {
         "summary": "備品部分更新（β版）",
         "description": "備品を部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメータのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ID"
+          }
+        ],
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/asset_categories": {
+      "get": {
+        "summary": "備品種別一覧取得（β版）",
+        "description": "備品種別の一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          }
+        ]
+      },
+      "post": {
+        "summary": "備品種別作成（β版）",
+        "description": "備品種別を作成します。",
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/asset_categories/{id}": {
+      "get": {
+        "summary": "備品種別詳細取得（β版）",
+        "description": "備品種別の詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品種別ID"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "備品種別削除（β版）",
+        "description": "備品種別を削除します。備品が紐付いている、または system-managed な種別は削除できません。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品種別ID"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "備品種別部分更新（β版）",
+        "description": "備品種別を部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品種別ID"
+          }
+        ],
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/asset_statuses": {
+      "get": {
+        "summary": "備品ステータス一覧取得（β版）",
+        "description": "備品ステータスの一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          }
+        ]
+      },
+      "post": {
+        "summary": "備品ステータス作成（β版）",
+        "description": "備品ステータスを作成します。",
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/asset_statuses/{id}": {
+      "get": {
+        "summary": "備品ステータス詳細取得（β版）",
+        "description": "備品ステータスの詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ステータスID"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "備品ステータス削除（β版）",
+        "description": "備品ステータスを削除します。備品が紐付いているステータスは削除できません。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ステータスID"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "備品ステータス部分更新（β版）",
+        "description": "備品ステータスを部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "備品ステータスID"
+          }
+        ],
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/departments": {
+      "get": {
+        "summary": "部署一覧取得（β版）",
+        "description": "部署の一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "キーワード検索（部署名に部分一致）",
+            "explode": false
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "部署コードでフィルター（完全一致）",
+            "explode": false
+          }
+        ]
+      },
+      "post": {
+        "summary": "部署作成（β版）",
+        "description": "部署を作成します。",
+        "hasJsonBody": true
+      }
+    },
+    "/hub/it_management/departments/{id}": {
+      "get": {
+        "summary": "部署詳細取得（β版）",
+        "description": "部署の詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "部署ID"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "部署削除（β版）",
+        "description": "部署を削除します。子部署が存在する、または利用中の場合は削除できません。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "部署ID"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "部署部分更新（β版）",
+        "description": "部署を部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメーターのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "部署ID"
+          }
+        ],
         "hasJsonBody": true
       }
     },
     "/hub/it_management/members": {
       "get": {
         "summary": "メンバー一覧取得（β版）",
-        "description": "メンバーの一覧をカーソルページネーションで取得します。"
+        "description": "メンバーの一覧をカーソルページネーションで取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "ページネーションのトークン",
+            "explode": false
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "1ページあたりの取得件数（デフォルト25、最大100）",
+            "explode": false
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "キーワード検索（name, email, code に部分一致）",
+            "explode": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "在籍ステータス",
+            "explode": false
+          },
+          {
+            "name": "department_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "部署IDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "employment_type_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "雇用形態IDでフィルタ",
+            "explode": false
+          },
+          {
+            "name": "entered_since",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "入社日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降)",
+            "explode": false
+          },
+          {
+            "name": "entered_until",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "入社日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前)",
+            "explode": false
+          },
+          {
+            "name": "resigned_since",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "退職日の範囲検索の開始日(yyyy-mm-dd、指定日を含む以降)",
+            "explode": false
+          },
+          {
+            "name": "resigned_until",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "退職日の範囲検索の終了日(yyyy-mm-dd、指定日を含む以前)",
+            "explode": false
+          }
+        ]
       },
       "post": {
         "summary": "メンバー作成（β版）",
@@ -66,15 +659,58 @@
     "/hub/it_management/members/{id}": {
       "get": {
         "summary": "メンバー詳細取得（β版）",
-        "description": "メンバーの詳細を取得します。"
+        "description": "メンバーの詳細を取得します。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "メンバーID"
+          }
+        ]
       },
       "delete": {
         "summary": "メンバー削除（β版）",
-        "description": "メンバーを削除します（ソフトデリート）。"
+        "description": "メンバーを削除します（ソフトデリート）。",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "description": "事業所ID",
+            "explode": false
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "メンバーID"
+          }
+        ]
       },
       "patch": {
         "summary": "メンバー部分更新（β版）",
         "description": "メンバーを部分的に更新します。\n\n## 注意点\n\n- 指定されたパラメータのみが更新されます。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "メンバーID"
+          }
+        ],
         "hasJsonBody": true
       }
     }

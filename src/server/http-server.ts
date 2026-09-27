@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { Request, RequestHandler, Response } from 'express';
 import { ipKeyGenerator } from 'express-rate-limit';
@@ -21,23 +22,39 @@ import { createLivenessHandler, createReadinessHandler } from './health-endpoint
 import { initLogger } from './logger.js';
 import { FreeeOAuthProvider } from './oauth-provider.js';
 import { OAuthStateStore } from './oauth-store.js';
+import { createOpenAIAppsChallengeHandler } from './openai-apps-challenge.js';
 import { getCurrentRecorder } from './request-context.js';
 import { initUserAgentTransportMode } from './user-agent.js';
 
 const BODY_SIZE_LIMIT = 1_048_576; // 1 MB
-const REGISTER_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const REGISTER_RATE_LIMIT_MAX = 3;
-const AUTHORIZE_RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const AUTHORIZE_RATE_LIMIT_MAX = 10;
-const AUTHORIZE_IP_RATE_LIMIT_MAX = 1000;
-const TOKEN_RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const TOKEN_RATE_LIMIT_MAX = 10;
-const FREEE_CALLBACK_RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const FREEE_CALLBACK_RATE_LIMIT_MAX = 10;
-const MCP_PRE_AUTH_RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const MCP_PRE_AUTH_RATE_LIMIT_MAX = 1000;
-const MCP_VERIFIED_RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const MCP_VERIFIED_RATE_LIMIT_MAX = 100;
+const MINUTE_MS = 60 * 1000;
+
+// Rate limit settings per endpoint. `windowMs` + `max` configure the fine
+// limiter (keyed per credential / state / user); `ipMax`, when present, adds a
+// coarse per-IP guard mounted alongside it to absorb many distinct users who
+// share one vendor egress IP or corporate NAT. See setupRateLimiting for how
+// each tier is keyed and mounted.
+const RATE_LIMITS = {
+  // Deduped upstream by client fingerprint, so a single flat IP limit suffices.
+  register: { windowMs: 60 * MINUTE_MS, max: 3 },
+  // Fine limiter keyed by per-attempt `state`; coarse IP guard for abuse.
+  authorize: { windowMs: 5 * MINUTE_MS, max: 10, ipMax: 1000 },
+  // Fine limiter keyed by the per-user credential (refresh_token / code): a
+  // single session exchanges/refreshes well under `max`. Coarse IP guard sized
+  // to absorb many users sharing one vendor egress IP while still stopping a
+  // single-IP token flood.
+  token: { windowMs: MINUTE_MS, max: 10, ipMax: 600 },
+  // Fine limiter keyed by per-attempt `state`; coarse IP guard for many users
+  // behind one corporate NAT.
+  freeeCallback: { windowMs: 5 * MINUTE_MS, max: 10, ipMax: 200 },
+  // Coarse per-IP guard before bearer auth. Kept high because vendor egress IPs
+  // aggregate many authenticated users; the real per-user cap is `mcpVerified`
+  // (keyed by user_id), applied after auth.
+  mcpPreAuth: { windowMs: MINUTE_MS, max: 6000 },
+  // Per-user cap for authenticated MCP traffic (keyed by user_id). Sized for
+  // agentic clients (e.g. claude-code) that burst many tool calls in a loop.
+  mcpVerified: { windowMs: MINUTE_MS, max: 300 },
+} as const;
 
 // Extend Express Request with request ID
 declare module 'express' {
@@ -147,7 +164,18 @@ export async function startHttpServer(options?: {
     cors({
       origin: allowedOrigins,
       methods: ['GET', 'POST', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Mcp-Session-Id', 'Accept'],
+      // Headers missing from this list are blocked by the browser at preflight, so the
+      // request never reaches the server. Mcp-Protocol-Version is required by spec
+      // 2025-06-18; Mcp-Method / Mcp-Name by spec 2026-07-28 (SEP-2243).
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Accept',
+        'Mcp-Session-Id',
+        'Mcp-Protocol-Version',
+        'Mcp-Method',
+        'Mcp-Name',
+      ],
     }),
   );
 
@@ -187,6 +215,14 @@ export async function startHttpServer(options?: {
   // freee OAuth callback (browser redirect, no MCP auth required)
   app.get(FREEE_CALLBACK_PATH, freeeCallbackHandler);
 
+  // OpenAI Plugin Directory domain-ownership challenge (no auth required).
+  // Mounted before mcpAuthRouter so Express first-match-wins keeps this
+  // /.well-known path out of the SDK router.
+  app.get(
+    '/.well-known/openai-apps-challenge',
+    createOpenAIAppsChallengeHandler(remoteConfig.openaiAppsChallengeToken),
+  );
+
   // MCP Auth Router: /.well-known/*, /authorize, /token, /register, /revoke
   const { mcpAuthRouter } = await import('@modelcontextprotocol/sdk/server/auth/router.js');
   const issuerUrl = new URL(remoteConfig.issuerUrl);
@@ -209,6 +245,15 @@ export async function startHttpServer(options?: {
   const { decodeBasicAuth } = await import('./client-auth-basic.js');
   app.use('/token', decodeBasicAuth({ clientStore, realm: 'freee MCP' }));
   app.use('/revoke', decodeBasicAuth({ clientStore, realm: 'freee MCP' }));
+  // Diagnostic: record the SDK auth router's OAuth error responses
+  // (invalid_grant / invalid_client / invalid_request / ...) so the canonical
+  // log surfaces the real failure reason instead of the `unrecorded` fallback.
+  // Mounted after decodeBasicAuth (whose own rejections are already recorded)
+  // and before mcpAuthRouter so the res.json wrapper is installed first.
+  const { captureOAuthErrorResponse } = await import('./oauth-error-capture.js');
+  for (const oauthPath of ['/token', '/authorize', '/register', '/revoke']) {
+    app.use(oauthPath, captureOAuthErrorResponse());
+  }
   app.use(
     mcpAuthRouter({
       provider,
@@ -216,10 +261,20 @@ export async function startHttpServer(options?: {
       resourceServerUrl: mcpResourceUrl,
       scopesSupported: ['mcp:read', 'mcp:write'],
       resourceName: 'freee MCP Server',
-      // Disable the SDK's built-in /register limiter (1h/20, in-memory). The
-      // freee-mcp Redis-backed limiter mounted in setupRateLimiting() is the
-      // single source of truth for /register throttling.
-      clientRegistrationOptions: { rateLimit: false },
+      clientRegistrationOptions: {
+        // Disable the SDK's built-in /register limiter (1h/20, in-memory). The
+        // freee-mcp Redis-backed limiter mounted in setupRateLimiting() is the
+        // single source of truth for /register throttling.
+        rateLimit: false,
+        // 0 issues non-expiring secrets (client_secret_expires_at: 0), leaving
+        // the stored registration's TTL as the only lifetime. The SDK default of
+        // 30 days is shorter than both that TTL (1 year) and
+        // REFRESH_TOKEN_TTL_SECONDS (90 days), so the secret died while the
+        // registration was still live and still being handed out by the
+        // fingerprint dedup -- breaking every user of a vendor-fronted client at
+        // /token, since client authentication is evaluated before the grant.
+        clientSecretExpirySeconds: 0,
+      },
     }),
   );
 
@@ -404,17 +459,70 @@ export function verifiedMcpRateLimitKey(req: Request): string {
   return rateLimitIpKey(req);
 }
 
-async function setupRateLimiting(
+// Rate-limit key for OAuth endpoints that carry a per-attempt `state` query
+// parameter (/authorize, /oauth/freee-callback). Keying by `state` isolates
+// concurrent sessions that share a single egress IP (vendor proxy, corporate
+// NAT); the raw IP is used only when no state is present. `state` is a
+// CSRF token, so it is hashed like the /token credentials -- the key reaches
+// Redis and, on 429, the canonical log.
+export function stateRateLimitKey(req: Request): string {
+  const state = req.query.state;
+  if (typeof state === 'string' && state.length > 0) {
+    return `state:${createHash('sha256').update(state).digest('hex')}`;
+  }
+  return rateLimitIpKey(req);
+}
+
+// Rate-limit key for /token. Keyed by the per-user credential so that distinct
+// users sharing one vendor egress IP do not consume each other's budget:
+// refresh_token / code are hashed (never store raw secrets in Redis keys),
+// falling back to client_id, then IP. Requires the urlencoded body to be
+// parsed before the limiter runs.
+export function tokenRateLimitKey(req: Request): string {
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const refreshToken = body.refresh_token;
+  if (typeof refreshToken === 'string' && refreshToken.length > 0) {
+    return `rt:${createHash('sha256').update(refreshToken).digest('hex')}`;
+  }
+  const code = body.code;
+  if (typeof code === 'string' && code.length > 0) {
+    return `code:${createHash('sha256').update(code).digest('hex')}`;
+  }
+  const clientId = body.client_id;
+  if (typeof clientId === 'string' && clientId.length > 0) {
+    return `client:${clientId}`;
+  }
+  return rateLimitIpKey(req);
+}
+
+export interface SetupRateLimitingOptions {
+  // Injectable store factory. Production leaves this unset and uses a
+  // Redis-backed store; tests pass an in-memory store to exercise the real
+  // middleware chain without Redis. Must return an independent store per call
+  // so that distinct prefixes do not share a counter.
+  createStore?: (prefix: string) => import('express-rate-limit').Store;
+}
+
+export async function setupRateLimiting(
   app: import('express').Express,
   redis: Redis,
   clientStore: RedisClientStore,
   logger: ReturnType<typeof initLogger>,
+  options?: SetupRateLimitingOptions,
 ): Promise<RateLimiters> {
   const rateLimitModule = await import('express-rate-limit');
   const rateLimit = rateLimitModule.rateLimit ?? rateLimitModule.default;
   const redisStoreModule = await import('rate-limit-redis');
   const RedisStore = redisStoreModule.RedisStore ?? redisStoreModule.default;
   const express = (await import('express')).default;
+
+  const createStore =
+    options?.createStore ??
+    ((prefix: string) =>
+      new RedisStore({
+        sendCommand: (...args: string[]) => redis.call(args[0], ...args.slice(1)) as never,
+        prefix: `rl:${prefix}:`,
+      }));
 
   const createLimiter = (
     windowMs: number,
@@ -428,10 +536,24 @@ async function setupRateLimiting(
       standardHeaders: true,
       legacyHeaders: false,
       keyGenerator,
-      store: new RedisStore({
-        sendCommand: (...args: string[]) => redis.call(args[0], ...args.slice(1)) as never,
-        prefix: `rl:${prefix}:`,
-      }),
+      store: createStore(prefix),
+      // Stacked limiters (e.g. /token's coarse 'token-ip' + fine 'token')
+      // return identical 429s, so record which limiter tripped -- and on which
+      // key -- into the canonical log line. `req.rateLimit.key` is the exact
+      // key the limiter counted; keys never contain raw secrets (credentials
+      // and `state` are hashed by the key generators above). The response
+      // replicates the library default and assumes `message` stays the
+      // default plain string (the default handler also supports functions).
+      handler: (req, res, _next, opts) => {
+        const { key } = (req as import('express-rate-limit').AugmentedRequest).rateLimit;
+        getCurrentRecorder()?.recordError({
+          source: 'middleware',
+          status_code: opts.statusCode,
+          error_type: 'rate_limited',
+          chain: makeErrorChain('RateLimitExceededError', `limiter=${prefix} key=${key}`),
+        });
+        res.status(opts.statusCode).send(opts.message);
+      },
     });
 
   // /register: dedup middleware mounted BEFORE the rate limiter so duplicate
@@ -458,7 +580,7 @@ async function setupRateLimiting(
       }
       next();
     },
-    createLimiter(REGISTER_RATE_LIMIT_WINDOW_MS, REGISTER_RATE_LIMIT_MAX, 'register'),
+    createLimiter(RATE_LIMITS.register.windowMs, RATE_LIMITS.register.max, 'register'),
   );
 
   // /authorize: PKCE state is unique per attempt, so it isolates concurrent
@@ -467,25 +589,61 @@ async function setupRateLimiting(
   app.use(
     '/authorize',
     createLimiter(
-      AUTHORIZE_RATE_LIMIT_WINDOW_MS,
-      AUTHORIZE_IP_RATE_LIMIT_MAX,
+      RATE_LIMITS.authorize.windowMs,
+      RATE_LIMITS.authorize.ipMax,
       'authorize-ip',
       rateLimitIpKey,
     ),
   );
   app.use(
     '/authorize',
-    createLimiter(AUTHORIZE_RATE_LIMIT_WINDOW_MS, AUTHORIZE_RATE_LIMIT_MAX, 'authorize', (req) => {
-      const state = req.query.state;
-      if (typeof state === 'string' && state.length > 0) return `state:${state}`;
-      return rateLimitIpKey(req);
-    }),
+    createLimiter(
+      RATE_LIMITS.authorize.windowMs,
+      RATE_LIMITS.authorize.max,
+      'authorize',
+      stateRateLimitKey,
+    ),
   );
 
-  app.use('/token', createLimiter(TOKEN_RATE_LIMIT_WINDOW_MS, TOKEN_RATE_LIMIT_MAX, 'token'));
+  // /token: coarse per-IP guard (abuse ceiling) runs first, before the body is
+  // parsed. Vendor-fronted clients (claude.ai, ChatGPT, ...) route many distinct
+  // users through a handful of shared egress IPs, so an IP-only limit collapses
+  // unrelated users into one counter and 429s their token refreshes. The fine
+  // limiter is keyed by the per-user credential (refresh_token / code) to keep
+  // each session isolated, mirroring the state-keyed /authorize limiter.
+  app.use(
+    '/token',
+    createLimiter(RATE_LIMITS.token.windowMs, RATE_LIMITS.token.ipMax, 'token-ip', rateLimitIpKey),
+  );
+  // Parse the urlencoded body so tokenRateLimitKey can read it. The SDK's
+  // mcpAuthRouter parses /token again later; express body parsers set req._body
+  // and no-op on the second pass (same pattern as /register + express.json()).
+  app.use('/token', express.urlencoded({ extended: false }));
+  app.use(
+    '/token',
+    createLimiter(RATE_LIMITS.token.windowMs, RATE_LIMITS.token.max, 'token', tokenRateLimitKey),
+  );
+
+  // /oauth/freee-callback: the browser redirect back from freee. Multiple users
+  // behind one corporate NAT share a public IP, so key the fine limiter by the
+  // per-attempt `state` and keep only a coarse IP guard for abuse.
   app.use(
     FREEE_CALLBACK_PATH,
-    createLimiter(FREEE_CALLBACK_RATE_LIMIT_WINDOW_MS, FREEE_CALLBACK_RATE_LIMIT_MAX, 'freee-cb'),
+    createLimiter(
+      RATE_LIMITS.freeeCallback.windowMs,
+      RATE_LIMITS.freeeCallback.ipMax,
+      'freee-cb-ip',
+      rateLimitIpKey,
+    ),
+  );
+  app.use(
+    FREEE_CALLBACK_PATH,
+    createLimiter(
+      RATE_LIMITS.freeeCallback.windowMs,
+      RATE_LIMITS.freeeCallback.max,
+      'freee-cb',
+      stateRateLimitKey,
+    ),
   );
 
   // /mcp pre-auth: keep a coarse IP guard before bearer auth. Per-user limits
@@ -493,8 +651,8 @@ async function setupRateLimiting(
   app.use(
     '/mcp',
     createLimiter(
-      MCP_PRE_AUTH_RATE_LIMIT_WINDOW_MS,
-      MCP_PRE_AUTH_RATE_LIMIT_MAX,
+      RATE_LIMITS.mcpPreAuth.windowMs,
+      RATE_LIMITS.mcpPreAuth.max,
       'mcp-ip',
       rateLimitIpKey,
     ),
@@ -503,8 +661,8 @@ async function setupRateLimiting(
   logger.info('Rate limiting enabled');
   return {
     mcpVerified: createLimiter(
-      MCP_VERIFIED_RATE_LIMIT_WINDOW_MS,
-      MCP_VERIFIED_RATE_LIMIT_MAX,
+      RATE_LIMITS.mcpVerified.windowMs,
+      RATE_LIMITS.mcpVerified.max,
       'mcp-user',
       verifiedMcpRateLimitKey,
     ),

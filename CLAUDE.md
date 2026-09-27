@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun run changeset` - Create a new changeset for version bumps
 - `bun run version` - Apply changesets to update versions and CHANGELOG
 - `bun run release` - Build and publish to npm
+- `bun run count:apis` - Count operations/paths per OpenAPI schema (`--json` for machine-readable output)
 
 ## Architecture
 
@@ -27,6 +28,8 @@ MCP server that exposes freee API endpoints as MCP tools:
   - `pm-api-schema.json` - 工数管理API (https://api.freee.co.jp/pm)
   - `sm-api-schema.json` - 販売API (https://api.freee.co.jp/sm)
   - `it-management-api-schema.json` - IT管理API (https://api.freee.co.jp、パスに `/hub/it_management/` プレフィックス)
+  - `partner-management-api-schema.json` - 業務委託管理API (https://api.freee.co.jp、パスに `/hub/partner_management/` プレフィックス)
+  - `mcponly-api-schema.json` - mcp-only（freee-mcp リモート版限定）区分のエンドポイント集約スキーマ (https://api.freee.co.jp)。複数ドメインが同居する（サーベイ / 開業 / 人事評価。パスは `/hub/<domain>/` プレフィックス）
   - `sign-api-schema.json` - サイン（電子契約）API (https://ninja-sign.com)
 - Schema Loader: `src/openapi/schema-loader.ts` loads and manages all API schemas
 - Tool Generation: `generateClientModeTool()` in `src/openapi/client-mode.ts` creates method-specific tools
@@ -82,6 +85,12 @@ Sign development mode: Use `"command": "bun", "args": ["run", "src/sign/index.ts
 - `FREEE_API_BASE_URL_PM` - 工数管理API
 - `FREEE_API_BASE_URL_SM` - 販売API
 - `FREEE_API_BASE_URL_IT_MANAGEMENT` - IT管理API
+- `FREEE_API_BASE_URL_PARTNER_MANAGEMENT` - 業務委託管理API
+- `FREEE_API_BASE_URL_SURVEY` - サーベイAPI
+- `FREEE_API_BASE_URL_LAUNCH` - 開業API
+- `FREEE_API_BASE_URL_EMPLOYEE_EVALUATION` - 人事評価API
+- `FREEE_API_BASE_URL_TAX_RETURN` - 申告API
+- `FREEE_API_BASE_URL_FIXED_ASSET_MANAGEMENT` - 固定資産API
 - `FREEE_SIGN_API_URL` - サインAPI（`src/sign/config.ts` で処理）
 
 ### Remote モードのロギング (canonical log line)
@@ -138,11 +147,30 @@ Common issues:
 - `skills/freee-api-skill/` 内の `VERSION.md` は npm publish 時に自動生成されるため、開発環境（ローカル）には存在しない
 - 開発環境では `freee_server_info` のバージョンが `dev` と返る（正常動作）。実際のバージョンは `package.json` の `version` を参照する
 - Skill の更新（レシピ・リファレンスの追加・修正など）は changeset で `patch` バージョンとする
+- `skills/freee-api-skill/references/INDEX.md` は `scripts/generate-references.ts` が自動生成する（手編集しないこと）。新しいドメインを追加する場合は同スクリプトの `SERVICE_LABELS` にも prefix を足す
+- `README.md` の「対応操作数」は `<!-- API-STATS-TOTAL-START -->` ～ `<!-- API-STATS-TOTAL-END -->` の間を同スクリプトが `API_CONFIGS` の全スキーマから再計算して埋める（手編集しないこと）。スキーマを更新したら `bun run fetch:schemas` → `bun run generate:references` で自動的に追従する
+- `SKILL.md` は実行時に毎回読まれるので、セットアップ手順（`SETUP.md`）や配色定義（`COLORS.md`）のように条件が揃ったときだけ必要な情報は別ファイルに置き、`SKILL.md` からは参照条件だけ書く
 
 ## Skill レシピの書き方
 
 - レシピ（`skills/*/recipes/`）は操作の流れと注意点に集中し、APIの仕様詳細（パス一覧・パラメータ・レスポンス・制約等）はリファレンス（`references/`）へのパス参照に留める
 - レシピにリファレンスと同じ情報を重複して書かない
+
+## mcp-only（freee-mcp リモート版限定）エンドポイントについて
+
+一部のエンドポイントは freee-mcp（リモート版）でのみ利用でき、ローカル（stdio）モードでは使えない。この区分は公開スキーマの配信元で mcp-only として指定され、必ず単一ファイル `mcponly.yml` に集約される。freee-mcp 側はこれを「出自（provenance）」として扱い、エンドポイント個別のフラグや手動リストは持たない。
+
+仕組み:
+
+- `scripts/fetch-schemas.ts` が `mcponly.yml` を1ソースとして取得し、`openapi/mcponly-api-schema.json` と `openapi/minimal/mcponly.json` を生成する
+- `scripts/generate-references.ts` は `mcponly-api-schema.json` の全パスを mcp-only 集合として読み込み、該当タグのリファレンス冒頭に「⚠ freee-mcp（リモート版） 限定」バナーを自動挿入する（手編集は不要・不可）
+- `src/openapi/schema-loader.ts` の `isMcpOnlyPath()` が同じ集合で判定し、`src/openapi/client-mode.ts` が stdio モードでの呼び出しを API に到達させず弾く
+
+新しく mcp-only 区分のエンドポイントがリリースされたとき:
+
+- それは必ず `mcponly.yml` に入るため、`bun run fetch:schemas` → `bun run generate:references` を流すだけでバナーと stdio ゲートは自動で反映される
+- 新しいドメインを `service` として増やす場合のみ、通常のドメイン追加と同様に `schema-loader.ts`（ApiType / SERVICE_METADATA）・`client-mode.ts`（enum / hint）・`tag-mappings.json` を配線する。バナーとゲートは provenance で自動
+- `mcponly.json` は複数ドメインが同居するため、`SERVICE_METADATA` の各エントリに `pathPrefix`（`/hub/<domain>/`）を必ず指定する。指定漏れは `schema-loader.test.ts` の「mcponly schema source coverage」が検出する
 
 ## Writing Style
 
