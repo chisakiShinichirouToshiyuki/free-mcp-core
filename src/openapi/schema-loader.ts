@@ -46,59 +46,150 @@ function loadSchema(filename: string): MinimalSchema {
   return result.data;
 }
 
-export type ApiType = 'accounting' | 'hr' | 'invoice' | 'pm' | 'sm' | 'it_management';
+/**
+ * スキーマソースの識別子。1 スキーマファイルに対応する。
+ * サービスとは 1:1 ではなく、1 ソースを複数サービスが共有することがある。
+ */
+type SchemaSourceId =
+  | 'accounting'
+  | 'hr'
+  | 'invoice'
+  | 'pm'
+  | 'sm'
+  | 'it_management'
+  | 'fixed_asset_management'
+  | 'partner_management'
+  | 'tax_return'
+  | 'mcponly';
+
+const SCHEMA_FILES: Record<SchemaSourceId, string> = {
+  accounting: 'accounting.json',
+  hr: 'hr.json',
+  invoice: 'invoice.json',
+  pm: 'pm.json',
+  sm: 'sm.json',
+  it_management: 'it-management.json',
+  fixed_asset_management: 'fixed-asset-management.json',
+  partner_management: 'partner-management.json',
+  tax_return: 'tax-return.json',
+  mcponly: 'mcponly.json',
+};
+
+// ソースを共有するサービスが複数あっても、読み込みと parse は 1 回で済ませる。
+const _loadedSources = new Map<SchemaSourceId, MinimalSchema>();
+
+function loadSource(sourceId: SchemaSourceId): MinimalSchema {
+  let schema = _loadedSources.get(sourceId);
+  if (schema === undefined) {
+    schema = loadSchema(SCHEMA_FILES[sourceId]);
+    _loadedSources.set(sourceId, schema);
+  }
+  return schema;
+}
+
+/**
+ * サービス識別子。freee_api_* ツールの `service` パラメータとして LLM に見せる値。
+ * ドメインの名前であって、スキーマファイルの名前ではない。
+ */
+export type ApiType =
+  | 'accounting'
+  | 'hr'
+  | 'invoice'
+  | 'pm'
+  | 'sm'
+  | 'it_management'
+  | 'fixed_asset_management'
+  | 'partner_management'
+  | 'survey'
+  | 'launch'
+  | 'employee_evaluation'
+  | 'tax_return';
 
 interface ApiConfig {
   schema: MinimalSchema;
   baseUrl: string;
-  prefix: string;
   name: string;
 }
 
-// API metadata without schema (loaded lazily per-API)
-interface ApiMetadata {
-  schemaFile: string;
+// サービスのメタデータ（スキーマ本体はアクセス時に遅延ロードする）
+interface ServiceMetadata {
+  /** 読みにいくスキーマソース。複数サービスで共有してよい。 */
+  source: SchemaSourceId;
+  /**
+   * source が複数サービスを含むとき、このサービスが担当するパス範囲を切り出す prefix。
+   * 省略時は source のパス全体を使う。minimal スキーマは tag を持たないため
+   * （paths のみ）、絞り込みのセレクタにはパスを使う。
+   */
+  pathPrefix?: string;
   baseUrl: string;
-  prefix: string;
   name: string;
 }
 
-const API_METADATA: Record<ApiType, ApiMetadata> = {
+const SERVICE_METADATA: Record<ApiType, ServiceMetadata> = {
   accounting: {
-    schemaFile: 'accounting.json',
+    source: 'accounting',
     baseUrl: 'https://api.freee.co.jp',
-    prefix: 'accounting',
     name: 'freee会計 API',
   },
   hr: {
-    schemaFile: 'hr.json',
+    source: 'hr',
     baseUrl: 'https://api.freee.co.jp/hr',
-    prefix: 'hr',
     name: 'freee人事労務 API',
   },
   invoice: {
-    schemaFile: 'invoice.json',
+    source: 'invoice',
     baseUrl: 'https://api.freee.co.jp/iv',
-    prefix: 'invoice',
     name: 'freee請求書 API',
   },
   pm: {
-    schemaFile: 'pm.json',
+    source: 'pm',
     baseUrl: 'https://api.freee.co.jp/pm',
-    prefix: 'pm',
     name: 'freee工数管理 API',
   },
   sm: {
-    schemaFile: 'sm.json',
+    source: 'sm',
     baseUrl: 'https://api.freee.co.jp/sm',
-    prefix: 'sm',
     name: 'freee販売 API',
   },
   it_management: {
-    schemaFile: 'it-management.json',
+    source: 'it_management',
     baseUrl: 'https://api.freee.co.jp',
-    prefix: 'it-management',
     name: 'freeeIT管理 API',
+  },
+  fixed_asset_management: {
+    source: 'fixed_asset_management',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freee固定資産 API',
+  },
+  partner_management: {
+    source: 'partner_management',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freee業務委託管理 API',
+  },
+  // 以下 3 つは mcponly ソースを pathPrefix で分け合う（1 ファイルに複数ドメインが同居する）。
+  // いずれも freee-mcp（リモート版）限定で、stdio モードでは isMcpOnlyPath で弾かれる。
+  survey: {
+    source: 'mcponly',
+    pathPrefix: '/hub/survey/',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freeeサーベイ API',
+  },
+  launch: {
+    source: 'mcponly',
+    pathPrefix: '/hub/launch/',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freee開業 API',
+  },
+  employee_evaluation: {
+    source: 'mcponly',
+    pathPrefix: '/hub/employee_evaluation/',
+    baseUrl: 'https://api.freee.co.jp',
+    name: '人事評価 API',
+  },
+  tax_return: {
+    source: 'tax_return',
+    baseUrl: 'https://api.freee.co.jp',
+    name: 'freee申告 API',
   },
 };
 
@@ -150,13 +241,27 @@ function resolveBaseUrl(apiType: ApiType, defaultUrl: string): string {
   return defaultUrl;
 }
 
+/**
+ * 集約スキーマソースから、あるサービスが担当するパスだけを取り出す。
+ * pathPrefix 未指定なら、そのソースはこのサービス専用なので全体をそのまま返す。
+ */
+function selectPaths(schema: MinimalSchema, pathPrefix: string | undefined): MinimalSchema {
+  if (pathPrefix === undefined) {
+    return schema;
+  }
+  return {
+    paths: Object.fromEntries(
+      Object.entries(schema.paths).filter(([schemaPath]) => schemaPath.startsWith(pathPrefix)),
+    ),
+  };
+}
+
 function getApiConfig(apiType: ApiType): ApiConfig {
   if (!_loadedConfigs[apiType]) {
-    const metadata = API_METADATA[apiType];
+    const metadata = SERVICE_METADATA[apiType];
     _loadedConfigs[apiType] = {
-      schema: loadSchema(metadata.schemaFile),
+      schema: selectPaths(loadSource(metadata.source), metadata.pathPrefix),
       baseUrl: resolveBaseUrl(apiType, metadata.baseUrl),
-      prefix: metadata.prefix,
       name: metadata.name,
     };
   }
@@ -172,22 +277,60 @@ export function _resetApiConfigs(): void {
   for (const key of Object.keys(_loadedConfigs)) {
     delete _loadedConfigs[key as ApiType];
   }
+  _loadedSources.clear();
   _pathRegexCache.clear();
   _cachedPathList = null;
+  _mcpOnlyPaths = null;
+}
+
+// mcp-only（freee-mcp リモート版でのみ利用可）なパスの集合。
+// 集約スキーマソース mcponly 由来のパスをそのまま採用する（provenance = mcponly.yml）。
+// service ではなくパス単位で判定するため、どのサービス経由でも横断的に効く。
+let _mcpOnlyPaths: string[] | null = null;
+
+function getMcpOnlyPaths(): string[] {
+  if (_mcpOnlyPaths === null) {
+    try {
+      _mcpOnlyPaths = Object.keys(loadSource('mcponly').paths);
+    } catch {
+      // mcponly スキーマが無い環境（未同期など）では mcp-only 判定を無効化する。
+      _mcpOnlyPaths = [];
+    }
+  }
+  return _mcpOnlyPaths;
+}
+
+/**
+ * Whether a concrete request path is an mcp-only endpoint (freee-mcp リモート版 限定).
+ *
+ * Matches against the aggregated mcponly schema, honoring path parameters
+ * (e.g. `/hub/survey/surveys/{survey_id}`). Used to block such calls in stdio
+ * (local) mode and to steer users toward freee-mcp（リモート版）.
+ */
+export function isMcpOnlyPath(path: string): boolean {
+  for (const schemaPath of getMcpOnlyPaths()) {
+    if (schemaPath === path) {
+      return true;
+    }
+    if (getPathRegex(schemaPath).test(path)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export const API_CONFIGS: Record<ApiType, ApiConfig> = new Proxy({} as Record<ApiType, ApiConfig>, {
   get(_, prop: string): ApiConfig | undefined {
-    if (prop in API_METADATA) {
+    if (prop in SERVICE_METADATA) {
       return getApiConfig(prop as ApiType);
     }
     return undefined;
   },
   ownKeys(): string[] {
-    return Object.keys(API_METADATA);
+    return Object.keys(SERVICE_METADATA);
   },
   getOwnPropertyDescriptor(_, prop: string): PropertyDescriptor | undefined {
-    if (prop in API_METADATA) {
+    if (prop in SERVICE_METADATA) {
       return {
         enumerable: true,
         configurable: true,

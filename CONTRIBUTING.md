@@ -26,9 +26,31 @@ freee-mcp では AI を活用した開発フローを採用しています。
 
 この仕組みにより、コードの一貫性と品質を保ちながら迅速に開発を進めています。
 
+## 脆弱性の報告 / Reporting a Vulnerability
+
+脆弱性は公開の Issue ではなく、非公開の経路で報告してください。
+報告方法と対応の流れは [SECURITY.md](./SECURITY.md) に記載しています。
+
+Security vulnerabilities must not be reported in public issues. See [SECURITY.md](./SECURITY.md)
+for the private reporting channel and what to expect.
+
 ## Issue の書き方 / How to Write Issues
 
 Issue を作成する際は、テンプレートに沿って記入してください。
 
-- [Bug Report / バグ報告](https://github.com/freee/freee-mcp/issues/new?template=bug_report.md)
-- [Feature Request / 機能要望](https://github.com/freee/freee-mcp/issues/new?template=feature_request.md)
+- [Bug Report / バグ報告](https://github.com/freee/freee-mcp/issues/new?template=bug_report.yml)
+- [Feature Request / 機能要望](https://github.com/freee/freee-mcp/issues/new?template=feature_request.yml)
+
+> [!WARNING]
+> このリポジトリは一般公開の OSS です。社内 API キー、内部 URL、アカウント情報など、公開できない情報を絶対に含めないでください。
+> Issue の本文・コメント・添付ファイル・編集履歴は誰でも閲覧でき、投稿後に削除や修正をしても完全には消えない場合があります。
+> 認証情報、社内・内部情報、個人情報、事業者の実データ、およびそれらを含みがちなログやスクリーンショットは、
+> ダミー値への置き換えやマスクをしてから記載してください。判断に迷う情報は記載しないでください。
+> 詳細は Issue テンプレートの冒頭に表示される注意事項を参照してください。
+>
+> This is a public open source repository. Never include internal API keys, internal URLs, account
+> information, or anything else that cannot be made public. Issue bodies, comments, attachments and
+> edit history are visible to anyone and may persist even after you delete or edit them. Replace
+> credentials, internal information, personal data and real business data with dummy values, mask
+> screenshots and logs that tend to carry them, and when in doubt, leave it out. See the notice at
+> the top of the issue templates for details.

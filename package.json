@@ -37,6 +37,7 @@
     "test:ui": "vitest --ui",
     "generate:references": "bun run scripts/generate-references.ts",
     "fetch:schemas": "bun run scripts/fetch-schemas.ts",
+    "count:apis": "bun run scripts/count-apis.ts",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "bun run build && changeset publish"
@@ -47,7 +48,8 @@
   "forkedFrom": {
     "name": "freee-mcp",
     "url": "https://github.com/freee/freee-mcp.git",
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "syncedVersion": "v0.36.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",

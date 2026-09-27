@@ -142,7 +142,7 @@ This package ships `skills/freee-api-skill/` (forked from upstream freee/freee-m
 
 ## Relationship to upstream
 
-This package is a derivative work of [freee/freee-mcp](https://github.com/freee/freee-mcp), tracked from a v0.25.4 baseline. The CLI binaries (`freee-mcp`, `freee-remote-mcp`, `freee-sign-mcp`, `freee-sign-remote-mcp`) remain behavior-compatible with upstream.
+This package is a derivative work of [freee/freee-mcp](https://github.com/freee/freee-mcp), tracked from a v0.36.0 baseline. The CLI binaries (`freee-mcp`, `freee-remote-mcp`, `freee-sign-mcp`, `freee-sign-remote-mcp`) remain behavior-compatible with upstream.
 
 The additional surface area introduced by this fork:
 
